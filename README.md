@@ -1,7 +1,25 @@
-# grand-mall-admin-web
+#grand-mall-admin-web
 
 > 商城管理端前端工程
 
+##项目目录结构（src）
+```
+src -- 源码目录
+|— api-----------axios网络请求定义
+|— assets ----------静态图片资源文件
+|— components ----------通用组件封装
+|— icons ---------svg矢量图片文件
+|— router ----------vue-router路由配置
+|— store ----------vuex的状态管理
+|— styles ----------全局css样式
+|— utils ---------工具类
+└── views -- 前端页面
+    |— common ----------公共页面
+
+```
+
+## 项目端口
+grand-mall-admin-web:9000
 ## Build Setup
 
 ``` bash
