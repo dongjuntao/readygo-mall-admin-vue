@@ -22,7 +22,7 @@
         </div>
       </div>
     </div>
-
+    <!--验证码-->
     <verify
       @success="dataFormSubmit"
       :captchaType="'blockPuzzle'"
@@ -37,6 +37,8 @@
 <script>
   import { getUUID } from '@/utils'
   import verify from '@/components/verifition/Verify'
+  import { adminLogin } from "../../api/mall-admin";
+
   export default {
     components: {
       verify
@@ -65,28 +67,20 @@
       dataFormSubmit (captchaVerification) {
         this.$refs['dataForm'].validate((valid) => {
           if (valid) {
-            this.$http({
-              url: this.$http.adornUrl('/login'),
-              method: 'post',
-              data: this.$http.adornData({
-                userName: this.dataForm.userName,
-                password: this.dataForm.password
-              }),
-              params:this.$http.adornParams(captchaVerification)
-            }).then(({data}) => {
-              console.log("data === ", data)
-              if (data && data.code === '200') {
-                // this.$cookie.set('token', data.token)
-                this.$router.replace({ name: 'home' })
-              } else {
-                this.$message.error(data.message)
-              }
+            var params = this.$axios.adornParams(captchaVerification);
+            var data = this.$axios.adornData({
+              userName: this.dataForm.userName,
+              password: this.dataForm.password
+            });
+            this.$store.dispatch('Login', {params, data}).then(() => {
+              this.loading = false
+              this.$router.replace({ name: 'home' })
+            }).catch(() => {
+              this.loading = false
             })
           }
         })
       },
-
-
 
       handerKeyup(e){
         var keycode = document.all ? event.keyCode : e.which;
@@ -94,30 +88,7 @@
           this.checkPrama();
         }
       },
-      goRegister () {
-        this.$router.push("/register");
-      },
 
-      checkPrama(){
-        if (!this.loginName || !this.loginPassword) {
-          this.$message({
-            message: "请输入完整的用户名密码",
-            type: 'error'
-          });
-          return false
-        }
-        this.$refs.verify.show();
-      },
-      login (params) {
-        if (this.loginName == "admin" && this.loginPassword=='123456') {
-          this.$router.push("/useOnline/sliderFixed");
-        }else{
-          this.$message({
-            message: "输入测试账号密码",
-            type: 'warning'
-          });
-        }
-      },
       useVerify(){
         this.$refs.verify.show()
       }
