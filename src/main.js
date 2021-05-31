@@ -7,9 +7,7 @@ import '@/element-ui'                         // api: https://github.com/ElemeFE
 import '@/icons'
 import '@/element-ui-theme'
 import '@/assets/scss/index.scss'
-
 import httpRequest from '@/utils/httpRequest' // api: https://github.com/axios/axios
-import 'element-ui/lib/theme-chalk/index.css'
 
 Vue.use(VueCookie)
 
