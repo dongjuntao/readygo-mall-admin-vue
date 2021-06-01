@@ -44,7 +44,7 @@
 
 <script>
 import UpdatePassword from './main-navbar-update-password'
-import { clearLoginInfo } from '@/utils'
+import { clearLoginInfo } from '@/utils/auth'
 export default {
   data () {
     return {
@@ -85,10 +85,10 @@ export default {
         cancelButtonText: '取消',
         type: 'warning'
       }).then(() => {
-        this.$http({
-          url: this.$http.adornUrl('/sys/logout'),
+        this.$axios({
+          url: this.$axios.adornUrl('/sys/logout'),
           method: 'post',
-          data: this.$http.adornData()
+          data: this.$axios.adornData()
         }).then(({data}) => {
           if (data && data.code === 0) {
             clearLoginInfo()

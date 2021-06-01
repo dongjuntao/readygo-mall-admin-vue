@@ -25,7 +25,7 @@
 </template>
 
 <script>
-  import { clearLoginInfo } from '@/utils'
+  import { clearLoginInfo } from '@/utils/auth'
   export default {
     data () {
       var validateConfirmPassword = (rule, value, callback) => {
@@ -77,10 +77,10 @@
       dataFormSubmit () {
         this.$refs['dataForm'].validate((valid) => {
           if (valid) {
-            this.$http({
+            this.$axios({
               url: this.$axios.adornUrl('/sys/user/password'),
               method: 'post',
-              data: this.$http.adornData({
+              data: this.$axios.adornData({
                 'password': this.dataForm.password,
                 'newPassword': this.dataForm.newPassword
               })

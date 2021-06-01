@@ -1,7 +1,3 @@
-import Vue from 'vue'
-import router from '@/router'
-import store from '@/store'
-
 /**
  * 获取uuid
  */
@@ -11,14 +7,7 @@ export function getUUID () {
   })
 }
 
-/**
- * 是否有权限
- * @param {*} key
- */
-export function isAuth (key) {
-  // return JSON.parse(sessionStorage.getItem('permissions') || '[]').indexOf(key) !== -1 || false
-  return true;
-}
+
 
 /**
  * 树形数据转换
@@ -49,11 +38,3 @@ export function treeDataTranslate (data, id = 'id', pid = 'parentId') {
   return res
 }
 
-/**
- * 清除登录信息
- */
-export function clearLoginInfo () {
-  Vue.cookie.delete('token')
-  store.commit('resetStore')
-  router.options.isAddDynamicMenuRoutes = false
-}
