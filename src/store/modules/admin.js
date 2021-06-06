@@ -24,8 +24,12 @@ const admin = {
       return new Promise((resolve, reject) => {
         adminLogin(params, data).then(response => {
           //登录后把token存到cookie中
-          setToken(response.data.data.access_token)
-          resolve()
+          if (response && response.data.code === "200") {
+            setToken(response.data.data.access_token)
+            resolve();
+          } else { //如果未返回200，则返回提示信息
+            resolve(response);
+          }
         }).catch(error => {
           reject(error)
         })

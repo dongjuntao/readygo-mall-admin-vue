@@ -45,6 +45,7 @@
 <script>
 import UpdatePassword from './main-navbar-update-password'
 import { clearLoginInfo } from '@/utils/auth'
+import { adminLogout } from '@/api/mall-admin'
 export default {
   data () {
     return {
@@ -85,16 +86,12 @@ export default {
         cancelButtonText: '取消',
         type: 'warning'
       }).then(() => {
-        this.$axios({
-          url: this.$axios.adornUrl('/sys/logout'),
-          method: 'post',
-          data: this.$axios.adornData()
-        }).then(({data}) => {
-          if (data && data.code === 0) {
-            clearLoginInfo()
-            this.$router.push({ name: 'login' })
-          }
-        })
+        adminLogout().then(({data}) => {
+            if (data && data.code === "200") {
+              clearLoginInfo()
+              this.$router.push({ name: 'login' })
+            }
+        });
       }).catch(() => {})
     }
   }

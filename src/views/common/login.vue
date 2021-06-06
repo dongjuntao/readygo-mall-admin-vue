@@ -67,16 +67,21 @@
       dataFormSubmit (captchaVerification) {
         this.$refs['dataForm'].validate((valid) => {
           if (valid) {
-            var params = this.$axios.adornParams(captchaVerification);
-            var data = this.$axios.adornData({
+            var params = this.axios.paramsHandler(captchaVerification);
+            var data = this.axios.dataHandler({
               userName: this.dataForm.userName,
               password: this.dataForm.password
             });
-            this.$store.dispatch('Login', {params, data}).then(() => {
+            this.$store.dispatch('Login', {params, data}).then((response) => {
               this.loading = false
-              this.$router.replace({ name: 'home' })
+              if (!response) {
+                this.$router.replace({ name: 'home' })
+              }else {
+                this.$message.warning(response.data.message);
+              }
             }).catch(() => {
               this.loading = false
+              this.$message.warning("登录失败");
             })
           }
         })

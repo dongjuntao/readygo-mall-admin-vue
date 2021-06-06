@@ -2,7 +2,7 @@
   <div class="mod-menu">
     <el-form :inline="true" :model="dataForm">
       <el-form-item>
-        <el-button v-if="$isAuth('sys:menu:save')" type="primary" @click="addOrUpdateHandle()">新增</el-button>
+        <el-button v-if="isAuth('sys:menu:save')" type="primary" @click="addOrUpdateHandle()">新增</el-button>
       </el-form-item>
     </el-form>
 
@@ -66,14 +66,13 @@
         label="授权标识">
       </el-table-column>
       <el-table-column
-        fixed="right"
         header-align="center"
         align="center"
         width="150"
         label="操作">
         <template slot-scope="scope">
-          <el-button v-if="$isAuth('sys:menu:update')" type="text" size="small" @click="addOrUpdateHandle(scope.row.id)">修改</el-button>
-          <el-button v-if="$isAuth('sys:menu:delete')" type="text" size="small" @click="deleteHandle(scope.row.id)">删除</el-button>
+          <el-button v-if="isAuth('sys:menu:update')" type="text" size="small" @click="addOrUpdateHandle(scope.row.id)">修改</el-button>
+          <el-button v-if="isAuth('sys:menu:delete')" type="text" size="small" @click="deleteHandle(scope.row.id)">删除</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -104,10 +103,10 @@
       // 获取数据列表
       getDataList () {
         this.dataListLoading = true
-        this.$axios({
-          url: this.$axios.adornUrl('/menu/list'),
+        this.axios({
+          url: this.axios.urlHandler('/system/menu/list'),
           method: 'get',
-          params: this.$axios.adornParams()
+          params: this.axios.paramsHandler()
         }).then(({data}) => {
           this.dataList = treeDataTranslate(data, 'id')
           this.dataListLoading = false
@@ -127,12 +126,12 @@
           cancelButtonText: '取消',
           type: 'warning'
         }).then(() => {
-          this.$http({
-            url: this.$axios.adornUrl(`/menu/delete/${id}`),
+          this.axios({
+            url: this.axios.urlHandler(`/system/menu/delete/${id}`),
             method: 'post',
-            data: this.$axios.adornData()
+            data: this.axios.dataHandler()
           }).then(({data}) => {
-            if (data && data.code === 0) {
+            if (data && data.code === "200") {
               this.$message({
                 message: '操作成功',
                 type: 'success',

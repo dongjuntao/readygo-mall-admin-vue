@@ -63,9 +63,9 @@ router.beforeEach((to, from, next) => {
     next()
   } else {
     http({
-      url: http.adornUrl('/menu/navbar'),
+      url: http.urlHandler('/system/menu/navbar'),
       method: 'get',
-      params: http.adornParams()
+      params: http.paramsHandler()
     }).then(({data}) => {
       if (data && data.code === '200') {
         fnAddDynamicMenuRoutes(data.data.menuList)

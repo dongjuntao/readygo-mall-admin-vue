@@ -73,10 +73,10 @@ export default {
     },
     // 获取当前管理员信息
     getUserInfo () {
-      // this.$axios({
-      //   url: this.$axios.adornUrl('/sys/user/info'),
+      // this.axios({
+      //   url: this.axios.urlHandler('/sys/user/info'),
       //   method: 'get',
-      //   params: this.$axios.adornParams()
+      //   params: this.axios.paramsHandler()
       // }).then(({data}) => {
       //   if (data && data.code === 0) {
       //     this.loading = false

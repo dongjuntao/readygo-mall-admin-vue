@@ -6,8 +6,8 @@
       </el-form-item>
       <el-form-item>
         <el-button @click="getDataList()">查询</el-button>
-        <el-button v-if="$isAuth('sys:role:save')" type="primary" @click="addOrUpdateHandle()">新增</el-button>
-        <el-button v-if="$isAuth('sys:role:delete')" type="danger" @click="deleteHandle()" :disabled="dataListSelections.length <= 0">批量删除</el-button>
+        <el-button v-if="isAuth('sys:role:save')" type="primary" @click="addOrUpdateHandle()">新增</el-button>
+        <el-button v-if="isAuth('sys:role:delete')" type="danger" @click="deleteHandle()" :disabled="dataListSelections.length <= 0">批量删除</el-button>
       </el-form-item>
     </el-form>
     <el-table
@@ -47,16 +47,16 @@
         align="center"
         width="180"
         label="创建时间">
+        <template  slot-scope="scope">{{scope.row.createTime | formatDateTime}}</template>
       </el-table-column>
       <el-table-column
-        fixed="right"
         header-align="center"
         align="center"
         width="150"
         label="操作">
         <template slot-scope="scope">
-          <el-button v-if="$isAuth('sys:role:update')" type="text" size="small" @click="addOrUpdateHandle(scope.row.id)">修改</el-button>
-          <el-button v-if="$isAuth('sys:role:delete')" type="text" size="small" @click="deleteHandle(scope.row.id)">删除</el-button>
+          <el-button v-if="isAuth('sys:role:update')" type="text" size="small" @click="addOrUpdateHandle(scope.row.id)">修改</el-button>
+          <el-button v-if="isAuth('sys:role:delete')" type="text" size="small" @click="deleteHandle(scope.row.id)">删除</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -101,16 +101,15 @@
       // 获取数据列表
       getDataList () {
         this.dataListLoading = true
-        this.$axios({
-          url: this.$axios.adornUrl('/role/list'),
+        this.axios({
+          url: this.axios.urlHandler('/system/role/list'),
           method: 'get',
-          params: this.$axios.adornParams({
+          params: this.axios.paramsHandler({
             'pageNum': this.pageNum,
             'pageSize': this.pageSize,
             'name': this.dataForm.name
           })
         }).then(({data}) => {
-          console.log("data == ", data)
           if (data && data.code === "200") {
             this.dataList = data.data.list
             this.totalPage = data.data.totalCount
@@ -153,12 +152,12 @@
           cancelButtonText: '取消',
           type: 'warning'
         }).then(() => {
-          this.$axios({
-            url: this.$axios.adornUrl('/role/delete'),
+          this.axios({
+            url: this.axios.urlHandler('/system/role/delete'),
             method: 'post',
-            data: this.$axios.adornData(ids, false)
+            data: this.axios.dataHandler(ids, false)
           }).then(({data}) => {
-            if (data && data.code === 0) {
+            if (data && data.code === "200") {
               this.$message({
                 message: '操作成功',
                 type: 'success',

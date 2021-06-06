@@ -77,15 +77,15 @@
       dataFormSubmit () {
         this.$refs['dataForm'].validate((valid) => {
           if (valid) {
-            this.$axios({
-              url: this.$axios.adornUrl('/sys/user/password'),
+            this.axios({
+              url: this.axios.urlHandler('/system/admin/password'),
               method: 'post',
-              data: this.$axios.adornData({
+              data: this.axios.dataHandler({
                 'password': this.dataForm.password,
                 'newPassword': this.dataForm.newPassword
               })
             }).then(({data}) => {
-              if (data && data.code === 0) {
+              if (data && data.code === "200") {
                 this.$message({
                   message: '操作成功',
                   type: 'success',

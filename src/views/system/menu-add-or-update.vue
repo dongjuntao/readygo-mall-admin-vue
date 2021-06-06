@@ -128,10 +128,10 @@
     methods: {
       init (id) {
         this.dataForm.id = id || 0
-        this.$axios({
-          url: this.$axios.adornUrl('/menu/select'),
+        this.axios({
+          url: this.axios.urlHandler('/system/menu/select'),
           method: 'get',
-          params: this.$axios.adornParams()
+          params: this.axios.paramsHandler()
         }).then(({data}) => {
           this.menuList = treeDataTranslate(data.data.menuList, 'id')
         }).then(() => {
@@ -145,10 +145,10 @@
             this.menuListTreeSetCurrentNode()
           } else {
             // 修改
-            this.$axios({
-              url: this.$axios.adornUrl(`/menu/info/${this.dataForm.id}`),
+            this.axios({
+              url: this.axios.urlHandler(`/system/menu/info/${this.dataForm.id}`),
               method: 'get',
-              params: this.$axios.adornParams()
+              params: this.axios.paramsHandler()
             }).then(({data}) => {
               this.dataForm.id = data.menu.id
               this.dataForm.type = data.menu.type
@@ -181,10 +181,10 @@
       dataFormSubmit () {
         this.$refs['dataForm'].validate((valid) => {
           if (valid) {
-            this.$axios({
-              url: this.$axios.adornUrl(`/menu/${!this.dataForm.id ? 'save' : 'update'}`),
+            this.axios({
+              url: this.axios.urlHandler(`/system/menu/${!this.dataForm.id ? 'save' : 'update'}`),
               method: 'post',
-              data: this.$axios.adornData({
+              data: this.axios.dataHandler({
                 'id': this.dataForm.id || undefined,
                 'type': this.dataForm.type,
                 'name': this.dataForm.name,
@@ -195,7 +195,7 @@
                 'icon': this.dataForm.icon
               })
             }).then(({data}) => {
-              if (data && data.code === 0) {
+              if (data && data.code === "200") {
                 this.$message({
                   message: '操作成功',
                   type: 'success',
