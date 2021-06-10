@@ -112,28 +112,26 @@
     methods: {
       init (id) {
         this.dataForm.id = id || 0
-        select(this.axios.paramsHandler())
-          .then(({data})=>{
-            this.roleList = data && data.code === "200" ? data.data : []
-          }).then(() => {
-            this.visible = true;
-            this.$nextTick(() => {
-              this.$refs['dataForm'].resetFields()
-            })
-          }).then(() => {
-            if (this.dataForm.id) {
-              getUserById(this.axios.paramsHandler({id: this.dataForm.id}))
-              .then(({data}) => {
-                if (data && data.code === "200") {
-                  this.dataForm.userName = data.data.userName
-                  this.dataForm.email = data.data.email
-                  this.dataForm.mobile = data.data.mobile
-                  this.dataForm.roleIdList = data.data.roleIdList
-                  this.dataForm.status = data.data.status
-                }
-              });
-            }
-         });
+        select(this.axios.paramsHandler()).then(({data})=>{
+          this.roleList = data && data.code === "200" ? data.data : []
+        }).then(() => {
+          this.visible = true;
+          this.$nextTick(() => {
+            this.$refs['dataForm'].resetFields()
+          })
+        }).then(() => {
+          if (this.dataForm.id) {
+            getUserById(this.axios.paramsHandler({id: this.dataForm.id})).then(({data}) => {
+              if (data && data.code === "200") {
+                this.dataForm.userName = data.data.userName
+                this.dataForm.email = data.data.email
+                this.dataForm.mobile = data.data.mobile
+                this.dataForm.roleIdList = data.data.roleIdList
+                this.dataForm.status = data.data.status
+              }
+            });
+          }
+        });
       },
       // 表单提交
       dataFormSubmit () {
@@ -164,33 +162,6 @@
                 this.$message.error(data.msg)
               }
             });
-            // this.axios({
-            //   url: this.axios.urlHandler(`/system/system/${!this.dataForm.id ? 'save' : 'update'}`),
-            //   method: 'post',
-            //   data: this.axios.dataHandler({
-            //     'id': this.dataForm.id || undefined,
-            //     'username': this.dataForm.userName,
-            //     'password': this.dataForm.password,
-            //     'email': this.dataForm.email,
-            //     'mobile': this.dataForm.mobile,
-            //     'status': this.dataForm.status,
-            //     'roleIdList': this.dataForm.roleIdList
-            //   })
-            // }).then(({data}) => {
-            //   if (data && data.code === "200") {
-            //     this.$message({
-            //       message: '操作成功',
-            //       type: 'success',
-            //       duration: 1500,
-            //       onClose: () => {
-            //         this.visible = false
-            //         this.$emit('refreshDataList')
-            //       }
-            //     })
-            //   } else {
-            //     this.$message.error(data.msg)
-            //   }
-            // })
           }
         })
       }

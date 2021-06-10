@@ -70,7 +70,7 @@ export function saveAdmin(data) {
 }
 
 /**
- * 保存用户信息
+ * 修改用户信息
  */
 export function updateAdmin(data) {
   return request({

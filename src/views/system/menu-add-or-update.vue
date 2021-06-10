@@ -80,6 +80,7 @@
 <script>
   import { treeDataTranslate } from '@/utils'
   import Icon from '@/icons'
+  import { select,getMenuInfo,saveMenu,updateMenu} from '@/api/mall-menu'
   export default {
     data () {
       var validateUrl = (rule, value, callback) => {
@@ -128,11 +129,8 @@
     methods: {
       init (id) {
         this.dataForm.id = id || 0
-        this.axios({
-          url: this.axios.urlHandler('/system/menu/select'),
-          method: 'get',
-          params: this.axios.paramsHandler()
-        }).then(({data}) => {
+        var params = this.axios.paramsHandler()
+        select(params).then(({data}) => {
           this.menuList = treeDataTranslate(data.data.menuList, 'id')
         }).then(() => {
           this.visible = true
@@ -145,19 +143,16 @@
             this.menuListTreeSetCurrentNode()
           } else {
             // 修改
-            this.axios({
-              url: this.axios.urlHandler(`/system/menu/info/${this.dataForm.id}`),
-              method: 'get',
-              params: this.axios.paramsHandler()
-            }).then(({data}) => {
-              this.dataForm.id = data.menu.id
-              this.dataForm.type = data.menu.type
-              this.dataForm.name = data.menu.name
-              this.dataForm.parentId = data.menu.parentId
-              this.dataForm.url = data.menu.url
-              this.dataForm.perms = data.menu.perms
-              this.dataForm.orderNum = data.menu.orderNum
-              this.dataForm.icon = data.menu.icon
+            getMenuInfo(this.dataForm.id).then(({data}) => {
+              console.log("data == ", data)
+              this.dataForm.id = data.data.menu.id
+              this.dataForm.type = data.data.menu.type
+              this.dataForm.name = data.data.menu.name
+              this.dataForm.parentId = data.data.menu.parentId
+              this.dataForm.url = data.data.menu.url
+              this.dataForm.perms = data.data.menu.perms
+              this.dataForm.orderNum = data.data.menu.orderNum
+              this.dataForm.icon = data.data.menu.icon
               this.menuListTreeSetCurrentNode()
             })
           }
@@ -181,20 +176,18 @@
       dataFormSubmit () {
         this.$refs['dataForm'].validate((valid) => {
           if (valid) {
-            this.axios({
-              url: this.axios.urlHandler(`/system/menu/${!this.dataForm.id ? 'save' : 'update'}`),
-              method: 'post',
-              data: this.axios.dataHandler({
-                'id': this.dataForm.id || undefined,
-                'type': this.dataForm.type,
-                'name': this.dataForm.name,
-                'parentId': this.dataForm.parentId,
-                'url': this.dataForm.url,
-                'perms': this.dataForm.perms,
-                'orderNum': this.dataForm.orderNum,
-                'icon': this.dataForm.icon
-              })
-            }).then(({data}) => {
+            var saveOrUpdate =  this.dataForm.id ? updateMenu : saveMenu;
+            var data = this.axios.dataHandler({
+              'id': this.dataForm.id || undefined,
+              'type': this.dataForm.type,
+              'name': this.dataForm.name,
+              'parentId': this.dataForm.parentId,
+              'url': this.dataForm.url,
+              'perms': this.dataForm.perms,
+              'orderNum': this.dataForm.orderNum,
+              'icon': this.dataForm.icon
+            })
+            saveOrUpdate(data).then(({data}) => {
               if (data && data.code === "200") {
                 this.$message({
                   message: '操作成功',

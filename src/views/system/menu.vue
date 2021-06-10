@@ -84,6 +84,7 @@
 <script>
   import AddOrUpdate from './menu-add-or-update'
   import { treeDataTranslate } from '@/utils'
+  import { getMenuList,deleteMenu } from '@/api/mall-menu'
   export default {
     data () {
       return {
@@ -103,11 +104,8 @@
       // 获取数据列表
       getDataList () {
         this.dataListLoading = true
-        this.axios({
-          url: this.axios.urlHandler('/system/menu/list'),
-          method: 'get',
-          params: this.axios.paramsHandler()
-        }).then(({data}) => {
+        var params = this.axios.paramsHandler()
+        getMenuList(params).then(({data}) => {
           this.dataList = treeDataTranslate(data, 'id')
           this.dataListLoading = false
         })
@@ -126,11 +124,7 @@
           cancelButtonText: '取消',
           type: 'warning'
         }).then(() => {
-          this.axios({
-            url: this.axios.urlHandler(`/system/menu/delete/${id}`),
-            method: 'post',
-            data: this.axios.dataHandler()
-          }).then(({data}) => {
+          deleteMenu(id).then(({data}) => {
             if (data && data.code === "200") {
               this.$message({
                 message: '操作成功',

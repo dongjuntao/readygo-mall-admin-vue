@@ -76,6 +76,7 @@
 
 <script>
   import AddOrUpdate from './role-add-or-update'
+  import { getRoleList,deleteRole } from '@/api/mall-role'
   export default {
     data () {
       return {
@@ -101,15 +102,12 @@
       // 获取数据列表
       getDataList () {
         this.dataListLoading = true
-        this.axios({
-          url: this.axios.urlHandler('/system/role/list'),
-          method: 'get',
-          params: this.axios.paramsHandler({
-            'pageNum': this.pageNum,
-            'pageSize': this.pageSize,
-            'name': this.dataForm.name
-          })
-        }).then(({data}) => {
+        var params =  this.axios.paramsHandler({
+          'pageNum': this.pageNum,
+          'pageSize': this.pageSize,
+          'name': this.dataForm.name
+        })
+        getRoleList(params).then(({data}) => {
           if (data && data.code === "200") {
             this.dataList = data.data.list
             this.totalPage = data.data.totalCount
@@ -152,11 +150,8 @@
           cancelButtonText: '取消',
           type: 'warning'
         }).then(() => {
-          this.axios({
-            url: this.axios.urlHandler('/system/role/delete'),
-            method: 'post',
-            data: this.axios.dataHandler(ids, false)
-          }).then(({data}) => {
+          var deleteData = this.axios.dataHandler(ids, false);
+          deleteRole(deleteData).then(({data}) => {
             if (data && data.code === "200") {
               this.$message({
                 message: '操作成功',

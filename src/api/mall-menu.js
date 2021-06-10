@@ -1,12 +1,11 @@
 import request from '@/utils/httpRequest'
 
-
 /**
- * 角色列表
+ * 列表
  */
-export function getRoleList(params) {
+export function getMenuList(params) {
   return request({
-    url: '/system/role/list',
+    url: '/system/menu/list',
     method: 'get',
     params: params
   })
@@ -15,32 +14,32 @@ export function getRoleList(params) {
 /**
  * 删除角色
  */
-export function deleteRole(data) {
+export function deleteMenu(pathParam) {
   return request({
-    url: '/system/role/delete',
-    method: 'delete',
-    data: data
+    url: '/system/menu/delete/'+pathParam,
+    method: 'delete'
   })
 }
 
 /**
- * 角色信息
+ * 菜单信息
  * @param params
  * @returns {*}
  */
-export function getRoleInfo(pathParam) {
+export function getMenuInfo(pathParam) {
   return request({
-    url: '/system/role/info/'+pathParam,
+    url: '/system/menu/info/'+pathParam,
     method: 'get'
   })
 }
 
+
 /**
  * 保存角色信息
  */
-export function saveRole(data) {
+export function saveMenu(data) {
   return request({
-    url: '/system/role/save',
+    url: '/system/menu/save',
     method: 'post',
     data: data
   })
@@ -49,23 +48,24 @@ export function saveRole(data) {
 /**
  * 修改角色信息
  */
-export function updateRole(data) {
+export function updateMenu(data) {
   return request({
-    url: '/system/role/update',
+    url: '/system/menu/update',
     method: 'put',
     data: data
   })
 }
 
+
 /**
- * 角色选择
+ * 菜单选择
  * @param params
  * @param data
  * @returns {*}
  */
 export function select(params, data) {
   return request({
-    url: '/system/role/select',
+    url: '/system/menu/select',
     method: 'get'
   })
 }

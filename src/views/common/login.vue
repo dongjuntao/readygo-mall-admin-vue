@@ -8,7 +8,7 @@
         </div>
         <div class="login-main">
           <h3 class="login-title">管理员登录</h3>
-          <el-form :model="dataForm" :rules="dataRule" ref="dataForm" @keyup.enter.native="dataFormSubmit()" status-icon>
+          <el-form :model="dataForm" :rules="dataRule" ref="dataForm" status-icon>
             <el-form-item prop="userName">
               <el-input v-model="dataForm.userName" placeholder="帐号"></el-input>
             </el-form-item>
@@ -35,9 +35,7 @@
 </template>
 
 <script>
-  import { getUUID } from '@/utils'
   import verify from '@/components/verifition/Verify'
-  import { adminLogin } from "../../api/mall-admin";
 
   export default {
     components: {
@@ -59,8 +57,17 @@
         }
       }
     },
-    created () {
-
+    mounted () {
+      document.onkeydown = (e) => {
+        if (window.event === undefined) {
+          var key = e.keyCode
+        } else {
+          var key = window.event.keyCode
+        }
+        if (key === 13) {
+          this.useVerify()
+        }
+      }
     },
     methods: {
       // 提交表单
@@ -85,13 +92,6 @@
             })
           }
         })
-      },
-
-      handerKeyup(e){
-        var keycode = document.all ? event.keyCode : e.which;
-        if (keycode == 13) {
-          this.checkPrama();
-        }
       },
 
       useVerify(){
