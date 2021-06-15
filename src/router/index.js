@@ -8,8 +8,8 @@ import Vue from 'vue'
 import Router from 'vue-router'
 import http from '@/utils/httpRequest'
 import { isURL } from '@/utils/validate'
-import { clearLoginInfo } from '@/utils/auth'
-import { getToken } from "../utils/auth";
+import { clearLoginInfo,getToken } from '@/utils/auth'
+import { getNavbar } from '@/api/mall-menu'
 
 Vue.use(Router)
 
@@ -62,11 +62,7 @@ router.beforeEach((to, from, next) => {
   if (router.options.isAddDynamicMenuRoutes || fnCurrentRouteType(to, globalRoutes) === 'global') {
     next()
   } else {
-    http({
-      url: http.urlHandler('/system/menu/navbar'),
-      method: 'get',
-      params: http.paramsHandler()
-    }).then(({data}) => {
+    getNavbar(http.paramsHandler()).then(({data}) => {
       if (data && data.code === '200') {
         fnAddDynamicMenuRoutes(data.data.menuList)
         router.options.isAddDynamicMenuRoutes = true

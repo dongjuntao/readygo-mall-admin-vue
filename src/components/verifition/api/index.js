@@ -5,11 +5,12 @@
 
 import request from "@/components/verifition/utils/axios"  //组件内部封装的axios
 // import request from "@/utils/httpRequest"       //调用项目封装的axios
+const prefix = "/mall-admin";
 
 //获取验证图片  以及token
 export function reqGet(data) {
 	return  request({
-        url: '/captcha/get',
+        url: prefix+'/captcha/get',
         method: 'post',
         data
     })
@@ -18,7 +19,7 @@ export function reqGet(data) {
 //滑动或者点选验证
 export function reqCheck(data) {
 	return  request({
-        url: '/captcha/check',
+        url: prefix+'/captcha/check',
         method: 'post',
         data
     })

@@ -1,12 +1,12 @@
 import request from '@/utils/httpRequest'
-
+const prefix = "/mall-admin";
 
 /**
  * 角色列表
  */
 export function getRoleList(params) {
   return request({
-    url: '/system/role/list',
+    url: prefix+'/system/role/list',
     method: 'get',
     params: params
   })
@@ -17,7 +17,7 @@ export function getRoleList(params) {
  */
 export function deleteRole(data) {
   return request({
-    url: '/system/role/delete',
+    url: prefix+'/system/role/delete',
     method: 'delete',
     data: data
   })
@@ -30,7 +30,7 @@ export function deleteRole(data) {
  */
 export function getRoleInfo(pathParam) {
   return request({
-    url: '/system/role/info/'+pathParam,
+    url: prefix+'/system/role/info/'+pathParam,
     method: 'get'
   })
 }
@@ -40,7 +40,7 @@ export function getRoleInfo(pathParam) {
  */
 export function saveRole(data) {
   return request({
-    url: '/system/role/save',
+    url: prefix+'/system/role/save',
     method: 'post',
     data: data
   })
@@ -51,7 +51,7 @@ export function saveRole(data) {
  */
 export function updateRole(data) {
   return request({
-    url: '/system/role/update',
+    url: prefix+'/system/role/update',
     method: 'put',
     data: data
   })
@@ -65,7 +65,7 @@ export function updateRole(data) {
  */
 export function select(params, data) {
   return request({
-    url: '/system/role/select',
+    url: prefix+'/system/role/select',
     method: 'get'
   })
 }

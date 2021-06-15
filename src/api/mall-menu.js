@@ -1,11 +1,24 @@
 import request from '@/utils/httpRequest'
+const prefix = "/mall-admin";
+
+/**
+ * 侧边栏
+ * @param params
+ * @returns {*}
+ */
+export function getNavbar() {
+  return request({
+    url: prefix+'/system/menu/navbar',
+    method: 'get'
+  })
+}
 
 /**
  * 列表
  */
 export function getMenuList(params) {
   return request({
-    url: '/system/menu/list',
+    url: prefix+'/system/menu/list',
     method: 'get',
     params: params
   })
@@ -16,7 +29,7 @@ export function getMenuList(params) {
  */
 export function deleteMenu(pathParam) {
   return request({
-    url: '/system/menu/delete/'+pathParam,
+    url: prefix+'/system/menu/delete/'+pathParam,
     method: 'delete'
   })
 }
@@ -28,7 +41,7 @@ export function deleteMenu(pathParam) {
  */
 export function getMenuInfo(pathParam) {
   return request({
-    url: '/system/menu/info/'+pathParam,
+    url: prefix+'/system/menu/info/'+pathParam,
     method: 'get'
   })
 }
@@ -39,7 +52,7 @@ export function getMenuInfo(pathParam) {
  */
 export function saveMenu(data) {
   return request({
-    url: '/system/menu/save',
+    url: prefix+'/system/menu/save',
     method: 'post',
     data: data
   })
@@ -50,7 +63,7 @@ export function saveMenu(data) {
  */
 export function updateMenu(data) {
   return request({
-    url: '/system/menu/update',
+    url: prefix+'/system/menu/update',
     method: 'put',
     data: data
   })
@@ -65,7 +78,7 @@ export function updateMenu(data) {
  */
 export function select(params, data) {
   return request({
-    url: '/system/menu/select',
+    url: prefix+'/system/menu/select',
     method: 'get'
   })
 }

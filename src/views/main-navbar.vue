@@ -90,6 +90,8 @@ export default {
             if (data && data.code === "200") {
               clearLoginInfo()
               this.$router.push({ name: 'login' })
+            }else {
+              this.$message.warning("退出失败");
             }
         });
       }).catch(() => {})

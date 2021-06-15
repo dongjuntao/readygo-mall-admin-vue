@@ -1,11 +1,12 @@
 import request from '@/utils/httpRequest'
+const prefix = "/mall-admin";
 
 /**
  * 管理员用户登录
  */
 export function adminLogin(params, data) {
   return request({
-    url: '/system/admin/login',
+    url: prefix+'/system/admin/login',
     method: 'post',
     params: params,
     data: data
@@ -20,7 +21,7 @@ export function adminLogin(params, data) {
  */
 export function adminLogout() {
   return request({
-    url: '/system/admin/logout',
+    url: prefix+'/system/admin/logout',
     method: 'delete'
   })
 }
@@ -30,7 +31,7 @@ export function adminLogout() {
  */
 export function getAdminList(params) {
   return request({
-    url: '/system/admin/list',
+    url: prefix+'/system/admin/list',
     method: 'get',
     params: params
   })
@@ -41,7 +42,7 @@ export function getAdminList(params) {
  */
 export function deleteAdmin(data) {
   return request({
-    url: '/system/admin/delete',
+    url: prefix+'/system/admin/delete',
     method: 'delete',
     data: data
   })
@@ -52,7 +53,7 @@ export function deleteAdmin(data) {
  */
 export function getUserById(params) {
   return request({
-    url: '/system/admin/getUserById',
+    url: prefix+'/system/admin/getUserById',
     method: 'get',
     params: params
   })
@@ -63,7 +64,7 @@ export function getUserById(params) {
  */
 export function saveAdmin(data) {
   return request({
-    url: '/system/admin/save',
+    url: prefix+'/system/admin/save',
     method: 'post',
     data: data
   })
@@ -74,7 +75,7 @@ export function saveAdmin(data) {
  */
 export function updateAdmin(data) {
   return request({
-    url: '/system/admin/update',
+    url: prefix+'/system/admin/update',
     method: 'put',
     data: data
   })

@@ -18,7 +18,7 @@ const http = axios.create({
  * 请求拦截
  */
 http.interceptors.request.use(config => {
-  config.headers['token'] = getToken() // 请求头带上token
+  config.headers['Authorization'] = 'Bearer ' + getToken() // 请求头带上token
   return config
 }, error => {
   return Promise.reject(error)
@@ -28,7 +28,8 @@ http.interceptors.request.use(config => {
  * 响应拦截
  */
 http.interceptors.response.use(response => {
-  if (response.data && response.data.code === 401) { // 401, token失效
+  if(response.data && response.data.code === "401") {
+    this.$message.error(response.data.message);
     clearLoginInfo()
     router.push({ name: 'login' })
   }
