@@ -144,7 +144,6 @@
           } else {
             // 修改
             getMenuInfo(this.dataForm.id).then(({data}) => {
-              console.log("data == ", data)
               this.dataForm.id = data.data.menu.id
               this.dataForm.type = data.data.menu.type
               this.dataForm.name = data.data.menu.name
