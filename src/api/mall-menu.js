@@ -25,7 +25,7 @@ export function getMenuList(params) {
 }
 
 /**
- * 删除角色
+ * 删除菜单
  */
 export function deleteMenu(pathParam) {
   return request({
@@ -48,7 +48,7 @@ export function getMenuInfo(pathParam) {
 
 
 /**
- * 保存角色信息
+ * 保存菜单信息
  */
 export function saveMenu(data) {
   return request({
@@ -59,7 +59,7 @@ export function saveMenu(data) {
 }
 
 /**
- * 修改角色信息
+ * 修改菜单信息
  */
 export function updateMenu(data) {
   return request({

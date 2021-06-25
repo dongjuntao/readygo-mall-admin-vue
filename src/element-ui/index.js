@@ -72,6 +72,7 @@ import {
   Aside,
   Main,
   Footer,
+  Scrollbar,
   Loading,
   MessageBox,
   Message,
@@ -141,6 +142,7 @@ Vue.use(Header)
 Vue.use(Aside)
 Vue.use(Main)
 Vue.use(Footer)
+Vue.use(Scrollbar)
 
 Vue.use(Loading.directive)
 

@@ -10,6 +10,8 @@ import http from '@/utils/httpRequest'
 import { isURL } from '@/utils/validate'
 import { clearLoginInfo,getToken } from '@/utils/auth'
 import { getNavbar } from '@/api/mall-menu'
+import NProgress from 'nprogress' // Progress 进度条
+import 'nprogress/nprogress.css'// Progress 进度条样式
 
 Vue.use(Router)
 
@@ -56,6 +58,8 @@ const router = new Router({
 })
 
 router.beforeEach((to, from, next) => {
+  // 每次切换页面时，调用进度条
+  NProgress.start();
   // 添加动态(菜单)路由
   // 1. 已经添加 or 全局路由, 直接访问
   // 2. 获取菜单列表, 添加并保存本地存储
@@ -79,6 +83,10 @@ router.beforeEach((to, from, next) => {
       router.push({ name: 'login' })
     })
   }
+})
+router.afterEach(() => {
+  // 在即将进入新的页面组件前，关闭掉进度条
+  NProgress.done()
 })
 
 /**

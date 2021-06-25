@@ -16,7 +16,7 @@
               <el-input v-model="dataForm.password" type="password" placeholder="密码"></el-input>
             </el-form-item>
             <el-form-item>
-              <el-button class="login-btn-submit" type="primary" @click="useVerify">登录</el-button>
+              <el-button class="login-btn-submit" :loading="loading" type="primary" @click="useVerify">登录</el-button>
             </el-form-item>
           </el-form>
         </div>
@@ -47,6 +47,7 @@
           userName: '',
           password: '',
         },
+        loading:false,
         dataRule: {
           userName: [
             { required: true, message: '帐号不能为空', trigger: 'blur' }
@@ -72,6 +73,7 @@
     methods: {
       // 提交表单
       dataFormSubmit (captchaVerification) {
+        this.loading=true;
         this.$refs['dataForm'].validate((valid) => {
           if (valid) {
             var params = this.axios.paramsHandler(captchaVerification);
