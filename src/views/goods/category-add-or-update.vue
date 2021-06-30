@@ -12,9 +12,13 @@
           ref="goodsCategoryListPopover"
           placement="bottom-start"
           trigger="click">
+          <el-input
+            placeholder="输入关键字进行过滤"
+            v-model="filterText">
+          </el-input>
           <el-scrollbar style="height:600px">
             <el-tree
-              style="width: 300px;"
+              style="width: 250px;"
               :data="goodsCategoryList"
               :props="goodsCategoryListTreeProps"
               node-key="id"
@@ -22,7 +26,8 @@
               @current-change="goodsCategoryListTreeCurrentChangeHandle"
               :default-expand-all="true"
               :highlight-current="true"
-              :expand-on-click-node="false">
+              :expand-on-click-node="false"
+              :filter-node-method="filterNode">
             </el-tree>
           </el-scrollbar>
         </el-popover>
@@ -65,10 +70,16 @@
         goodsCategoryListTreeProps: {
           label: 'name',
           children: 'children'
-        }
+        },
+        filterText:''
       }
     },
     created () {
+    },
+    watch: {
+      filterText(val) {
+        this.$refs.goodsCategoryListTree.filter(val);
+      }
     },
     methods: {
       init (id) {
@@ -136,6 +147,16 @@
             })
           }
         })
+      },
+      /**
+       * 按分类名称模糊搜索分类
+       * @param value
+       * @param data
+       * @returns {boolean}
+       */
+      filterNode(value, data) {
+        if (!value) return true;
+        return data.name.indexOf(value) !== -1;
       }
     }
   }

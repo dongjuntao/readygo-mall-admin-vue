@@ -24,7 +24,7 @@ NProgress.configure({
 })
 
 import ElementUI from 'element-ui'
-Vue.use(ElementUI)
+Vue.use(ElementUI,{size: 'medium'})
 
 Vue.config.productionTip = false
 
@@ -34,10 +34,14 @@ Vue.prototype.isAuth = isAuth //认证方法
 
 // 定义全局时间戳过滤器
 Vue.filter('formatDate', function(value) {
-  return Moment(value).format('YYYY-MM-DD')
+  if (value != null) {
+    return Moment(value).format('YYYY-MM-DD')
+  }
 })
 Vue.filter('formatDateTime', function(value) {
-  return Moment(value).format('YYYY-MM-DD HH:mm:ss')
+  if (value != null) {
+    return Moment(value).format('YYYY-MM-DD HH:mm:ss')
+  }
 })
 
 /* eslint-disable no-new */

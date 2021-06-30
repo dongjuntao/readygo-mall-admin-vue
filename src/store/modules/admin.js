@@ -1,15 +1,16 @@
 import { adminLogin } from '@/api/mall-admin'
-import { getToken, setToken, removeToken } from '@/utils/auth'
+import { setToken } from '@/utils/auth'
+import {setUserInfo} from "../../utils/auth";
 
 const admin = {
   state: {
     accessToken:{
-      accessToken: "",
-      tokenType: "",
-      refreshToken: "",
-      expiresIn: 0,
-      scope: [],
-      enhanceInfo: {}
+      accessToken: "", //token值
+      tokenType: "", //token类型
+      refreshToken: "", //刷新token值
+      expiresIn: 0, //token有效期
+      scope: [], //范围
+      enhanceInfo: {} //扩展增强信息（目前包括userName和userId）
     }
   },
   mutations: {
@@ -25,6 +26,7 @@ const admin = {
           //登录后把token存到cookie中
           if (response && response.data.code === "200") {
             setToken(response.data.data.accessToken)
+            setUserInfo(response.data.data.enhanceInfo);
             commit('SET_ACCESS_TOKEN',response.data.data)
             resolve();
           } else { //如果未返回200，则返回提示信息

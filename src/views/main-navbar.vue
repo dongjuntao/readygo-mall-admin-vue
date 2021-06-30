@@ -17,13 +17,6 @@
       <el-menu
         class="site-navbar__menu site-navbar__menu--right"
         mode="horizontal">
-        <el-menu-item index="1" @click="$router.push({ name: 'theme' })">
-          <template slot="title">
-            <el-badge value="new">
-              <icon-svg name="shezhi" class="el-icon-setting"></icon-svg>
-            </el-badge>
-          </template>
-        </el-menu-item>
         <el-menu-item class="site-navbar__avatar" index="3">
           <el-dropdown :show-timeout="0" placement="bottom">
             <span class="el-dropdown-link">
@@ -38,18 +31,20 @@
       </el-menu>
     </div>
     <!-- 弹窗, 修改密码 -->
-    <update-password v-if="updatePassowrdVisible" ref="updatePassowrd"></update-password>
+    <update-password v-if="updatePasswordVisible" ref="updatePassword" :userName="userName"></update-password>
   </nav>
 </template>
 
 <script>
 import UpdatePassword from './main-navbar-update-password'
-import { clearLoginInfo } from '@/utils/auth'
+import { clearLoginInfo, getUserInfo } from '@/utils/auth'
 import { adminLogout } from '@/api/mall-admin'
 export default {
   data () {
     return {
-      updatePassowrdVisible: false
+      updatePasswordVisible: false,
+      userName: '',
+      userId: 0
     }
   },
   components: {
@@ -66,17 +61,17 @@ export default {
     mainTabs: {
       get () { return this.$store.state.common.mainTabs },
       set (val) { this.$store.commit('common/updateMainTabs', val) }
-    },
-    userName: {
-      get () { return this.$store.state.user.name }
     }
+  },
+  created() {
+    this.getUserInfo()
   },
   methods: {
     // 修改密码
     updatePasswordHandle () {
-      this.updatePassowrdVisible = true
+      this.updatePasswordVisible = true
       this.$nextTick(() => {
-        this.$refs.updatePassowrd.init()
+        this.$refs.updatePassword.init()
       })
     },
     // 退出
@@ -95,6 +90,15 @@ export default {
             }
         });
       }).catch(() => {})
+    },
+
+    /**
+     * cookie中获取当前登录的用户信息
+     */
+    getUserInfo() {
+      var userInfo = JSON.parse(getUserInfo());
+      this.userName = userInfo.userName;
+      this.userId = userInfo.userId;
     }
   }
 }

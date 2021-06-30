@@ -27,6 +27,7 @@
 <script>
   import { clearLoginInfo } from '@/utils/auth'
   export default {
+    props: ['userName'],
     data () {
       var validateConfirmPassword = (rule, value, callback) => {
         if (this.dataForm.newPassword !== value) {
@@ -57,9 +58,6 @@
       }
     },
     computed: {
-      userName: {
-        get () { return this.$store.state.user.name }
-      },
       mainTabs: {
         get () { return this.$store.state.common.mainTabs },
         set (val) { this.$store.commit('common/updateMainTabs', val) }

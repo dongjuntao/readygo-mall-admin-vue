@@ -4,14 +4,15 @@ const prefix = "/mall-brand";
 /**
  * 上传logo
  */
-export function uploadLogo(data) {
+export function uploadLogo(data,params) {
   return request({
     url: prefix+'/brand/logo/upload',
     method: 'post',
     headers: {
       'Content-Type': 'multipart/form-data'
     },
-    data: data
+    data: data,
+    params: params
   })
 }
 

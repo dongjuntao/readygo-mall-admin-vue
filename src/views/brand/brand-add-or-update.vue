@@ -51,6 +51,7 @@
 import { getBrandById, saveBrand, updateBrand } from '@/api/mall-brand/brand'
 import { getBrandCategoryListAll } from '@/api/mall-brand/brand-category'
 import {  uploadLogo, deleteLogo } from '@/api/mall-brand/file'
+import { brandConstant } from "@/utils/constant";
 export default {
   data () {
     return {
@@ -179,14 +180,15 @@ export default {
       return (isType || isType2) && isImg && fileNum
     },
 
-    //上传文件
+    //上传品牌logon
     uploadFile(file){
       let formData = new FormData();
-      formData.append("file", file.file);
-      uploadLogo(formData).then(({data}) => {
+      formData.append("files", file.file);
+      var params = this.axios.paramsHandler({folderName: brandConstant.brand_logo_folder_name })
+      uploadLogo(formData, params).then(({data}) => {
         this.dataForm.logo = data.data;
         this.fileList.push({
-          name:this.dataForm.logo.substring(this.dataForm.logo.lastIndexOf("/")),
+          name:this.dataForm.logo.substring(this.dataForm.logo.lastIndexOf("/")+1),
           url:this.dataForm.logo
         });
       })
@@ -203,7 +205,9 @@ export default {
         type: "warning",
         center: true
       }).then(() => {
-        var params = this.axios.paramsHandler({filePath: file.url});
+        var params = this.axios.paramsHandler(
+          { filePath: file.url, folderName: brandConstant.brand_logo_folder_name}
+        );
         deleteLogo(params).then(({data}) => {
           if (data && data.code === "200") {
             this.$message({

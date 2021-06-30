@@ -32,7 +32,7 @@ export default {
   },
   data () {
     return {
-      loading: true
+      loading: false
     }
   },
   components: {
@@ -47,19 +47,9 @@ export default {
     },
     sidebarFold: {
       get () { return this.$store.state.common.sidebarFold }
-    },
-    userId: {
-      get () { return this.$store.state.user.id },
-      set (val) { this.$store.commit('user/updateId', val) }
-    },
-    userName: {
-      get () { return this.$store.state.user.name },
-      set (val) { this.$store.commit('user/updateName', val) }
     }
   },
-  created () {
-    this.getUserInfo()
-  },
+  created () {},
   mounted () {
     this.resetDocumentClientHeight()
   },
@@ -70,23 +60,6 @@ export default {
       window.onresize = () => {
         this.documentClientHeight = document.documentElement['clientHeight']
       }
-    },
-    // 获取当前管理员信息
-    getUserInfo () {
-      // this.axios({
-      //   url: this.axios.urlHandler('/sys/user/info'),
-      //   method: 'get',
-      //   params: this.axios.paramsHandler()
-      // }).then(({data}) => {
-      //   if (data && data.code === 0) {
-      //     this.loading = false
-      //     this.userId = data.user.userId
-      //     this.userName = data.user.username
-      //   }
-      // })
-      this.loading = false
-      this.userId = 1
-      this.userName = "admin"
     }
   }
 }

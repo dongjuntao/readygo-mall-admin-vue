@@ -2,6 +2,7 @@ import Cookies from 'js-cookie'
 import router from '@/router'
 
 const TokenKey = 'Admin-TokenKey'
+const UserInfoKey = "Admin-UserInfoKey"
 
 export function getToken() {
   return Cookies.get(TokenKey)
@@ -13,6 +14,14 @@ export function setToken(token) {
 
 export function removeToken() {
   return Cookies.remove(TokenKey)
+}
+
+export function setUserInfo(userInfo) {
+  return Cookies.set(UserInfoKey, userInfo)
+}
+
+export function getUserInfo() {
+  return Cookies.get(UserInfoKey)
 }
 
 /**
