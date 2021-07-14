@@ -51,7 +51,6 @@
 
 <script>
   import AddOrUpdate from './category-add-or-update'
-  import { treeDataTranslate } from '@/utils'
   import { getGoodsCategoryTree, deleteGoodsCategory } from '@/api/mall-goods/goods-category'
   export default {
     data () {
@@ -74,7 +73,7 @@
         this.dataListLoading = true
         var params = this.axios.paramsHandler()
         getGoodsCategoryTree(params).then(({data}) => {
-          this.dataList = treeDataTranslate(data.data, 'id')
+          this.dataList = data.data;
           this.dataListLoading = false
         })
       },

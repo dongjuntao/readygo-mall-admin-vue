@@ -22,14 +22,16 @@
         :label="item.title"
         :name="item.name">
         <el-card :body-style="siteContentViewHeight">
-          <iframe
-            v-if="item.type === 'iframe'"
-            :src="item.iframeUrl"
-            width="100%" height="100%" frameborder="0" scrolling="yes">
-          </iframe>
-          <keep-alive v-else>
-            <router-view v-if="item.name === mainTabsActiveName" />
-          </keep-alive>
+          <transition name="fade-transform"> <!--过渡动画-->
+            <iframe
+              v-if="item.type === 'iframe'"
+              :src="item.iframeUrl"
+              width="100%" height="100%" frameborder="0" scrolling="yes">
+            </iframe>
+            <keep-alive v-else>
+              <router-view v-if="item.name === mainTabsActiveName" />
+            </keep-alive>
+          </transition>
         </el-card>
       </el-tab-pane>
     </el-tabs>
@@ -124,4 +126,19 @@
     }
   }
 </script>
+<style lang="scss" scoped>
+.fade-transform-leave-active,
+.fade-transform-enter-active {
+  transition: all 0.3s;
+}
 
+.fade-transform-enter {
+  opacity: 0;
+  transform: translateX(-50px);
+}
+
+.fade-transform-leave-to {
+  opacity: 0;
+  transform: translateX(50px);
+}
+</style>

@@ -45,7 +45,6 @@
 </template>
 
 <script>
-  import { treeDataTranslate } from '@/utils'
   import { select, getGoodsCategoryInfo, saveGoodsCategory, updateGoodsCategory} from '@/api/mall-goods/goods-category'
   export default {
     data () {
@@ -86,8 +85,7 @@
         this.dataForm.id = id || 0
         var params = this.axios.paramsHandler()
         select(params).then(({data}) => {
-          console.log("data == ", data)
-          this.goodsCategoryList = treeDataTranslate(data.data, 'id')
+          this.goodsCategoryList = data.data
         }).then(() => {
           this.visible = true
           this.$nextTick(() => {

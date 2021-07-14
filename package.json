@@ -14,23 +14,28 @@
     "build": "node build/build.js"
   },
   "dependencies": {
-    "axios": "^0.19.2",
+    "@tinymce/tinymce-vue": "^4.0.3",
+    "axios": "^0.21.1",
     "babel-plugin-component": "0.10.1",
     "babel-polyfill": "6.26.0",
     "crypto-js": "^4.0.0",
-    "element-ui": "2.8.2",
+    "element-ui": "^2.15.3",
     "js-cookie": "^2.2.1",
     "lodash": "^4.17.15",
     "moment": "^2.29.1",
-    "node-sass": "^4.13.1",
+    "node-sass": "^4.14.1",
     "npm": "^6.14.4",
     "nprogress": "^0.2.0",
     "pubsub-js": "^1.8.0",
-    "sass-loader": "6.0.6",
+    "sass-loader": "^6.0.6",
+    "scss": "^0.2.4",
+    "scss-loader": "0.0.1",
+    "tinymce": "^5.8.2",
     "vue": "2.5.16",
     "vue-cookie": "1.1.4",
     "vue-router": "3.0.1",
-    "vuex": "3.0.1"
+    "vuex": "3.0.1",
+    "wangeditor": "^4.7.5"
   },
   "devDependencies": {
     "autoprefixer": "7.1.2",

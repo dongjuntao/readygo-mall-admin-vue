@@ -2,11 +2,22 @@ import request from '@/utils/httpRequest'
 const prefix = "/mall-brand";
 
 /**
- * 品牌列表
+ * 品牌列表（分页）
  */
 export function getBrandList(params) {
   return request({
     url: prefix+'/brand/list',
+    method: 'get',
+    params: params
+  })
+}
+
+/**
+ * 品牌列表（不分页）
+ */
+export function getBrandListAll(params) {
+  return request({
+    url: prefix+'/brand/listAll',
     method: 'get',
     params: params
   })

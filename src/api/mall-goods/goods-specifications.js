@@ -48,11 +48,22 @@ export function deleteGoodsSpecifications(data) {
 }
 
 /**
- * 商品规格列表
+ * 商品规格列表（分页）
  */
 export function getGoodsSpecificationsList(params) {
   return request({
     url: prefix+'/goods/specifications/list',
+    method: 'get',
+    params: params
+  })
+}
+
+/**
+ * 商品规格列表（不分页）
+ */
+export function getGoodsSpecificationsListAll(params) {
+  return request({
+    url: prefix+'/goods/specifications/listAll',
     method: 'get',
     params: params
   })

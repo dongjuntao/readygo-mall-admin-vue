@@ -2,161 +2,251 @@
   <el-dialog
     :title="!dataForm.id ? '新增' : '修改'"
     :close-on-click-modal="false"
-    :visible.sync="visible">
-    <el-form :model="dataForm" :rules="dataRule" ref="dataForm" @keyup.enter.native="dataFormSubmit()" label-width="80px">
-      <el-form-item label="分类名称" prop="name">
-        <el-input v-model="dataForm.name" placeholder="分类名称"></el-input>
-      </el-form-item>
-      <el-form-item label="上级分类" prop="parentName">
-        <el-popover
-          ref="goodsCategoryListPopover"
-          placement="bottom-start"
-          trigger="click">
-          <el-input
-            placeholder="输入关键字进行过滤"
-            v-model="filterText">
-          </el-input>
-          <el-scrollbar style="height:600px">
-            <el-tree
-              style="width: 250px;"
-              :data="goodsCategoryList"
-              :props="goodsCategoryListTreeProps"
-              node-key="id"
-              ref="goodsCategoryListTree"
-              @current-change="goodsCategoryListTreeCurrentChangeHandle"
-              :default-expand-all="true"
-              :highlight-current="true"
-              :expand-on-click-node="false"
-              :filter-node-method="filterNode">
-            </el-tree>
-          </el-scrollbar>
-        </el-popover>
-        <el-input v-model="dataForm.parentName" v-popover:goodsCategoryListPopover :readonly="true" placeholder="点击选择上级菜单" class="menu-list__input"></el-input>
-      </el-form-item>
-      <el-form-item label="排序号" prop="orderNum">
-        <el-input-number v-model="dataForm.orderNum" controls-position="right" :min="0" label="排序号"></el-input-number>
-      </el-form-item>
-    </el-form>
-    <span slot="footer" class="dialog-footer">
-      <el-button @click="visible = false">取消</el-button>
-      <el-button type="primary" @click="dataFormSubmit()">确定</el-button>
-    </span>
+    :visible.sync="visible" :before-close="closeDialog">
+
+    <el-steps style="margin-top: -20px;margin-bottom: 20px;" :active="active" align-center finish-status="success">
+      <el-step title="商品基本信息"></el-step>
+      <el-step title="商品详细信息"></el-step>
+      <el-step title="商品规格参数"></el-step>
+      <el-step title="商品促销信息"></el-step>
+    </el-steps>
+    <!--商品基本信息-->
+    <GoodsBasicInfo
+      v-show="showGoodsBasicInfo"
+      ref="goodsBasicInfo">
+    </GoodsBasicInfo>
+    <!--商品详细信息-->
+    <GoodsDetailInfo
+      v-show="showGoodsDetailInfo"
+      ref="goodsDetailInfo">
+    </GoodsDetailInfo>
+    <!--商品规格信息-->
+    <GoodsSpecificationsInfo
+      v-show="showGoodsSpecificationsInfo"
+      ref="goodsSpecificationsInfo">
+    </GoodsSpecificationsInfo>
+    <!--商品促销信息-->
+    <GoodsPromotionInfo
+      v-show="showGoodsPromotionInfo"
+      ref="goodsPromotionInfo">
+    </GoodsPromotionInfo>
+    <div style="text-align: center">
+      <el-button v-show="showGoodsBasicInfo" type="primary" @click="beforeNextStep(1,'goodsBasicInfo')">下一步，填写商品详细信息</el-button>
+      <el-button v-show="showGoodsDetailInfo" type="primary" @click="previousStep(2)">上一步，填写商品基本信息</el-button>
+      <el-button v-show="showGoodsDetailInfo" type="primary" @click="beforeNextStep(2,'goodsDetailInfo')">下一步，填写商品规格参数</el-button>
+      <el-button v-show="showGoodsSpecificationsInfo" type="primary" @click="previousStep(3)">上一步，填写商品详细信息</el-button>
+      <el-button v-show="showGoodsSpecificationsInfo" type="primary" @click="beforeNextStep(3, 'goodsSpecificationsInfo')">下一步，填写商品促销信息</el-button>
+      <el-button v-show="showGoodsPromotionInfo" type="primary" @click="previousStep(4, 'goodsPromotionInfo')">上一步，填写商品规格参数</el-button>
+      <el-button v-show="showGoodsPromotionInfo" type="primary" @click="dataFormSubmit()">确认提交</el-button>
+    </div>
   </el-dialog>
 </template>
 
 <script>
-import { treeDataTranslate } from '@/utils'
-import { select, getGoodsCategoryInfo, saveGoodsCategory, updateGoodsCategory} from '@/api/mall-goods/goods-category'
+import GoodsBasicInfo from './components/goods_basic_info'
+import GoodsSpecificationsInfo from './components/goods_specifications_info'
+import GoodsDetailInfo from './components/goods_detail_info'
+import GoodsPromotionInfo from './components/goods_promotion_info'
+import { saveGoods, updateGoods, getGoodsById} from "@/api/mall-goods/goods";
 export default {
   data () {
     return {
       visible: false,
       dataForm: {
-        id: 0,
-        name: '',
-        parentId: 0,
-        parentName: '',
-        orderNum: 0
+        id: 0
       },
-      dataRule: {
-        name: [
-          { required: true, message: '分类名称不能为空', trigger: 'blur' }
-        ],
-        parentName: [
-          { required: true, message: '上级分类不能为空', trigger: 'change' }
-        ]
-      },
-      goodsCategoryList: [],
-      goodsCategoryListTreeProps: {
-        label: 'name',
-        children: 'children'
-      },
-      filterText:''
+      active: 0,
+      showGoodsBasicInfo: true,
+      showGoodsSpecificationsInfo: false,
+      showGoodsDetailInfo: false,
+      showGoodsPromotionInfo: false
     }
+  },
+  components: {
+    GoodsBasicInfo,
+    GoodsSpecificationsInfo,
+    GoodsDetailInfo,
+    GoodsPromotionInfo
   },
   created () {
   },
-  watch: {
-    filterText(val) {
-      this.$refs.goodsCategoryListTree.filter(val);
-    }
-  },
   methods: {
     init (id) {
-      this.dataForm.id = id || 0
-      var params = this.axios.paramsHandler()
-      select(params).then(({data}) => {
-        console.log("data == ", data)
-        this.goodsCategoryList = treeDataTranslate(data.data, 'id')
-      }).then(() => {
-        this.visible = true
-        this.$nextTick(() => {
-          this.$refs['dataForm'].resetFields()
-        })
-      }).then(() => {
-        if (!this.dataForm.id) {
-          // 新增
-          this.goodsCategoryListTreeSetCurrentNode()
-        } else {
-          // 修改
-          getGoodsCategoryInfo(this.dataForm.id).then(({data}) => {
-            this.dataForm.id = data.data.goodsCategoryEntity.id
-            this.dataForm.name = data.data.goodsCategoryEntity.name
-            this.dataForm.parentId = data.data.goodsCategoryEntity.parentId
-            this.dataForm.orderNum = data.data.goodsCategoryEntity.orderNum
-            this.goodsCategoryListTreeSetCurrentNode()
-          })
+      this.visible=true
+      this.$nextTick(() => {
+        this.dataForm.id = id;
+        //每次打开，进入第一步
+        this.active = 0;
+        this.showGoodsBasicInfo = true;
+        this.showGoodsSpecificationsInfo = false;
+        this.showGoodsDetailInfo = false;
+        this.showGoodsPromotionInfo = false;
+        if (this.dataForm.id) { //修改
+          getGoodsById(this.axios.paramsHandler({id: this.dataForm.id})).then(({data})=>{
+            var goodsBasicInfo = this.$refs['goodsBasicInfo'].$refs['dataForm'].model; //商品基本信息
+            var goodsDetailInfo = this.$refs['goodsDetailInfo'].$refs['dataForm'].model;//商品详细信息
+            var goodsSpecificationsInfo = this.$refs['goodsSpecificationsInfo'].$refs['dataForm'].model;//商品规格参数
+            var goodsPromotionInfo = this.$refs['goodsPromotionInfo'].$refs['dataForm'].model;//商品促销信息
+            //商品基本信息
+            goodsBasicInfo.name = data.data.name;
+            goodsBasicInfo.description = data.data.description;
+            /*直接push无法显示商品分类级联效果，故使用此方法*/
+            goodsBasicInfo.goodsCategoryIds = [parseInt( data.data.goodsCategoryIds.split(",")[0]),parseInt(data.data.goodsCategoryIds.split(",")[1]),parseInt(data.data.goodsCategoryIds.split(",")[2])];
+            goodsBasicInfo.brandId =  data.data.brandId;
+            goodsBasicInfo.merchantId =  data.data.merchantId;
+            goodsBasicInfo.code =  data.data.code
+            goodsBasicInfo.unit =  data.data.unit
+            //商品详细信息
+            if (data.data.images.split(",") && data.data.images.split(",").length>0){
+              this.$refs['goodsDetailInfo'].fileList = [] //先清空
+              goodsDetailInfo.images = [];
+              //循环回显图片
+              data.data.images.split(",").forEach(image=>{
+                this.$refs['goodsDetailInfo'].fileList.push({url:image})
+                goodsDetailInfo.images.push(image);
+              });
+            }
+            goodsDetailInfo.infoDetail = data.data.infoDetail;
+            //商品规格参数
+            goodsSpecificationsInfo.goodsSpecificationsDetailEntityList = data.data.goodsSkuList
+            goodsSpecificationsInfo.params = JSON.parse(data.data.params)
+            if (data.data.goodsSkuList && data.data.goodsSkuList.length>0) {
+              this.$refs['goodsSpecificationsInfo'].selectedSpecificationsAndValueList = JSON.parse(data.data.goodsSkuList[0].extendAttr);
+            }
+            //商品促销信息
+            goodsPromotionInfo.points = data.data.points;
+            goodsPromotionInfo.recommend = data.data.recommend.split(",");
+            goodsPromotionInfo.onSale = data.data.onSale;
+            goodsPromotionInfo.freightSetting = data.data.freightSetting;
+            goodsPromotionInfo.keyword = data.data.keyword;
+          });
+        }else { //新增
+          this.$refs['goodsBasicInfo'].$refs['dataForm'].resetFields(); //清空商品基本信息
+          this.$refs['goodsDetailInfo'].$refs['dataForm'].resetFields();//清空商品详细信息
+          this.$refs['goodsSpecificationsInfo'].$refs['dataForm'].resetFields();//清空商品规格参数
+          this.$refs['goodsPromotionInfo'].$refs['dataForm'].resetFields();//清空商品促销信息
+          //清空规格参数信息（部分数据无法通过resetFields()清空）
+          this.$refs['goodsSpecificationsInfo'].selectedSpecifications = null;
+          this.$refs['goodsSpecificationsInfo'].selectedSpecificationsValue = null;
+          this.$refs['goodsSpecificationsInfo'].selectedSpecificationsAndValueList = [];
+          this.$refs['goodsSpecificationsInfo'].params = [];
+          this.$refs['goodsDetailInfo'].fileList = [] //清空图片
         }
       })
     },
-    // 菜单树选中
-    goodsCategoryListTreeCurrentChangeHandle (data, node) {
-      this.dataForm.parentId = data.id
-      this.dataForm.parentName = data.name
+
+    /**
+     * 下一步进行之前表单校验
+     */
+    beforeNextStep(step, formName) {
+      return this.$refs[formName].$refs['dataForm'].validate((valid) => {
+        if (valid) {
+          this.nextStep(step);
+        } else {
+          return false;
+        }
+      });
     },
-    // 菜单树设置当前选中节点
-    goodsCategoryListTreeSetCurrentNode () {
-      this.$refs.goodsCategoryListTree.setCurrentKey(this.dataForm.parentId)
-      this.dataForm.parentName = (this.$refs.goodsCategoryListTree.getCurrentNode() || {})['name']
+    /**
+     * 下一步
+     * @Params step（当前是哪一步）
+     */
+    nextStep(step) {
+      if (step == 1) {
+        this.showGoodsBasicInfo=false;
+        this.showGoodsDetailInfo=true;
+        this.active=1;
+      } else if (step == 2) {
+        this.showGoodsDetailInfo=false;
+        this.showGoodsSpecificationsInfo=true;
+        this.active=2;
+      } else if (step == 3) {
+        this.showGoodsSpecificationsInfo=false;
+        this.showGoodsPromotionInfo=true;
+        this.active=3;
+      }
+    },
+    /**
+     * 上一步
+     * @Params step（当前是哪一步）
+     */
+    previousStep(step) {
+      if (step == 2) {
+        this.showGoodsBasicInfo=true;
+        this.showGoodsDetailInfo=false;
+        this.active=0
+      }else if (step == 3) {
+        this.showGoodsDetailInfo=true;
+        this.showGoodsSpecificationsInfo=false;
+        this.active=1;
+      }else if (step == 4) {
+        this.showGoodsSpecificationsInfo=true;
+        this.showGoodsPromotionInfo=false;
+        this.active=2;
+      }
     },
     // 表单提交
     dataFormSubmit () {
-      this.$refs['dataForm'].validate((valid) => {
-        if (valid) {
-          var saveOrUpdate =  this.dataForm.id ? updateGoodsCategory : saveGoodsCategory;
-          var data = this.axios.dataHandler({
-            id: this.dataForm.id || undefined,
-            name: this.dataForm.name,
-            parentId: this.dataForm.parentId,
-            orderNum: this.dataForm.orderNum
-          })
-          saveOrUpdate(data).then(({data}) => {
-            if (data && data.code === "200") {
-              this.$message({
-                message: '操作成功',
-                type: 'success',
-                duration: 1500,
-                onClose: () => {
-                  this.visible = false
-                  this.$emit('refreshDataList')
-                }
-              })
-            } else {
-              this.$message.error(data.msg)
+      var goodsBasicInfo = this.$refs['goodsBasicInfo'].$refs['dataForm'].model; //商品基本信息
+      var goodsDetailInfo = this.$refs['goodsDetailInfo'].$refs['dataForm'].model;//商品详细信息
+      var goodsSpecificationsInfo = this.$refs['goodsSpecificationsInfo'].$refs['dataForm'].model;//商品规格参数
+      var goodsPromotionInfo = this.$refs['goodsPromotionInfo'].$refs['dataForm'].model;//商品促销信息
+      //组织提交的参数
+      var data = {
+        id: this.dataForm.id || undefined,
+        //商品基本信息
+        name: goodsBasicInfo.name, //商品名称
+        description: goodsBasicInfo.description,//商品描述
+        goodsCategoryIds: goodsBasicInfo.goodsCategoryIds.join(','),//处理商品分类字段,商品分类id集合，三级分类id,如 1,2,3
+        brandId: goodsBasicInfo.brandId, //品牌id
+        merchantId: goodsBasicInfo.merchantId, //所属商户id
+        code: goodsBasicInfo.code, //商品编码
+        unit: goodsBasicInfo.unit, //单位
+        //商品详细信息
+        images: goodsDetailInfo.images.join(","),//处理商品图片字段
+        infoDetail: goodsDetailInfo.infoDetail, //商品详情
+        //商品规格参数
+        goodsSkuList: goodsSpecificationsInfo.goodsSpecificationsDetailEntityList, //商品sku
+        params: JSON.stringify(goodsSpecificationsInfo.params),//处理商品参数字段
+        //商品促销信息
+        points: goodsPromotionInfo.points, //积分
+        recommend: goodsPromotionInfo.recommend.join(","), //商品推荐
+        onSale: goodsPromotionInfo.onSale, //是否上架
+        freightSetting: goodsPromotionInfo.freightSetting, //运费设置
+        keyword: goodsPromotionInfo.keyword //关键词
+      }
+
+      var saveOrUpdate =  this.dataForm.id ? updateGoods : saveGoods;
+      saveOrUpdate(data).then(({data}) => {
+        if (data && data.code === "200") {
+          this.$message({
+            message: '操作成功',
+            type: 'success',
+            duration: 1500,
+            onClose: () => {
+              this.visible = false
+              this.$emit('refreshDataList')
             }
           })
+        } else {
+          this.$message.error(data.msg)
         }
       })
+
     },
+
     /**
-     * 按分类名称模糊搜索分类
-     * @param value
-     * @param data
-     * @returns {boolean}
+     * 关闭时提示用户会清除信息
      */
-    filterNode(value, data) {
-      if (!value) return true;
-      return data.name.indexOf(value) !== -1;
+    closeDialog() {
+      this.$confirm(`关闭窗口，所填信息将不生效，需重新填写，确定?`, '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(async () => {
+        this.visible = false
+        this.$emit('refreshDataList')
+      }).catch(() => {})
     }
   }
 }

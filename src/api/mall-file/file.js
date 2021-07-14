@@ -1,12 +1,12 @@
 import request from '@/utils/httpRequest'
-const prefix = "/mall-brand";
+const prefix = "/mall-file";
 
 /**
- * 上传logo
+ * 上传文件
  */
-export function uploadLogo(data,params) {
+export function fileUpload(data,params) {
   return request({
-    url: prefix+'/brand/logo/upload',
+    url: prefix+'/file/upload',
     method: 'post',
     headers: {
       'Content-Type': 'multipart/form-data'
@@ -17,11 +17,11 @@ export function uploadLogo(data,params) {
 }
 
 /**
- * 删除logo
+ * 删除文件
  */
-export function deleteLogo(params) {
+export function fileDelete(params) {
   return request({
-    url: prefix+'/brand/logo/delete',
+    url: prefix+'/file/delete',
     method: 'delete',
     params: params
   })

@@ -2,7 +2,7 @@
   <el-dialog
     :title="!dataForm.id ? '新增' : '修改'"
     :close-on-click-modal="false"
-    :visible.sync="visible">
+    :visible.sync="visible" append-to-body>
     <el-form :model="dataForm" :rules="dataRule" ref="dataForm" @keyup.enter.native="dataFormSubmit()" label-width="80px">
       <el-form-item label="规格名称" prop="name">
         <el-input v-model="dataForm.name" placeholder="规格名称"></el-input>
@@ -81,7 +81,7 @@
 <script>
 
 import { getGoodsSpecificationsById,saveGoodsSpecifications,updateGoodsSpecifications } from '@/api/mall-goods/goods-specifications'
-import { uploadSpecificationBindImage, deleteSpecificationBindImage } from '@/api/mall-goods/file'
+import { fileUpload, fileDelete } from '@/api/mall-file/file'
 import { goodsConstant } from '@/utils/constant';
 import { getUserInfo } from '@/utils/auth'
 
@@ -178,7 +178,7 @@ export default {
       let formData = new FormData();
       formData.append("files", file.file);
       var params = this.axios.paramsHandler({ folderName: goodsConstant.goods_specifications_folder_name })
-      uploadSpecificationBindImage(formData, params).then(({data}) => {
+      fileUpload(formData, params).then(({data}) => {
         this.dataForm.goodsSpecificationsDetailEntityList[index].bindImage = data.data;
       })
     },
