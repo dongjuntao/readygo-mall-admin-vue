@@ -44,7 +44,8 @@ export default {
     return {
       updatePasswordVisible: false,
       userName: '',
-      userId: 0
+      userId: 0,
+      userType: null
     }
   },
   components: {
@@ -84,7 +85,8 @@ export default {
         adminLogout().then(({data}) => {
             if (data && data.code === "200") {
               clearLoginInfo()
-              this.$router.push({ name: 'login' })
+              //系统管理员用户，退出到系统管理员等了页面
+              this.$router.push({ name: this.userType==0 ? "admin-login": "merchant-login" })
             }else {
               this.$message.warning("退出失败");
             }
@@ -96,9 +98,10 @@ export default {
      * cookie中获取当前登录的用户信息
      */
     getUserInfo() {
-      var userInfo = JSON.parse(getUserInfo());
+      var userInfo = JSON.parse(getUserInfo(sessionStorage.getItem("userName")));
       this.userName = userInfo.userName;
       this.userId = userInfo.userId;
+      this.userType = userInfo.userType;
     }
   }
 }

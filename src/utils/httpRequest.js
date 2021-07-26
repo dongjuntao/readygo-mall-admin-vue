@@ -31,7 +31,7 @@ http.interceptors.response.use(response => {
   if(response.data && response.data.code === "401") {
     this.$message.error(response.data.message);
     clearLoginInfo()
-    router.push({ name: 'login' })
+    router.push({ name: localStorage.getItem("fromPath") })
   }
   return response
 }, error => {

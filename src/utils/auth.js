@@ -4,24 +4,24 @@ import router from '@/router'
 const TokenKey = 'Admin-TokenKey'
 const UserInfoKey = "Admin-UserInfoKey"
 
-export function getToken() {
-  return Cookies.get(TokenKey)
+export function getToken(key) {
+  return Cookies.get(TokenKey+"-"+key)
 }
 
-export function setToken(token) {
-  return Cookies.set(TokenKey, token)
+export function setToken(key,token) {
+  return Cookies.set(TokenKey+"-"+key, token)
 }
 
-export function removeToken() {
-  return Cookies.remove(TokenKey)
+export function removeToken(key) {
+  return Cookies.remove(TokenKey+"-"+key)
 }
 
-export function setUserInfo(userInfo) {
-  return Cookies.set(UserInfoKey, userInfo)
+export function setUserInfo(key,userInfo) {
+  return Cookies.set(UserInfoKey+"-"+key, userInfo)
 }
 
-export function getUserInfo() {
-  return Cookies.get(UserInfoKey)
+export function getUserInfo(key) {
+  return Cookies.get(UserInfoKey+"-"+key)
 }
 
 /**
@@ -36,6 +36,6 @@ export function isAuth (key) {
  * 清除登录信息
  */
 export function clearLoginInfo () {
-  removeToken();
+  removeToken(sessionStorage.getItem("userName"));
   router.options.isAddDynamicMenuRoutes = false
 }

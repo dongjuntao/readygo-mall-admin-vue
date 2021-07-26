@@ -8,7 +8,7 @@ import Vue from 'vue'
 import Router from 'vue-router'
 import http from '@/utils/httpRequest'
 import { isURL } from '@/utils/validate'
-import { clearLoginInfo,getToken } from '@/utils/auth'
+import { clearLoginInfo,getToken,getUserInfo} from '@/utils/auth'
 import { getNavbar } from '@/api/mall-menu'
 import NProgress from 'nprogress' // Progress 进度条
 import 'nprogress/nprogress.css'// Progress 进度条样式
@@ -21,7 +21,8 @@ const _import = require('./import-' + process.env.NODE_ENV)
 // 全局路由(无需嵌套上左右整体布局)
 const globalRoutes = [
   { path: '/404', component: _import('common/404'), name: '404', meta: { title: '404未找到' } },
-  { path: '/login', component: _import('common/login'), name: 'login', meta: { title: '登录' } }
+  { path: '/admin/login', component: _import('common/admin-login'), name: 'admin-login', meta: { title: '登录' } },
+  { path: '/merchant/login', component: _import('common/merchant-login'), name: 'merchant-login', meta: { title: '登录' } }
 ]
 
 // 主入口路由(需嵌套上左右整体布局)
@@ -38,16 +39,7 @@ const mainRoutes = {
     // 提示: 如需要通过iframe嵌套展示内容, 但不通过tab打开, 请自行创建组件使用iframe处理!
     { path: '/home', component: _import('common/home'), name: 'home', meta: { title: '首页' } },
     { path: '/theme', component: _import('common/theme'), name: 'theme', meta: { title: '主题' } }
-  ],
-  beforeEnter (to, from, next) {
-    //判断是否有token，没有就跳转到登录页面
-    let token = getToken();
-    if (!token) {
-      clearLoginInfo()
-      next({ name: 'login' })
-    }
-    next()
-  }
+  ]
 }
 
 const router = new Router({
@@ -63,8 +55,13 @@ router.beforeEach((to, from, next) => {
   // 添加动态(菜单)路由
   // 1. 已经添加 or 全局路由, 直接访问
   // 2. 获取菜单列表, 添加并保存本地存储
-  if (router.options.isAddDynamicMenuRoutes || fnCurrentRouteType(to, globalRoutes) === 'global') {
+  if (!getToken(sessionStorage.getItem("userName"))){
+    router.options.isAddDynamicMenuRoutes = false;
+  }
+  if(router.options.isAddDynamicMenuRoutes || fnCurrentRouteType(to, globalRoutes) === 'global'){
     next()
+  } else if (!getToken(sessionStorage.getItem("userName"))) { //判断登录状态（是否有token）
+    router.push({ path: "/admin/login"})
   } else {
     getNavbar(http.paramsHandler()).then(({data}) => {
       if (data && data.code === '200') {
@@ -79,11 +76,11 @@ router.beforeEach((to, from, next) => {
         next()
       }
     }).catch((e) => {
-      console.log(`%c${e} 请求菜单列表和权限失败，跳转至登录页！！`, 'color:blue')
-      router.push({ name: 'login' })
+      router.push({ path: "/admin/login"})
     })
   }
 })
+
 router.afterEach(() => {
   // 在即将进入新的页面组件前，关闭掉进度条
   NProgress.done()
