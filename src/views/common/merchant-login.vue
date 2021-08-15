@@ -27,10 +27,17 @@
           </el-input>
         </el-form-item>
 
-        <el-form-item style="margin-top: 50px;text-align: center">
+        <el-form-item style="text-align: right; margin-top: -15px;">
+          <el-button type="danger" size="mini" plain style="width: 25%; font-size: 14px;" @click="toMerchantSettled">
+            商家入驻
+          </el-button>
+        </el-form-item>
+
+        <el-form-item style="text-align: center; margin-top: -15px;">
           <el-button v-if="!loading" style="width: 100%" type="primary" :loading="loading" @click="useVerify">登 录</el-button>
           <el-button style="width: 100%" type="primary" :loading="loading" v-else>登 录 中</el-button>
         </el-form-item>
+
       </el-form>
     </el-card>
     <img :src="login_background" class="login-center-layout">
@@ -116,6 +123,13 @@
 
       useVerify(){
         this.$refs.verify.show()
+      },
+      /**
+       * 跳转到商家入驻页面
+       */
+      toMerchantSettled(){
+        let pushData = this.$router.resolve({ path: '/merchant/settled' });
+        window.open(pushData.href,"_blank")
       }
     }
   }

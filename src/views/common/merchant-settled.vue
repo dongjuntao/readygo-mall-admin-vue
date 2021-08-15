@@ -1,0 +1,318 @@
+<template>
+  <div>
+    <el-card class="login-form-layout">
+      <el-form :model="dataForm" :rules="dataRule" ref="dataForm" label-width="50px;">
+        <h2 class="login-title">商家入驻信息</h2>
+        <el-form-item label="用户名" prop="userName" >
+          <el-input v-model="dataForm.userName" placeholder="请输入用户名"></el-input>
+        </el-form-item>
+        <el-form-item prop="password" label="密码" >
+          <el-input name="password" type="password" v-model="dataForm.password" placeholder="请输入密码"></el-input>
+        </el-form-item>
+        <el-form-item prop="password" label="确认密码" >
+          <el-input type="password" v-model="dataForm.surePassword" placeholder="请输入确认密码"></el-input>
+        </el-form-item>
+        <el-form-item prop="avatar" label="商户头像" >
+          <el-upload
+            class="avatar-uploader"
+            action="#"
+            :multiple="false"
+            :show-file-list="false"
+            :http-request="uploadAvatar"
+            :before-upload="beforeUploadAvatar">
+            <img style="width: 50px; height: 50px;" v-if="dataForm.avatar" :src="dataForm.avatar" class="avatar">
+            <i v-else >
+              <el-button type="primary" plain>上传头像</el-button>
+            </i>
+          </el-upload>
+        </el-form-item>
+        <el-form-item prop="name" label="商户真实名称" >
+          <el-input type="name" v-model="dataForm.name" placeholder="请输入商户真实名称"></el-input>
+        </el-form-item>
+        <el-form-item prop="qualificationMaterials" label="商户资质材料" >
+          <el-upload
+            class="upload-demo"
+            action="#"
+            :http-request="uploadQualificationMaterials"
+            :before-upload="beforeUploadQualificationMaterials"
+            multiple
+            :file-list="fileList">
+            <el-button type="primary" plain>点击上传</el-button>
+            <span slot="tip" class="el-upload__tip custom-tip">只能上传jpg/png文件，且不超过500kb</span>
+          </el-upload>
+        </el-form-item>
+
+        <el-form-item prop="fixedTelephone" label="固定电话" >
+          <el-input v-model="dataForm.fixedTelephone" placeholder="请输入固定电话"></el-input>
+        </el-form-item>
+        <el-form-item prop="mobile" label="手机号码" >
+          <el-input v-model="dataForm.mobile" placeholder="请输入手机号码"></el-input>
+        </el-form-item>
+        <el-form-item prop="email" label="邮箱" >
+          <el-input type="email" v-model="dataForm.email" placeholder="请输入邮箱"></el-input>
+        </el-form-item>
+        <el-form-item prop="regions" label="地区" >
+          <template>
+            <el-select v-model="province" filterable placeholder="请选择省份" @change="getCity()">
+              <el-option
+                v-for="item in provinceList"
+                :key="item.id"
+                :label="item.name"
+                :value="item.id">
+              </el-option>
+            </el-select>
+            <el-select v-model="city" filterable placeholder="请选择城市" @change="getArea()">
+              <el-option
+                v-for="item in cityList"
+                :key="item.id"
+                :label="item.name"
+                :value="item.id">
+              </el-option>
+            </el-select>
+            <el-select v-model="area" filterable placeholder="请选择区县">
+              <el-option
+                v-for="item in areaList"
+                :key="item.id"
+                :label="item.name"
+                :value="item.id">
+              </el-option>
+            </el-select>
+          </template>
+        </el-form-item>
+        <el-form-item prop="address" label="详细地址" >
+          <el-input type="address" v-model="dataForm.address" placeholder="请输入详细地址"></el-input>
+        </el-form-item>
+
+        <el-form-item style="margin-top: 50px;text-align: center;">
+          <el-button style="width: 20%" type="primary" :loading="loading" >申 请 入 驻</el-button>
+        </el-form-item>
+      </el-form>
+    </el-card>
+    <img :src="merchant_settled_background" class="login-center-layout">
+  </div>
+</template>
+
+<script>
+import { getRegionList } from '@/api/mall-region'
+import merchant_settled_background from '@/assets/img/merchant_settled_background.png';
+import { adminUserConstant } from "@/utils/constant";
+import {  fileUpload } from '@/api/mall-file/file'
+
+export default {
+  data () {
+    return {
+      loginType: 'system',
+      dataForm: {
+        userName: '',//用户名
+        password: '',//密码
+        surePassword: '', //确认密码
+        avatar: '', //头像
+        name: '', //商户真实名称
+        qualificationMaterials: '', //商户资质材料
+        fixedTelephone: '', //固定电话
+        mobile: '', //手机号码
+        email: '', //邮箱
+        regions: '', //所属区域id集合【1,2,3】
+        address: ''//详细地址
+      },
+      fileList:[], //商户资质材料列表
+      dataRule: {
+        userName: [
+          { required: true, message: '帐号不能为空', trigger: 'blur' }
+        ],
+        password: [
+          { required: true, message: '密码不能为空', trigger: 'blur' }
+        ],
+        name: [
+          { required: true, message: '商户真实名称不能为空', trigger: 'blur' }
+        ],
+        qualificationMaterials: [
+          { required: true, message: '商户资质材料不能为空', trigger: 'blur' }
+        ],
+        mobile: [
+          { required: true, message: '手机号码不能为空', trigger: 'blur' }
+        ],
+        address: [
+          { required: true, message: '详细地址不能为空', trigger: 'blur' }
+        ],
+      },
+      loading: false,
+      pwdType: 'password',
+      merchant_settled_background,
+      supportDialogVisible:false,
+      userType: 0,
+      provinceList: [], //省份
+      province:"", //已选省份
+      cityList: [], //城市
+      city: "", //已选城市
+      areaList: [], //区县
+      area: "" //已选区县
+    }
+  },
+  mounted () {
+    this.getProvinceData();
+  },
+  methods: {
+    //获取（初始化）省份信息
+    getProvinceData() {
+      this.dataListLoading = true
+      var params =  this.axios.paramsHandler({parent_id: 0},false)
+      getRegionList(params).then(({data}) => {
+        if (data && data.code === "200") {
+          this.provinceList = data.data;
+        }
+        this.dataListLoading = false
+      })
+    },
+    //获取城市信息
+    getCity(){
+      this.dataListLoading = true
+      var params =  this.axios.paramsHandler({parent_id: this.province},false)
+      getRegionList(params).then(({data}) => {
+        if (data && data.code === "200") {
+          this.city = null;
+          this.area = null;
+          this.cityList = data.data
+          this.areaList = [];
+        }
+        this.dataListLoading = false
+      })
+    },
+    //获取区县信息
+    getArea(){
+      this.dataListLoading = true
+      var params =  this.axios.paramsHandler({parent_id: this.city},false)
+      getRegionList(params).then(({data}) => {
+        if (data && data.code === "200") {
+          this.area = null;
+          this.areaList = data.data
+        }
+        this.dataListLoading = false
+      })
+    },
+    // 提交表单
+    dataFormSubmit (captchaVerification) {
+      this.$refs['dataForm'].validate((valid) => {
+        if (valid) {
+          this.loading=true;
+          var params = this.axios.paramsHandler(captchaVerification);
+          var data = this.axios.dataHandler({
+            userName: this.dataForm.userName,
+            password: this.dataForm.password,
+            userType: 0 //系统管理员
+          });
+          this.$store.dispatch('Login', {params, data}).then((response) => {
+            this.loading = false
+            if (!response) {
+              this.$router.replace({ name: 'home' })
+            }else {
+              this.$message.warning(response.data.message);
+            }
+          }).catch(() => {
+            this.loading = false
+            this.$message.warning("登录失败");
+          })
+        }
+      })
+    },
+
+    //上传头像
+    uploadAvatar(file){
+      let formData = new FormData();
+      formData.append("files", file.file);
+      var params = this.axios.paramsHandler({folderName: adminUserConstant.admin_user_avatar })
+      fileUpload(formData, params).then(({data}) => {
+        this.dataForm.avatar = data.data;
+      })
+    },
+    //上传头像前判断
+    beforeUploadAvatar(){
+      const isImg = (file.size / 1024 / 1024) < 1
+      if (!isImg) {
+        this.$message.error('上传头像图片大小不能超过 3MB!')
+      }
+      const isType = file.type === "image/png"
+      const isType2 = file.type === "image/jpeg"
+      if (!isType && !isType2) {
+        this.$message.error('上传logo图片格式为png或jpg')
+      }
+      return (isType || isType2) && isImg
+    },
+
+    uploadQualificationMaterials(){
+
+    },
+    beforeUploadQualificationMaterials(){
+
+    }
+
+  }
+}
+</script>
+
+<style lang="scss">
+.login-form-layout {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0px;
+  width: 800px;
+  min-height: 700px;
+  margin: 100px auto;
+  border-top: 3px solid #3399ff;
+  background-color: #FFFFFFFF;
+  font-weight: 700;
+}
+
+.login-title {
+  text-align: center;
+}
+
+.login-center-layout {
+  overflow: hidden;
+  position: fixed;
+  width:100%;
+  height:100%;
+  background-size:cover;
+  z-index: -1;
+}
+
+.el-form-item__label {
+  text-align: right;
+  vertical-align: middle;
+  float: left;
+  font-size: 14px;
+  color: #606266;
+  line-height: 40px;
+  padding: 0 12px 0 0;
+  -webkit-box-sizing: border-box;
+  box-sizing: border-box;
+  width: 14%;
+}
+
+.el-input {
+  position: relative;
+  font-size: 14px;
+  display: inline-block;
+  width: 85%;
+}
+
+.el-form-item__error {
+  color: #F56C6C;
+  font-size: 12px;
+  line-height: 1;
+  padding-top: 5px;
+  position: absolute;
+  top: 99%;
+  left: 0;
+  margin-left: 14%;
+}
+
+.el-card__body {
+  padding: 0px 20px 20px 20px;
+}
+
+.custom-tip{
+  margin-left: 10px;
+}
+</style>

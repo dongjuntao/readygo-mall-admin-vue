@@ -22,7 +22,8 @@ const _import = require('./import-' + process.env.NODE_ENV)
 const globalRoutes = [
   { path: '/404', component: _import('common/404'), name: '404', meta: { title: '404未找到' } },
   { path: '/admin/login', component: _import('common/admin-login'), name: 'admin-login', meta: { title: '登录' } },
-  { path: '/merchant/login', component: _import('common/merchant-login'), name: 'merchant-login', meta: { title: '登录' } }
+  { path: '/merchant/login', component: _import('common/merchant-login'), name: 'merchant-login', meta: { title: '登录' } },
+  { path: '/merchant/settled', component: _import('common/merchant-settled'), name: 'merchant-settled', meta: { title: '商家入驻' } }
 ]
 
 // 主入口路由(需嵌套上左右整体布局)

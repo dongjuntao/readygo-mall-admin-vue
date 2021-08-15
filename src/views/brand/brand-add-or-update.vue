@@ -165,7 +165,7 @@ export default {
     beforeUpload(file){
       const isImg = (file.size / 1024 / 1024) < 3
       if (!isImg) {
-        this.$message.error('上传头像图片大小不能超过 3MB!')
+        this.$message.error('上传logo图片大小不能超过 3MB!')
       }
       const isType = file.type === "image/png"
       const isType2 = file.type === "image/jpeg"
