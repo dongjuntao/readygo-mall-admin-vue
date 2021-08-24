@@ -11,7 +11,8 @@ const goodsConstant = {
   goods_specifications_folder_name: "/goods/specifications/images/" //商品规格详细信息绑定的图片路径
 }
 const adminUserConstant = {
-  admin_user_avatar: "/admin/avatar/" //管理用户头像
+  admin_user_avatar: "/admin/avatar/", //管理用户头像
+  admin_qualification_materials: "/admin/qualificationMaterials/" //资质材料
 }
 
 

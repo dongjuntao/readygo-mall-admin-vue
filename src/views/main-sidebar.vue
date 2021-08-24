@@ -5,7 +5,8 @@
         :default-active="menuActiveName || 'home'"
         :collapse="sidebarFold"
         :collapseTransition="false"
-        class="site-sidebar__menu">
+        class="site-sidebar__menu"
+        unique-opened>
         <el-menu-item index="home" @click="$router.push({ name: 'home' })">
           <icon-svg name="shouye" class="site-sidebar__menu-icon"></icon-svg>
           <span slot="title">系统首页</span>
@@ -27,7 +28,8 @@ import { isURL } from '@/utils/validate'
 export default {
   data () {
     return {
-      dynamicMenuRoutes: []
+      dynamicMenuRoutes: [],
+      lastIndex: ""
     }
   },
   components: {
@@ -63,6 +65,7 @@ export default {
   created () {
     this.menuList = JSON.parse(sessionStorage.getItem('menuList') || '[]')
     this.dynamicMenuRoutes = JSON.parse(sessionStorage.getItem('dynamicMenuRoutes') || '[]')
+    console.log("this.dynamicMenuRoutes =",this.dynamicMenuRoutes )
     this.routeHandle(this.$route)
   },
   methods: {

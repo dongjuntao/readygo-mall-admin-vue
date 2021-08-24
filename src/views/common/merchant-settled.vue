@@ -9,7 +9,7 @@
         <el-form-item prop="password" label="密码" >
           <el-input name="password" type="password" v-model="dataForm.password" placeholder="请输入密码"></el-input>
         </el-form-item>
-        <el-form-item prop="password" label="确认密码" >
+        <el-form-item prop="surePassword" label="确认密码" >
           <el-input type="password" v-model="dataForm.surePassword" placeholder="请输入确认密码"></el-input>
         </el-form-item>
         <el-form-item prop="avatar" label="商户头像" >
@@ -35,10 +35,11 @@
             action="#"
             :http-request="uploadQualificationMaterials"
             :before-upload="beforeUploadQualificationMaterials"
-            multiple
-            :file-list="fileList">
+            :on-remove="removeQualificationMaterials"
+            :file-list="qualificationMaterialsList"
+            multiple>
             <el-button type="primary" plain>点击上传</el-button>
-            <span slot="tip" class="el-upload__tip custom-tip">只能上传jpg/png文件，且不超过500kb</span>
+            <span slot="tip" class="el-upload__tip custom-tip">只能上传jpg/png文件，且不超过1MB</span>
           </el-upload>
         </el-form-item>
 
@@ -61,7 +62,7 @@
                 :value="item.id">
               </el-option>
             </el-select>
-            <el-select v-model="city" filterable placeholder="请选择城市" @change="getArea()">
+            <el-select style="margin-left: 12px;" v-model="city" filterable placeholder="请选择城市" @change="getArea()">
               <el-option
                 v-for="item in cityList"
                 :key="item.id"
@@ -69,14 +70,14 @@
                 :value="item.id">
               </el-option>
             </el-select>
-            <el-select v-model="area" filterable placeholder="请选择区县">
+            <el-select style="margin-left: 12px;" v-model="area" filterable placeholder="请选择区县">
               <el-option
                 v-for="item in areaList"
                 :key="item.id"
                 :label="item.name"
                 :value="item.id">
               </el-option>
-            </el-select>
+            </el-select >
           </template>
         </el-form-item>
         <el-form-item prop="address" label="详细地址" >
@@ -84,7 +85,7 @@
         </el-form-item>
 
         <el-form-item style="margin-top: 50px;text-align: center;">
-          <el-button style="width: 20%" type="primary" :loading="loading" >申 请 入 驻</el-button>
+          <el-button style="width: 20%" type="primary" :loading="loading" @click="dataFormSubmit">申 请 入 驻</el-button>
         </el-form-item>
       </el-form>
     </el-card>
@@ -97,9 +98,24 @@ import { getRegionList } from '@/api/mall-region'
 import merchant_settled_background from '@/assets/img/merchant_settled_background.png';
 import { adminUserConstant } from "@/utils/constant";
 import {  fileUpload } from '@/api/mall-file/file'
+import {saveAdmin} from "../../api/mall-admin";
 
 export default {
   data () {
+    var surePasswordValidator = (rule, value, callback)=>{
+      if (value !== this.dataForm.password) {
+        callback(new Error('两次输入密码不一致!'))
+      } else {
+        callback()
+      }
+    }
+    var qualificationMaterialsValidator = (rule, value, callback)=>{
+      if (!this.qualificationMaterialsList || this.qualificationMaterialsList.length == 0) {
+        callback(new Error('请上传商户资质材料！'))
+      } else {
+        callback()
+      }
+    }
     return {
       loginType: 'system',
       dataForm: {
@@ -115,7 +131,7 @@ export default {
         regions: '', //所属区域id集合【1,2,3】
         address: ''//详细地址
       },
-      fileList:[], //商户资质材料列表
+      qualificationMaterialsList:[], //商户资质材料列表
       dataRule: {
         userName: [
           { required: true, message: '帐号不能为空', trigger: 'blur' }
@@ -126,15 +142,18 @@ export default {
         name: [
           { required: true, message: '商户真实名称不能为空', trigger: 'blur' }
         ],
-        qualificationMaterials: [
-          { required: true, message: '商户资质材料不能为空', trigger: 'blur' }
-        ],
         mobile: [
           { required: true, message: '手机号码不能为空', trigger: 'blur' }
         ],
         address: [
           { required: true, message: '详细地址不能为空', trigger: 'blur' }
         ],
+        qualificationMaterials: [
+          { required: true, validator:qualificationMaterialsValidator, trigger: 'blur' }
+        ],
+        surePassword: [
+          {required: true, validator:surePasswordValidator, trigger: 'blur'}
+        ]
       },
       loading: false,
       pwdType: 'password',
@@ -190,31 +209,6 @@ export default {
         this.dataListLoading = false
       })
     },
-    // 提交表单
-    dataFormSubmit (captchaVerification) {
-      this.$refs['dataForm'].validate((valid) => {
-        if (valid) {
-          this.loading=true;
-          var params = this.axios.paramsHandler(captchaVerification);
-          var data = this.axios.dataHandler({
-            userName: this.dataForm.userName,
-            password: this.dataForm.password,
-            userType: 0 //系统管理员
-          });
-          this.$store.dispatch('Login', {params, data}).then((response) => {
-            this.loading = false
-            if (!response) {
-              this.$router.replace({ name: 'home' })
-            }else {
-              this.$message.warning(response.data.message);
-            }
-          }).catch(() => {
-            this.loading = false
-            this.$message.warning("登录失败");
-          })
-        }
-      })
-    },
 
     //上传头像
     uploadAvatar(file){
@@ -226,10 +220,10 @@ export default {
       })
     },
     //上传头像前判断
-    beforeUploadAvatar(){
+    beforeUploadAvatar(file){
       const isImg = (file.size / 1024 / 1024) < 1
       if (!isImg) {
-        this.$message.error('上传头像图片大小不能超过 3MB!')
+        this.$message.error('上传头像图片大小不能超过 1MB!')
       }
       const isType = file.type === "image/png"
       const isType2 = file.type === "image/jpeg"
@@ -238,12 +232,95 @@ export default {
       }
       return (isType || isType2) && isImg
     },
-
-    uploadQualificationMaterials(){
-
+    /**
+     * 上传资质材料
+     * @param file
+     */
+    uploadQualificationMaterials(file){
+      let formData = new FormData();
+      formData.append("files", file.file);
+      var params = this.axios.paramsHandler({folderName: adminUserConstant.admin_qualification_materials })
+      fileUpload(formData, params).then(({data}) => {
+        console.log("data==",data)
+        this.qualificationMaterialsList.push({
+          name:data.data.substring(data.data.lastIndexOf("/")+20),
+          url: data.data
+        });
+      })
     },
-    beforeUploadQualificationMaterials(){
+    /**
+     * 上传资质材料前
+     * @returns {boolean}
+     */
+    beforeUploadQualificationMaterials(file){
+      const isImg = (file.size / 1024 / 1024) < 1
+      if (!isImg) {
+        this.$message.error('上传头像图片大小不能超过 1MB!')
+      }
+      const isType = file.type === "image/png"
+      const isType2 = file.type === "image/jpeg"
+      if (!isType && !isType2) {
+        this.$message.error('上传资质材料格式为png或jpg')
+      }
+      const fileNum = this.qualificationMaterialsList.length<5;
+      if (!fileNum) {
+        this.$message.error('最多只能上传5份资质材料')
+      }
+      return (isType || isType2) && isImg && fileNum
+    },
+    /**
+     * 移除资质材料
+     */
+    removeQualificationMaterials(file, fileList){
+      this.qualificationMaterialsList
+        .splice(this.qualificationMaterialsList.findIndex(item=>{return item.url==file.url}), 1);
+    },
 
+    // 提交表单
+    dataFormSubmit () {
+      //需要特殊处理的字段
+      var qualificationMaterials = ''; //商户资质材料
+      var regions = this.province+","+this.city+","+this.area; //所属区域
+      if (this.qualificationMaterialsList.length>0){
+        this.qualificationMaterialsList.forEach(qualification=>{
+          qualificationMaterials += qualification.url + ",";
+        });
+        qualificationMaterials = qualificationMaterials.substring(0,qualificationMaterials.length-1)
+      }
+      this.$refs['dataForm'].validate((valid) => {
+        if (valid) {
+          this.loading=true;
+          var data = this.axios.dataHandler({
+            userName: this.dataForm.userName,
+            password: this.dataForm.password,
+            userType: 1, //商户管理员
+            avatar: this.dataForm.avatar, //头像
+            name: this.dataForm.name, //商户真实名称
+            qualificationMaterials: qualificationMaterials, //商户资质材料
+            fixedTelephone: this.dataForm.fixedTelephone, //固定电话
+            mobile: this.dataForm.mobile, //手机号码
+            email: this.dataForm.email, //邮箱
+            regions: regions, //所属区域id集合【1,2,3】
+            address: this.dataForm.address//详细地址
+          });
+          saveAdmin(data).then(({data}) => {
+            console.log("data===",data)
+            if (data && data.code === "200") {
+              this.$message({
+                message: '操作成功',
+                type: 'success',
+                duration: 1500,
+                onClose: () => {
+                  this.$route.push({name: 'admin-merchant'});
+                }
+              })
+            } else {
+              this.$message.error(data.msg)
+            }
+          })
+
+        }
+      })
     }
 
   }
@@ -314,5 +391,30 @@ export default {
 
 .custom-tip{
   margin-left: 10px;
+}
+
+.el-upload-list__item-name {
+  color: #606266;
+  display: block;
+  margin-right: 40px;
+  overflow: hidden;
+  padding-left: 4px;
+  text-overflow: ellipsis;
+  -webkit-transition: color .3s;
+  transition: color .3s;
+  white-space: nowrap;
+  margin-left: 13%;
+}
+
+.el-upload-list__item.is-ready,
+.el-upload-list__item.is-uploading {
+  display: none !important;
+}
+
+
+
+.el-select>.el-input {
+  display: block;
+  width: 100%;
 }
 </style>

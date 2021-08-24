@@ -6,10 +6,11 @@ const prefix = "/mall-admin";
  * @param params
  * @returns {*}
  */
-export function getNavbar() {
+export function getNavbar(params) {
   return request({
     url: prefix+'/system/menu/navbar',
-    method: 'get'
+    method: 'get',
+    params: params
   })
 }
 

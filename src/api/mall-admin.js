@@ -80,3 +80,14 @@ export function updateAdmin(data) {
     data: data
   })
 }
+
+/**
+ * 商家审核
+ */
+export function auditAdmin(id, data) {
+  return request({
+    url: prefix+'/system/admin/audit/'+id,
+    method: 'put',
+    data: data
+  })
+}

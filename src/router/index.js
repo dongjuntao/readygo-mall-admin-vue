@@ -8,7 +8,7 @@ import Vue from 'vue'
 import Router from 'vue-router'
 import http from '@/utils/httpRequest'
 import { isURL } from '@/utils/validate'
-import { clearLoginInfo,getToken,getUserInfo} from '@/utils/auth'
+import { getToken,getUserInfo} from '@/utils/auth'
 import { getNavbar } from '@/api/mall-menu'
 import NProgress from 'nprogress' // Progress 进度条
 import 'nprogress/nprogress.css'// Progress 进度条样式
@@ -64,7 +64,8 @@ router.beforeEach((to, from, next) => {
   } else if (!getToken(sessionStorage.getItem("userName"))) { //判断登录状态（是否有token）
     router.push({ path: "/admin/login"})
   } else {
-    getNavbar(http.paramsHandler()).then(({data}) => {
+    var userInfo = JSON.parse(getUserInfo(sessionStorage.getItem("userName")));
+    getNavbar(http.paramsHandler({userId: userInfo.userId, userType: userInfo.userType})).then(({data}) => {
       if (data && data.code === '200') {
         fnAddDynamicMenuRoutes(data.data.menuList)
         router.options.isAddDynamicMenuRoutes = true

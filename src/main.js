@@ -2,6 +2,7 @@ import Vue from 'vue'
 import App from '@/App'
 import router from '@/router'
 import store from '@/store'
+import 'element-ui/lib/theme-chalk/index.css'
 import '@/icons'
 import '@/assets/scss/index.scss'
 
@@ -22,7 +23,7 @@ NProgress.configure({
   minimum: 0.3 // 初始化时的最小百分比
 })
 
-import 'element-ui/lib/theme-chalk/index.css'
+
 import locale from 'element-ui/lib/locale/lang/zh-CN' // lang i18n
 import ElementUI from 'element-ui'
 Vue.use(ElementUI,{size: 'medium', locale })

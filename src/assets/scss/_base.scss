@@ -277,7 +277,7 @@ img {
       }
       .el-menu-item.is-active,
       .el-submenu.is-active > .el-submenu__title {
-        color: mix(#fff, $sidebar--color-text-dark, 80%);
+        color: mix(#409EFF, $sidebar--color-text-dark, 80%);
       }
     }
   }

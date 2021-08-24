@@ -11,3 +11,16 @@ export function getRegionList(params) {
     params: params
   })
 }
+
+/**
+ * 商品信息
+ * @param params
+ * @returns {*}
+ */
+export function getRegionsNameByRegions(params) {
+  return request({
+    url: prefix+'/system/region/getRegionsNameByRegions',
+    method: 'get',
+    params: params
+  })
+}

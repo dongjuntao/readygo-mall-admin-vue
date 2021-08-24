@@ -1,6 +1,5 @@
 import { adminLogin } from '@/api/mall-admin'
-import { setToken } from '@/utils/auth'
-import {setUserInfo} from "@/utils/auth";
+import {setToken, setUserInfo} from "@/utils/auth";
 
 const admin = {
   state: {
@@ -25,9 +24,10 @@ const admin = {
         adminLogin(params, data).then(response => {
           //登录后把token存到cookie中
           if (response && response.data.code === "200") {
-            setToken(response.data.data.enhanceInfo.userName, response.data.data.accessToken)
-            setUserInfo(response.data.data.enhanceInfo.userName, response.data.data.enhanceInfo);
-            sessionStorage.setItem("userName", response.data.data.enhanceInfo.userName)
+            var result = response.data.data;
+            setToken(result.enhanceInfo.userName, result.accessToken)
+            setUserInfo(result.enhanceInfo.userName, result.enhanceInfo);
+            sessionStorage.setItem("userName", result.enhanceInfo.userName)
             commit('SET_ACCESS_TOKEN',response.data.data)
             resolve();
           } else { //如果未返回200，则返回提示信息
