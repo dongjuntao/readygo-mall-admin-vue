@@ -28,7 +28,8 @@ export default {
      * cookie中获取当前登录的用户信息
      */
     getUserInfo() {
-      var userInfo = JSON.parse(getUserInfo(sessionStorage.getItem("userName")));
+      var userInfo = JSON.parse(getUserInfo(sessionStorage.getItem("userNameKey")));
+      console.log("userInfo==",userInfo)
       this.userName = userInfo.userName;
       this.userId = userInfo.userId;
       this.userType = userInfo.userType;

@@ -25,9 +25,9 @@ const admin = {
           //登录后把token存到cookie中
           if (response && response.data.code === "200") {
             var result = response.data.data;
-            setToken(result.enhanceInfo.userName, result.accessToken)
-            setUserInfo(result.enhanceInfo.userName, result.enhanceInfo);
-            sessionStorage.setItem("userName", result.enhanceInfo.userName)
+            setToken(result.enhanceInfo.userName+"_"+result.enhanceInfo.userId, result.accessToken)
+            setUserInfo(result.enhanceInfo.userName+"_"+result.enhanceInfo.userId, result.enhanceInfo);
+            sessionStorage.setItem("userNameKey", result.enhanceInfo.userName+"_"+result.enhanceInfo.userId)
             commit('SET_ACCESS_TOKEN',response.data.data)
             resolve();
           } else { //如果未返回200，则返回提示信息

@@ -22,7 +22,6 @@ const _import = require('./import-' + process.env.NODE_ENV)
 const globalRoutes = [
   { path: '/404', component: _import('common/404'), name: '404', meta: { title: '404未找到' } },
   { path: '/admin/login', component: _import('common/admin-login'), name: 'admin-login', meta: { title: '登录' } },
-  { path: '/merchant/login', component: _import('common/merchant-login'), name: 'merchant-login', meta: { title: '登录' } },
   { path: '/merchant/settled', component: _import('common/merchant-settled'), name: 'merchant-settled', meta: { title: '商家入驻' } }
 ]
 
@@ -56,15 +55,15 @@ router.beforeEach((to, from, next) => {
   // 添加动态(菜单)路由
   // 1. 已经添加 or 全局路由, 直接访问
   // 2. 获取菜单列表, 添加并保存本地存储
-  if (!getToken(sessionStorage.getItem("userName"))){
+  if (!getToken(sessionStorage.getItem("userNameKey"))){
     router.options.isAddDynamicMenuRoutes = false;
   }
   if(router.options.isAddDynamicMenuRoutes || fnCurrentRouteType(to, globalRoutes) === 'global'){
     next()
-  } else if (!getToken(sessionStorage.getItem("userName"))) { //判断登录状态（是否有token）
+  } else if (!getToken(sessionStorage.getItem("userNameKey"))) { //判断登录状态（是否有token）
     router.push({ path: "/admin/login"})
   } else {
-    var userInfo = JSON.parse(getUserInfo(sessionStorage.getItem("userName")));
+    var userInfo = JSON.parse(getUserInfo(sessionStorage.getItem("userNameKey")));
     getNavbar(http.paramsHandler({userId: userInfo.userId, userType: userInfo.userType})).then(({data}) => {
       if (data && data.code === '200') {
         fnAddDynamicMenuRoutes(data.data.menuList)

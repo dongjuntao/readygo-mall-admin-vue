@@ -80,6 +80,8 @@
   import { select } from '@/api/mall-role'
   import { getUserById, auditAdmin } from '@/api/mall-admin'
   import { getRegionsNameByRegions } from '@/api/mall-region'
+  import { getUserInfo, setUserInfo} from '@/utils/auth'
+
   export default {
     data () {
       return {

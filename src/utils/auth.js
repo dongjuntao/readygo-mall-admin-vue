@@ -36,6 +36,6 @@ export function isAuth (key) {
  * 清除登录信息
  */
 export function clearLoginInfo () {
-  removeToken(sessionStorage.getItem("userName"));
+  removeToken(sessionStorage.getItem("userNameKey"));
   router.options.isAddDynamicMenuRoutes = false
 }

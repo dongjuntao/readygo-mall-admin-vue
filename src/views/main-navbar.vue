@@ -19,7 +19,10 @@
         mode="horizontal">
         <el-menu-item class="site-navbar__avatar" index="3">
           <el-dropdown :show-timeout="0" placement="bottom">
-            <span class="el-dropdown-link">
+            <span class="el-dropdown-link" v-if="avatar">
+              <img :src="avatar" :alt="userName">{{ userName }}
+            </span>
+            <span class="el-dropdown-link"v-else>
               <img src="~@/assets/img/avatar.jpg" :alt="userName">{{ userName }}
             </span>
             <el-dropdown-menu slot="dropdown">
@@ -46,7 +49,8 @@ export default {
       updatePasswordVisible: false,
       userName: '',
       userId: 0,
-      userType: null
+      userType: null,
+      avatar: null
     }
   },
   components: {
@@ -87,7 +91,7 @@ export default {
             if (data && data.code === "200") {
               clearLoginInfo()
               //系统管理员用户，退出到系统管理员等了页面
-              this.$router.push({ name: this.userType==0 ? "admin-login": "merchant-login" })
+              this.$router.push({ name: "admin-login" })
             }else {
               this.$message.warning("退出失败");
             }
@@ -99,10 +103,11 @@ export default {
      * cookie中获取当前登录的用户信息
      */
     getUserInfo() {
-      var userInfo = JSON.parse(getUserInfo(sessionStorage.getItem("userName")));
+      var userInfo = JSON.parse(getUserInfo(sessionStorage.getItem("userNameKey")));
       this.userName = userInfo.userName;
       this.userId = userInfo.userId;
       this.userType = userInfo.userType;
+      this.avatar = userInfo.avatar
     }
   }
 }
