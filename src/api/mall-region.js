@@ -13,7 +13,7 @@ export function getRegionList(params) {
 }
 
 /**
- * 商品信息
+ * 区域名称集 如（安徽省 淮南市 寿县）
  * @param params
  * @returns {*}
  */
@@ -21,6 +21,54 @@ export function getRegionsNameByRegions(params) {
   return request({
     url: prefix+'/system/region/getRegionsNameByRegions',
     method: 'get',
+    params: params
+  })
+}
+
+/**
+ * 根据id查询地区信息
+ * @param params
+ * @returns {*}
+ */
+export function getRegionById(params) {
+  return request({
+    url: prefix+'/system/region/getRegionById',
+    method: 'get',
+    params: params
+  })
+}
+
+
+
+/**
+ * 新增地区
+ */
+export function saveRegion(data) {
+  return request({
+    url: prefix+'/system/region/save',
+    method: 'post',
+    data: data
+  })
+}
+
+/**
+ * 修改地区
+ */
+export function updateRegion(data) {
+  return request({
+    url: prefix+'/system/region/update',
+    method: 'put',
+    data: data
+  })
+}
+
+/**
+ * 删除地区
+ */
+export function deleteRegion(params) {
+  return request({
+    url: prefix+'/system/region/delete',
+    method: 'delete',
     params: params
   })
 }
