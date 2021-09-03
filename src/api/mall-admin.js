@@ -38,6 +38,17 @@ export function getAdminList(params) {
 }
 
 /**
+ * 管理员列表（不分页）
+ */
+export function getAdminListAll(params) {
+  return request({
+    url: prefix+'/system/admin/listAll',
+    method: 'get',
+    params: params
+  })
+}
+
+/**
  * 删除用户
  */
 export function deleteAdmin(data) {

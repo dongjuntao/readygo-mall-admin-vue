@@ -241,7 +241,6 @@ export default {
       formData.append("files", file.file);
       var params = this.axios.paramsHandler({folderName: adminUserConstant.admin_qualification_materials })
       fileUpload(formData, params).then(({data}) => {
-        console.log("data==",data)
         this.qualificationMaterialsList.push({
           name:data.data.substring(data.data.lastIndexOf("/")+20),
           url: data.data
@@ -304,7 +303,6 @@ export default {
             address: this.dataForm.address//详细地址
           });
           saveAdmin(data).then(({data}) => {
-            console.log("data===",data)
             if (data && data.code === "200") {
               this.$message({
                 message: '操作成功',

@@ -29,7 +29,6 @@ export default {
      */
     getUserInfo() {
       var userInfo = JSON.parse(getUserInfo(sessionStorage.getItem("userNameKey")));
-      console.log("userInfo==",userInfo)
       this.userName = userInfo.userName;
       this.userId = userInfo.userId;
       this.userType = userInfo.userType;

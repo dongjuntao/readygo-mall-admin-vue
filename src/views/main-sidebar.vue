@@ -65,7 +65,6 @@ export default {
   created () {
     this.menuList = JSON.parse(sessionStorage.getItem('menuList') || '[]')
     this.dynamicMenuRoutes = JSON.parse(sessionStorage.getItem('dynamicMenuRoutes') || '[]')
-    console.log("this.dynamicMenuRoutes =",this.dynamicMenuRoutes )
     this.routeHandle(this.$route)
   },
   methods: {
