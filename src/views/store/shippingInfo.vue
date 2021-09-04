@@ -5,7 +5,7 @@
         <el-input v-model="dataForm.userName" placeholder="用户名" clearable></el-input>
       </el-form-item>
       <el-form-item>
-        <el-button @click="getDataList()">查询</el-button>
+        <el-button v-if="isAuth('store-shippingInfo-search')" @click="getDataList()">查询</el-button>
         <el-button v-if="isAuth('store-shippingInfo-create')" type="primary" @click="addOrUpdateHandle()">新增</el-button>
         <el-button v-if="isAuth('store-shippingInfo-batchDelete')" type="danger" @click="deleteHandle()" :disabled="dataListSelections.length <= 0">批量删除</el-button>
       </el-form-item>
@@ -37,17 +37,26 @@
         width="120">
       </el-table-column>
       <el-table-column
+        prop="fixedTelephone"
+        header-align="center"
+        align="center"
+        label="固定电话"
+        width="190"
+        v-if="userType != 0">
+      </el-table-column>
+      <el-table-column
         prop="merchant"
         header-align="center"
         align="center"
         label="所属商户"
-        width="160">
+        width="190"
+        v-if="userType == 0">
       </el-table-column>
       <el-table-column
         prop="regionNames"
         header-align="center"
         align="center"
-        label="地区"
+        label="发货地区"
         width="300">
       </el-table-column>
       <el-table-column
@@ -55,22 +64,24 @@
         header-align="center"
         align="center"
         label="邮政编码"
-        width="120">
+        width="100">
       </el-table-column>
       <el-table-column
         prop="createTime"
         header-align="center"
         align="center"
-        width="180"
+        width="160"
         label="创建时间">
         <template slot-scope="scope">{{scope.row.createTime | formatDateTime}}</template>
       </el-table-column>
+
       <el-table-column
         header-align="center"
         align="center"
-        width="180"
         label="操作">
         <template slot-scope="scope">
+          <el-button v-if="!scope.row.isDefault" type="text" size="small" @click="isDefaultHandle(scope.row.id, true)">设为默认</el-button>
+          <el-button v-if="scope.row.isDefault" type="text" style="color: red" size="small" @click="isDefaultHandle(scope.row.id, false)">取消默认</el-button>
           <el-button v-if="isAuth('store-shippingInfo-detail')" type="text" size="small" @click="detailHandle(scope.row.id, 'detail')">详情</el-button>
           <el-button v-if="isAuth('store-shippingInfo-update')" type="text" size="small" @click="addOrUpdateHandle(scope.row.id)">修改</el-button>
           <el-button v-if="isAuth('store-shippingInfo-delete')" type="text" size="small" @click="deleteHandle(scope.row.id)">删除</el-button>
@@ -96,7 +107,8 @@
 <script>
 import AddOrUpdate from './shippingInfo-add-or-update'
 import Detail from './shipping-detail'
-import { getShippingInfoList, deleteShippingInfo } from '@/api/mall-shipping-info'
+import { getShippingInfoList, deleteShippingInfo, updateIsDefault } from '@/api/mall-shipping-info'
+import { getUserInfo } from '@/utils/auth'
 export default {
   data () {
     return {
@@ -107,8 +119,7 @@ export default {
       pageNum: 1,
       pageSize: 10,
       totalPage: 0,
-      userType: 1,
-      auditStatus: 1,
+      userType: null,
       dataListLoading: false,
       dataListSelections: [],
       addOrUpdateVisible: false,
@@ -120,7 +131,8 @@ export default {
     Detail
   },
   activated () {
-    this.getDataList()
+    this.getDataList();
+    this.getUserInfo();
   },
   methods: {
     // 获取数据列表
@@ -200,6 +212,37 @@ export default {
           }
         });
       }).catch(() => {})
+    },
+
+    /**
+     * 设为默认 1/ 取消默认2
+     */
+    isDefaultHandle(id, isDefault){
+      var params = this.axios.paramsHandler({isDefault: isDefault}, false);
+      updateIsDefault(id, params).then(({data}) => {
+        if (data && data.code === "200") {
+          this.$message({
+            message: '操作成功',
+            type: 'success',
+            duration: 1500,
+            onClose: () => {
+              this.getDataList()
+            }
+          })
+        } else {
+          this.$message.error(data.msg)
+        }
+      });
+    },
+
+
+
+    /**
+     * cookie中获取当前登录的用户信息
+     */
+    getUserInfo() {
+      var userInfo = JSON.parse(getUserInfo(sessionStorage.getItem("userNameKey")));
+      this.userType = userInfo.userType;
     }
   }
 }

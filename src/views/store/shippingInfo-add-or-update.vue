@@ -12,12 +12,12 @@
         <el-radio v-model="dataForm.sex" :label="1">女</el-radio>
       </el-form-item>
       <el-form-item label="手机号码" prop="mobile">
-        <el-input v-model="dataForm.mobile" placeholder="手机号"></el-input>
+        <el-input v-model="dataForm.mobile" maxlength="11" placeholder="手机号"></el-input>
       </el-form-item>
       <el-form-item label="固定电话" prop="fixedTelephone">
         <el-input v-model="dataForm.fixedTelephone" placeholder="固定电话"></el-input>
       </el-form-item>
-      <el-form-item label="所属商户" prop="adminUserId">
+      <el-form-item label="所属商户" prop="adminUserId" v-if="userType == 0">
         <el-select v-model="dataForm.adminUserId" clearable placeholder="请选择">
           <el-option
             v-for="item in merchantList"
@@ -56,10 +56,10 @@
         </template>
       </el-form-item>
       <el-form-item label="详细地址" prop="address">
-        <el-input v-model="dataForm.address" placeholder="详细地址"></el-input>
+        <el-input v-model="dataForm.address" maxlength="100" placeholder="详细地址"></el-input>
       </el-form-item>
       <el-form-item label="邮政编码" prop="postalCode">
-        <el-input v-model="dataForm.postalCode" placeholder="邮政编码"></el-input>
+        <el-input v-model="dataForm.postalCode" maxlength="6" placeholder="邮政编码"></el-input>
       </el-form-item>
       <el-form-item label="是否默认" prop="isDefault">
         <el-checkbox v-model="dataForm.isDefault" label="设置为默认地址"></el-checkbox>
@@ -116,6 +116,7 @@
           isDefault: false
         },
         createBy: 0, //创建人id
+        userType: null, //用户类型
         provinceList: [], //省份
         province:"", //已选省份
         cityList: [], //城市
@@ -149,8 +150,6 @@
 
     created() {
       this.getProvinceData();
-      // this.getCity()
-      // this.getArea()
       this.getMerchantList();
       this.getUserInfo();
     },
@@ -161,6 +160,9 @@
         this.visible = true;
         this.$nextTick( ()=> {
           this.$refs['dataForm'].resetFields()
+          this.province=null;
+          this.city=null;
+          this.area=null;
           if (this.dataForm.id) {
             var that = this;
             getShippingInfoById(this.axios.paramsHandler({id: this.dataForm.id})).then(async function ({data}) {
@@ -230,6 +232,7 @@
       getUserInfo() {
         var userInfo = JSON.parse(getUserInfo(sessionStorage.getItem("userNameKey")));
         this.createBy = userInfo.userId;
+        this.userType = userInfo.userType;
       },
 
       // 表单提交
@@ -246,7 +249,7 @@
               postalCode: this.dataForm.postalCode,
               mobile: this.dataForm.mobile,
               fixedTelephone: this.dataForm.fixedTelephone,
-              adminUserId: this.dataForm.adminUserId,
+              adminUserId: this.dataForm.adminUserId ? this.dataForm.adminUserId : this.createBy,
               createBy: this.createBy,
               isDefault: this.dataForm.isDefault,
             })

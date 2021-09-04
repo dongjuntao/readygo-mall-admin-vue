@@ -56,3 +56,14 @@ export function getShippingInfoById(params) {
     params: params
   })
 }
+
+/**
+ * 设为默认 / 取消默认
+ */
+export function updateIsDefault(id, params) {
+  return request({
+    url: prefix+'/store/shippingInfo/updateIsDefault/'+id,
+    method: 'put',
+    params: params
+  })
+}
