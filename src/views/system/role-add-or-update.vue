@@ -12,12 +12,13 @@
       </el-form-item>
       <el-form-item size="mini" label="授权">
         <el-tree
+          show-checkbox
+          default-expand-all
           :data="menuList"
           :props="menuListTreeProps"
           node-key="id"
-          ref="menuListTree"
-          :default-expand-all="true"
-          show-checkbox>
+          check-strictly
+          ref="menuListTree">
         </el-tree>
       </el-form-item>
     </el-form>
@@ -60,6 +61,7 @@
         var params = this.axios.paramsHandler();
         getMenuList(params).then(({data}) => {
           this.menuList = treeDataTranslate(data, 'id')
+          console.log("this.menuList===",this.menuList)
         }).then(() => {
           this.visible = true
           this.$nextTick(() => {
@@ -69,7 +71,6 @@
         }).then(() => {
           if (this.dataForm.id) {
             getRoleInfo(this.dataForm.id).then(({data}) => {
-              console.log("data=", data)
               if (data && data.code === "200") {
                 this.dataForm.name = data.data.name
                 this.dataForm.remark = data.data.remark
@@ -77,6 +78,7 @@
                 if (idx !== -1) {
                   data.data.menuIdList.splice(idx, data.data.menuIdList.length - idx)
                 }
+                console.log("data.data.menuIdList=", data.data.menuIdList)
                 this.$refs.menuListTree.setCheckedKeys(data.data.menuIdList)
               }
             })

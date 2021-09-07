@@ -1,12 +1,11 @@
 <template>
   <div class="mod-system-region">
-
     <el-form :inline="true" :model="dataForm" @keyup.enter.native="getRegionData()">
       <el-form-item>
-        <el-input v-model="name" class="region-search-input" placeholder="请输入地区名称"></el-input>
+        <el-input v-model="name" clearable class="region-search-input" placeholder="请输入地区名称"></el-input>
       </el-form-item>
       <el-form-item>
-        <el-button type="primary" v-if="isAuth('system-region-create')" @click="addOrUpdateHandle()">新增</el-button>
+        <el-button type="primary" v-if="isAuth('logistics-region-create')" @click="addOrUpdateHandle()">新增</el-button>
       </el-form-item>
     </el-form>
 
@@ -20,12 +19,12 @@
       <span class="custom-tree-node" slot-scope="{ node, data }">
         <span>{{ node.label }}（{{data.code}}）</span>
         <span>
-          <el-button v-if="isAuth('system-region-update')"
+          <el-button v-if="isAuth('logistics-region-update')"
                      type="text"
                      icon="el-icon-edit" size="small" @click="() => addOrUpdateHandle(data.id)">
             修改
           </el-button>
-          <el-button v-if="isAuth('system-region-delete')"
+          <el-button v-if="isAuth('logistics-region-delete')"
                      type="text"
                      icon="el-icon-delete" size="small" @click="() => deleteHandle(data.id)">
             删除

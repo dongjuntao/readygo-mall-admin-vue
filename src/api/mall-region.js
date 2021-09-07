@@ -6,7 +6,7 @@ const prefix = "/mall-admin";
  */
 export function getRegionList(params) {
   return request({
-    url: prefix+'/system/region/list',
+    url: prefix+'/logistics/region/list',
     method: 'get',
     params: params
   })
@@ -19,7 +19,7 @@ export function getRegionList(params) {
  */
 export function getRegionsNameByRegions(params) {
   return request({
-    url: prefix+'/system/region/getRegionsNameByRegions',
+    url: prefix+'/logistics/region/getRegionsNameByRegions',
     method: 'get',
     params: params
   })
@@ -32,7 +32,7 @@ export function getRegionsNameByRegions(params) {
  */
 export function getRegionById(params) {
   return request({
-    url: prefix+'/system/region/getRegionById',
+    url: prefix+'/logistics/region/getRegionById',
     method: 'get',
     params: params
   })
@@ -45,7 +45,7 @@ export function getRegionById(params) {
  */
 export function saveRegion(data) {
   return request({
-    url: prefix+'/system/region/save',
+    url: prefix+'/logistics/region/save',
     method: 'post',
     data: data
   })
@@ -56,7 +56,7 @@ export function saveRegion(data) {
  */
 export function updateRegion(data) {
   return request({
-    url: prefix+'/system/region/update',
+    url: prefix+'/logistics/region/update',
     method: 'put',
     data: data
   })
@@ -67,7 +67,7 @@ export function updateRegion(data) {
  */
 export function deleteRegion(params) {
   return request({
-    url: prefix+'/system/region/delete',
+    url: prefix+'/logistics/region/delete',
     method: 'delete',
     params: params
   })
