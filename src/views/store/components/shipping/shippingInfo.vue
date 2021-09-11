@@ -18,9 +18,9 @@
         </el-select>
       </el-form-item>
       <el-form-item>
-        <el-button v-if="isAuth('store-shippingInfo-search')" @click="getDataList()">查询</el-button>
-        <el-button v-if="isAuth('store-shippingInfo-create')" type="primary" @click="addOrUpdateHandle()">新增</el-button>
-        <el-button v-if="isAuth('store-shippingInfo-batchDelete')" type="danger" @click="deleteHandle()" :disabled="dataListSelections.length <= 0">批量删除</el-button>
+        <el-button @click="getDataList()">查询</el-button>
+        <el-button type="primary" @click="addOrUpdateHandle()">新增</el-button>
+        <el-button type="danger" @click="deleteHandle()" :disabled="dataListSelections.length <= 0">批量删除</el-button>
       </el-form-item>
     </el-form>
     <el-table
@@ -92,11 +92,11 @@
         align="center"
         label="操作">
         <template slot-scope="scope">
-          <el-button v-if="isAuth('store-shippingInfo-setDefault') && !scope.row.isDefault" type="text" size="small" @click="isDefaultHandle(scope.row.id, true)">设为默认</el-button>
-          <el-button v-if="isAuth('store-shippingInfo-cancelDefault') && scope.row.isDefault" type="text" style="color: red" size="small" @click="isDefaultHandle(scope.row.id, false)">取消默认</el-button>
-          <el-button v-if="isAuth('store-shippingInfo-detail')" type="text" size="small" @click="detailHandle(scope.row.id, 'detail')">详情</el-button>
-          <el-button v-if="isAuth('store-shippingInfo-update')" type="text" size="small" @click="addOrUpdateHandle(scope.row.id)">修改</el-button>
-          <el-button v-if="isAuth('store-shippingInfo-delete')" type="text" size="small" @click="deleteHandle(scope.row.id)">删除</el-button>
+          <el-button v-if="!scope.row.isDefault" type="text" size="small" @click="isDefaultHandle(scope.row.id, true)">设为默认</el-button>
+          <el-button v-if="scope.row.isDefault" type="text" style="color: red" size="small" @click="isDefaultHandle(scope.row.id, false)">取消默认</el-button>
+          <el-button type="text" size="small" @click="detailHandle(scope.row.id, 'detail')">详情</el-button>
+          <el-button type="text" size="small" @click="addOrUpdateHandle(scope.row.id)">修改</el-button>
+          <el-button type="text" size="small" @click="deleteHandle(scope.row.id)">删除</el-button>
         </template>
       </el-table-column>
     </el-table>

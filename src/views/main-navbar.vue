@@ -17,6 +17,11 @@
       <el-menu
         class="site-navbar__menu site-navbar__menu--right"
         mode="horizontal">
+
+        <el-menu-item v-if="userType != 0" index="1"  class="el-menu-demo" @click="$router.push({ name: 'myStore' })">
+            <a style="color: #000000;" >我的店铺</a>
+        </el-menu-item>
+
         <el-menu-item class="site-navbar__avatar" index="3">
           <el-dropdown :show-timeout="0" placement="bottom">
             <span class="el-dropdown-link" v-if="avatar">

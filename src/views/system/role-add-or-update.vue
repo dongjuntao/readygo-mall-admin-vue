@@ -17,7 +17,6 @@
           :data="menuList"
           :props="menuListTreeProps"
           node-key="id"
-          check-strictly
           ref="menuListTree">
         </el-tree>
       </el-form-item>
@@ -52,7 +51,6 @@
             { required: true, message: '角色名称不能为空', trigger: 'blur' }
           ]
         },
-        tempKey: -666666 // 临时key, 用于解决tree半选中状态项不能传给后台接口问题. # 待优化
       }
     },
     methods: {
@@ -61,7 +59,6 @@
         var params = this.axios.paramsHandler();
         getMenuList(params).then(({data}) => {
           this.menuList = treeDataTranslate(data, 'id')
-          console.log("this.menuList===",this.menuList)
         }).then(() => {
           this.visible = true
           this.$nextTick(() => {
@@ -74,12 +71,10 @@
               if (data && data.code === "200") {
                 this.dataForm.name = data.data.name
                 this.dataForm.remark = data.data.remark
-                var idx = data.data.menuIdList.indexOf(this.tempKey)
-                if (idx !== -1) {
-                  data.data.menuIdList.splice(idx, data.data.menuIdList.length - idx)
-                }
-                console.log("data.data.menuIdList=", data.data.menuIdList)
-                this.$refs.menuListTree.setCheckedKeys(data.data.menuIdList)
+                let that = this
+                data.data.menuIdList.forEach(value => {
+                  that.$refs.menuListTree.setChecked(value, true, false);
+                });
               }
             })
           }
@@ -90,10 +85,10 @@
         this.$refs['dataForm'].validate((valid) => {
           if (valid) {
             var data = this.axios.dataHandler({
-              'id': this.dataForm.id || undefined,
-              'name': this.dataForm.name,
-              'remark': this.dataForm.remark,
-              'menuIdList': [].concat(this.$refs.menuListTree.getCheckedKeys(), [this.tempKey], this.$refs.menuListTree.getHalfCheckedKeys())
+              id: this.dataForm.id || undefined,
+              name: this.dataForm.name,
+              remark: this.dataForm.remark,
+              menuIdList: [].concat(this.$refs.menuListTree.getCheckedKeys(), this.$refs.menuListTree.getHalfCheckedKeys())
             })
             var saveOrUpdate =  this.dataForm.id ? updateRole : saveRole;
             saveOrUpdate(data).then(({data}) => {

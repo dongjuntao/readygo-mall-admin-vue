@@ -78,7 +78,6 @@ export default {
           { required: true, message: '请选择品牌分类', trigger: 'blur' }
         ]
       },
-      tempKey: -666666, // 临时key, 用于解决tree半选中状态项不能传给后台接口问题. # 待优化
       fileList:[],
       brandCategoryList: []//所有品牌分类
     }

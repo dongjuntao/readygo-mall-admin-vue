@@ -13,6 +13,17 @@ export function getLogisticsCompanyList(params) {
 }
 
 /**
+ * 物流公司列表（带enable）
+ */
+export function getListWithExpressSetting(params) {
+  return request({
+    url: prefix+'/logistics/company/listWithExpressSetting',
+    method: 'get',
+    params: params
+  })
+}
+
+/**
  * 新增物流公司
  */
 export function saveLogisticsCompany(data) {
