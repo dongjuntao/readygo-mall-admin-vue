@@ -22,3 +22,14 @@ export function deleteExpressSetting(params) {
     params: params
   })
 }
+
+/**
+ * 设为默认 / 取消默认
+ */
+export function updateIsDefault(params) {
+  return request({
+    url: prefix+'/store/expressSetting/updateIsDefault',
+    method: 'put',
+    params: params
+  })
+}

@@ -31,7 +31,7 @@
         header-align="center"
         align="center"
         label="公司简称"
-        width="200">
+        width="180">
       </el-table-column>
       <el-table-column
         prop="code"
@@ -45,16 +45,28 @@
         header-align="center"
         align="center"
         label="公司网址"
-        width="400">
+        width="360">
       </el-table-column>
       <el-table-column
         header-align="center"
         align="center"
-        label="是否启用">
+        label="是否启用"
+        width="80">
         <template slot-scope="scope">
           <el-switch v-model="scope.row.enable" @change="changeEnable(scope.row.id, scope.row.enable)"></el-switch>
         </template>
       </el-table-column>
+      <el-table-column
+        header-align="center"
+        align="center"
+        label="操作">
+        <template slot-scope="scope">
+          <el-button v-if="!scope.row.isDefault && scope.row.enable" type="text" size="small" @click="isDefaultHandle(scope.row.id, true)">设为默认</el-button>
+          <el-button v-if="!scope.row.isDefault && !scope.row.enable" type="text" size="small" disabled>设为默认</el-button>
+          <el-button v-if="scope.row.isDefault && scope.row.enable" type="text" style="color: red" size="small" @click="isDefaultHandle(scope.row.id, false)">取消默认</el-button>
+        </template>
+      </el-table-column>
+
     </el-table>
     <el-pagination
       @size-change="sizeChangeHandle"
@@ -71,7 +83,7 @@
 <script>
 import { getListWithExpressSetting } from '@/api/mall-logistics-company'
 import { getUserInfo } from '@/utils/auth'
-import { saveExpressSetting, deleteExpressSetting } from '@/api/mall-expressSetting'
+import { saveExpressSetting, deleteExpressSetting, updateIsDefault } from '@/api/mall-expressSetting'
 export default {
   data () {
     return {
@@ -136,7 +148,8 @@ export default {
       var data = this.axios.dataHandler({
         adminUserId: this.adminUserId,
         logisticsCompanyId: id,
-        enable: true
+        enable: true,
+        isDefault: false
       });
       //开启
       if (enable) {
@@ -147,8 +160,7 @@ export default {
               type: 'success',
               duration: 1500,
               onClose: () => {
-                this.visible = false
-                this.$emit('refreshDataList')
+                this.getDataList()
               }
             })
           } else {
@@ -175,6 +187,31 @@ export default {
           }
         });
       }
+    },
+
+    /**
+     * 设为默认 1/ 取消默认2
+     */
+    isDefaultHandle(id, isDefault){
+      var params =  this.axios.paramsHandler({
+        adminUserId: this.adminUserId,
+        logisticsCompanyId: id,
+        isDefault: isDefault
+      });
+      updateIsDefault(params).then(({data}) => {
+        if (data && data.code === "200") {
+          this.$message({
+            message: '操作成功',
+            type: 'success',
+            duration: 1500,
+            onClose: () => {
+              this.getDataList()
+            }
+          })
+        } else {
+          this.$message.error(data.msg)
+        }
+      });
     },
 
     /**
