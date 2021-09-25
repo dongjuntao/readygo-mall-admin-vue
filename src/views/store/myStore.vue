@@ -6,13 +6,16 @@
     <el-tab-pane label="快递设置" name="expressSetting">
       <express-setting ref="ExpressSetting"></express-setting>
     </el-tab-pane>
-    <el-tab-pane label="运费模板" name="yunfei">运费模板</el-tab-pane>
+    <el-tab-pane label="运费模板" name="freightTemplate">
+      <freight-template ref="FreightTemplate"></freight-template>
+    </el-tab-pane>
   </el-tabs>
 </template>
 
 <script>
 import ShippingInfo from './components/shipping/shippingInfo'
 import ExpressSetting from './components/express/expressSetting'
+import FreightTemplate from './components/freight/freightTemplate'
 export default {
   name: 'myStore',
   data () {
@@ -22,7 +25,8 @@ export default {
   },
   components: {
     ShippingInfo,
-    ExpressSetting
+    ExpressSetting,
+    FreightTemplate
   },
 }
 </script>

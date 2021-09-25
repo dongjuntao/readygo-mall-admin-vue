@@ -1,11 +1,8 @@
 <template>
   <div class="mod-user">
     <el-form :inline="true" :model="searchForm" @keyup.enter.native="getDataList()">
-      <el-form-item label="发货人姓名">
+      <el-form-item label="模板名称">
         <el-input v-model="searchForm.name" placeholder="发货人姓名" clearable></el-input>
-      </el-form-item>
-      <el-form-item label="手机号码">
-        <el-input v-model="searchForm.mobile" placeholder="手机号码" clearable></el-input>
       </el-form-item>
       <el-form-item>
         <el-button @click="getDataList()">查询</el-button>
@@ -29,45 +26,15 @@
         prop="name"
         header-align="center"
         align="center"
-        label="发货人姓名"
-        width="120">
+        label="模板名称"
+        width="200">
       </el-table-column>
       <el-table-column
         prop="mobile"
         header-align="center"
         align="center"
-        label="手机号码"
-        width="120">
-      </el-table-column>
-      <el-table-column
-        prop="fixedTelephone"
-        header-align="center"
-        align="center"
-        label="固定电话"
-        width="190"
-        v-if="userType != 0">
-      </el-table-column>
-      <el-table-column
-        prop="merchant"
-        header-align="center"
-        align="center"
-        label="所属商户"
-        width="190"
-        v-if="userType == 0">
-      </el-table-column>
-      <el-table-column
-        prop="regionNames"
-        header-align="center"
-        align="center"
-        label="发货地区"
-        width="300">
-      </el-table-column>
-      <el-table-column
-        prop="postalCode"
-        header-align="center"
-        align="center"
-        label="邮政编码"
-        width="100">
+        label="模板类型"
+        width="150">
       </el-table-column>
       <el-table-column
         prop="createTime"
@@ -101,31 +68,25 @@
     </el-pagination>
     <!-- 弹窗, 新增 / 修改 -->
     <add-or-update v-if="addOrUpdateVisible" ref="addOrUpdate" @refreshDataList="getDataList"></add-or-update>
-    <!-- 详情-->
-    <detail v-if="detailVisible" ref="detail" @refreshDataList="getDataList"></detail>
   </div>
 </template>
 
 <script>
-import AddOrUpdate from './shippingInfo-add-or-update'
-import Detail from './shipping-detail'
-import { getShippingInfoList, deleteShippingInfo, updateIsDefault } from '@/api/mall-shipping-info'
+import AddOrUpdate from './freightTemplate-add-or-update'
+import { getFreightTemplateList, deleteFreightTemplate } from '@/api/mall-freight-template'
 import { getUserInfo } from '@/utils/auth'
 import { getAdminListAll } from '@/api/mall-admin'
 export default {
   data () {
     return {
       searchForm: {
-        name: '',
-        adminUserId: null,
-        mobile: ''
+        name: ''
       },
       dataList: [],
       pageNum: 1,
       pageSize: 10,
       totalPage: 0,
       userType: null,
-      adminUserId: null,
       dataListLoading: false,
       dataListSelections: [],
       addOrUpdateVisible: false,
@@ -133,8 +94,7 @@ export default {
     }
   },
   components: {
-    AddOrUpdate,
-    Detail
+    AddOrUpdate
   },
   async activated () {
     await this.getUserInfo();
@@ -149,10 +109,8 @@ export default {
         pageNum: this.pageNum,
         pageSize: this.pageSize,
         name: this.searchForm.name,
-        adminUserId: this.userType == 0 ? (this.searchForm.adminUserId ? this.searchForm.adminUserId : null) : this.adminUserId,
-        mobile: this.searchForm.mobile
       })
-      getShippingInfoList(params).then(({data})=> {
+      getFreightTemplateList(params).then(({data})=> {
         if (data && data.code === "200") {
           this.dataList = data.data.list
           this.totalPage = data.data.totalCount
