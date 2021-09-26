@@ -2,7 +2,7 @@
   <div class="mod-user">
     <el-form :inline="true" :model="searchForm" @keyup.enter.native="getDataList()">
       <el-form-item label="模板名称">
-        <el-input v-model="searchForm.name" placeholder="发货人姓名" clearable></el-input>
+        <el-input v-model="searchForm.name" placeholder="模板名称" clearable></el-input>
       </el-form-item>
       <el-form-item>
         <el-button @click="getDataList()">查询</el-button>
@@ -27,20 +27,24 @@
         header-align="center"
         align="center"
         label="模板名称"
-        width="200">
+        width="250">
       </el-table-column>
       <el-table-column
-        prop="mobile"
+        prop="type"
         header-align="center"
         align="center"
         label="模板类型"
         width="150">
+        <template slot-scope="scope">
+          <div v-if="scope.row.type === 0" size="small" type="warning">买家承担运费</div>
+          <div v-else size="small" type="success">卖家承担运费</div>
+        </template>
       </el-table-column>
       <el-table-column
         prop="createTime"
         header-align="center"
         align="center"
-        width="160"
+        width="180"
         label="创建时间">
         <template slot-scope="scope">{{scope.row.createTime | formatDateTime}}</template>
       </el-table-column>
@@ -51,7 +55,7 @@
         <template slot-scope="scope">
           <el-button v-if="!scope.row.isDefault" type="text" size="small" @click="isDefaultHandle(scope.row.id, true)">设为默认</el-button>
           <el-button v-if="scope.row.isDefault" type="text" style="color: red" size="small" @click="isDefaultHandle(scope.row.id, false)">取消默认</el-button>
-          <el-button type="text" size="small" @click="detailHandle(scope.row.id, 'detail')">详情</el-button>
+<!--          <el-button type="text" size="small" @click="detailHandle(scope.row.id, 'detail')">详情</el-button>-->
           <el-button type="text" size="small" @click="addOrUpdateHandle(scope.row.id)">修改</el-button>
           <el-button type="text" size="small" @click="deleteHandle(scope.row.id)">删除</el-button>
         </template>
@@ -73,7 +77,7 @@
 
 <script>
 import AddOrUpdate from './freightTemplate-add-or-update'
-import { getFreightTemplateList, deleteFreightTemplate } from '@/api/mall-freight-template'
+import { getFreightTemplateList, updateIsDefault, deleteFreightTemplate } from '@/api/mall-freight-template'
 import { getUserInfo } from '@/utils/auth'
 import { getAdminListAll } from '@/api/mall-admin'
 export default {
@@ -109,6 +113,7 @@ export default {
         pageNum: this.pageNum,
         pageSize: this.pageSize,
         name: this.searchForm.name,
+        adminUserId: this.adminUserId
       })
       getFreightTemplateList(params).then(({data})=> {
         if (data && data.code === "200") {
@@ -156,16 +161,16 @@ export default {
 
     // 删除
     deleteHandle (id) {
-      var userIds = id ? [id] : this.dataListSelections.map(item => {
+      var freightTemplateIds = id ? [id] : this.dataListSelections.map(item => {
         return item.id
       })
-      this.$confirm(`确定对[id=${userIds.join(',')}]进行[${id ? '删除' : '批量删除'}]操作?`, '提示', {
+      this.$confirm(`确定对[id=${freightTemplateIds.join(',')}]进行[${id ? '删除' : '批量删除'}]操作?`, '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning'
       }).then(() => {
         var postData = this.axios.dataHandler(userIds, false);
-        deleteShippingInfo(postData).then(({data})=>{
+        deleteFreightTemplate(postData).then(({data})=>{
           if (data && data.code === "200") {
             this.$message({
               message: '操作成功',

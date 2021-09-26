@@ -12,7 +12,7 @@
         <el-radio v-model="dataForm.type" :label="0">买家承担运费</el-radio>
         <el-radio v-model="dataForm.type" :label="1">卖家承担运费</el-radio>
       </el-form-item>
-      <el-form-item label="计费方式"  prop="chargeType">
+      <el-form-item label="计费方式"  prop="chargeType" v-if="dataForm.type==0">
         <el-radio-group v-model="dataForm.chargeType">
           <el-radio :label="0">按件数</el-radio>
           <el-radio :label="1">按重量</el-radio>
@@ -21,7 +21,7 @@
       </el-form-item>
 
       <!--运费规则表格-->
-      <el-form-item>
+      <el-form-item v-if="dataForm.type==0">
         <el-table :data="dataForm.freightRuleEntityList" border style="width: 100%;float: right" class="table-con">
           <el-table-column header-align="center" align="center" label="设置配送区域">
             <template slot-scope="scope">
@@ -75,15 +75,15 @@
           </el-table-column>
         </el-table>
       </el-form-item>
-      <el-form-item>
+      <el-form-item v-if="dataForm.type==0">
         <el-button type="primary" @click="addFreightRule()">点击添加配送区域和运费</el-button>
       </el-form-item>
 
       <!--设置指定包邮-->
-      <el-form-item label="包邮条件" prop="enableConditionFree">
+      <el-form-item label="包邮条件" v-if="dataForm.type==0" prop="enableConditionFree">
         <el-checkbox v-model="dataForm.enableConditionFree" label="设置指定包邮条件"></el-checkbox>
       </el-form-item>
-      <el-form-item v-if="dataForm.enableConditionFree">
+      <el-form-item v-if="dataForm.type==0 && dataForm.enableConditionFree">
         <el-table :data="dataForm.freightFreeRuleEntityList"
                   border
                   style="width: 100%;">
@@ -141,18 +141,18 @@
           </el-table-column>
         </el-table>
       </el-form-item>
-      <el-form-item v-if="dataForm.enableConditionFree">
+      <el-form-item v-if="dataForm.type==0 && dataForm.enableConditionFree">
         <el-button type="primary" @click="addFreightFreeRule()">点击添加指定包邮条件</el-button>
       </el-form-item>
 
-      <el-form-item label="默认运费" prop="enableDefaultFreight">
+      <el-form-item label="默认运费" v-if="dataForm.type==0" prop="enableDefaultFreight">
         <el-checkbox v-model="dataForm.enableDefaultFreight" label="设置默认运费"></el-checkbox>
         <el-tooltip placement="top"  effect="light">
           <div slot="content">关闭默认运费，则未设置配送区域的城市或不符合指定包邮条件的城市将不支持配送</div>
           <i class="el-icon-warning"></i>
         </el-tooltip>
       </el-form-item>
-      <el-form-item v-if="dataForm.enableDefaultFreight">
+      <el-form-item v-if="dataForm.type==0 && dataForm.enableDefaultFreight">
         <el-table :data="dataForm.freightDefaultEntityList" border style="width: 100%;float: right" class="table-con">
           <el-table-column header-align="center" align="center" :label="tableTitle[0]">
             <template slot-scope="scope">
@@ -208,7 +208,7 @@
 
 <script>
   import { getRegionList } from '@/api/mall-region'
-  import { saveFreightTemplate, updateFreightTemplate, getFreightTemplateList } from '@/api/mall-freight-template'
+  import { saveFreightTemplate, updateFreightTemplate, getFreightTemplateById } from '@/api/mall-freight-template'
   import { getUserInfo } from '@/utils/auth'
   import RegionSelect from './regionSelect'
 
@@ -236,6 +236,7 @@
             continuationFreight:0
           }],
           freightFreeRuleEntityList:[{
+            cityList: [],
             freightTemplateId: null,
             regionIdNames: '',
             freeCondition: 0,
@@ -285,14 +286,42 @@
         this.visible = true;
         this.$nextTick( ()=> {
           this.$refs['dataForm'].resetFields()
-          this.province=null;
-          this.city=null;
-          this.area=null;
           if (this.dataForm.id) {
-            var that = this;
-            getFreightTemplateList(this.axios.paramsHandler({id: this.dataForm.id})).then(async function ({data}) {
+            getFreightTemplateById(this.axios.paramsHandler({id: this.dataForm.id})).then (({data})=> {
               if (data && data.code === "200") {
-                this.dataForm = data.data()
+                this.dataForm.name = data.data.name;
+                this.dataForm.type = data.data.type;
+                this.dataForm.chargeType = data.data.chargeType;
+                this.dataForm.isDefault = data.data.isDefault;
+                this.dataForm.enableDefaultFreight = data.data.enableDefaultFreight; //默认开启默认运费
+                this.dataForm.enableConditionFree = data.data.enableConditionFree;
+                //默认运费处理（freightDefault）
+                this.dataForm.freightDefaultEntityList = [];
+                var freightDefaultEntity = data.data.freightDefaultEntity;
+                this.dataForm.freightDefaultEntityList.push(freightDefaultEntity);
+                //处理运费规则
+                this.dataForm.freightRuleEntityList = [];
+                data.data.freightRuleEntityList.forEach(freightRule=>{
+                  this.dataForm.freightRuleEntityList.push({
+                    cityList: freightRule.regionIdNames.split(","),
+                    regionIdNames: "",
+                    first: freightRule.first,
+                    firstFreight: freightRule.firstFreight,
+                    continuation: freightRule.continuation,
+                    continuationFreight: freightRule.continuationFreight
+                  })
+                });
+                //处理包邮规则
+                this.dataForm.freightFreeRuleEntityList = [];
+                data.data.freightFreeRuleEntityList.forEach(freightFreeRule=>{
+                  this.dataForm.freightFreeRuleEntityList.push({
+                    cityList: freightFreeRule.regionIdNames.split(","),
+                    regionIdNames: "",
+                    freeCondition: freightFreeRule.freeCondition,
+                    money: freightFreeRule.money,
+                    quantity: freightFreeRule.quantity
+                  })
+                });
               }
             });
           }
@@ -374,7 +403,6 @@
       },
 
       setRegionSelect (row, cityList, type) {
-        console.log("=setFreightRuleList=",row, cityList,type)
         if (type === 0) {
           this.$set(this.dataForm.freightRuleEntityList[row], 'cityList', cityList)
         }else if (type === 1) {
@@ -413,10 +441,12 @@
               freightDefaultEntity: this.dataForm.freightDefaultEntityList[0],
               freightRuleEntityList: this.dataForm.freightRuleEntityList,
               enableConditionFree: this.dataForm.enableConditionFree,
+              adminUserId: this.createBy,
               freightFreeRuleEntityList: this.dataForm.freightFreeRuleEntityList,
               isDefault: this.dataForm.isDefault,
               createBy: this.createBy
             })
+            console.log("data=============================================",data)
             saveOrUpdate(data).then(({data}) => {
               if (data && data.code === "200") {
                 this.$message({

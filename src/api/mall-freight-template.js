@@ -44,3 +44,25 @@ export function deleteFreightTemplate(data) {
     data: data
   })
 }
+
+/**
+ * 根据id获取运费模板
+ */
+export function getFreightTemplateById(params) {
+  return request({
+    url: prefix+'/store/freightTemplate/getFreightTemplateById',
+    method: 'get',
+    params: params
+  })
+}
+
+/**
+ * 设为默认 / 取消默认
+ */
+export function updateIsDefault(id, params) {
+  return request({
+    url: prefix+'/store/freightTemplate/updateIsDefault/'+id,
+    method: 'put',
+    params: params
+  })
+}
