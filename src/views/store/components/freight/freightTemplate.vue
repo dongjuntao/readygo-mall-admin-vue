@@ -27,14 +27,14 @@
         header-align="center"
         align="center"
         label="模板名称"
-        width="250">
+        width="400">
       </el-table-column>
       <el-table-column
         prop="type"
         header-align="center"
         align="center"
         label="模板类型"
-        width="150">
+        width="200">
         <template slot-scope="scope">
           <div v-if="scope.row.type === 0" size="small" type="warning">买家承担运费</div>
           <div v-else size="small" type="success">卖家承担运费</div>
@@ -44,7 +44,7 @@
         prop="createTime"
         header-align="center"
         align="center"
-        width="180"
+        width="200"
         label="创建时间">
         <template slot-scope="scope">{{scope.row.createTime | formatDateTime}}</template>
       </el-table-column>
@@ -169,7 +169,7 @@ export default {
         cancelButtonText: '取消',
         type: 'warning'
       }).then(() => {
-        var postData = this.axios.dataHandler(userIds, false);
+        var postData = this.axios.dataHandler(freightTemplateIds, false);
         deleteFreightTemplate(postData).then(({data})=>{
           if (data && data.code === "200") {
             this.$message({

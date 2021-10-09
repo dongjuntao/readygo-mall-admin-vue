@@ -31,7 +31,6 @@
               <img src="~@/assets/img/avatar.jpg" :alt="userName">{{ userName }}
             </span>
             <el-dropdown-menu slot="dropdown">
-              <el-dropdown-item v-if="userType==1" @click.native="$router.push({ name: 'home' })">我的店铺</el-dropdown-item>
               <el-dropdown-item @click.native="updatePasswordHandle()">修改密码</el-dropdown-item>
               <el-dropdown-item @click.native="logoutHandle()">退出登录</el-dropdown-item>
             </el-dropdown-menu>

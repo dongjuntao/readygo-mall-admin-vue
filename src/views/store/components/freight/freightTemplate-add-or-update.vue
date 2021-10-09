@@ -9,10 +9,12 @@
         <el-input v-model="dataForm.name" placeholder="模板名称"></el-input>
       </el-form-item>
       <el-form-item label="模板类型" prop="type">
-        <el-radio v-model="dataForm.type" :label="0">买家承担运费</el-radio>
-        <el-radio v-model="dataForm.type" :label="1">卖家承担运费</el-radio>
+        <el-radio-group v-model="dataForm.type" @change="changeType(dataForm.type)">
+          <el-radio :label="0">买家承担运费</el-radio>
+          <el-radio :label="1">卖家承担运费</el-radio>
+        </el-radio-group>
       </el-form-item>
-      <el-form-item label="计费方式"  prop="chargeType" v-if="dataForm.type==0">
+      <el-form-item label="计费方式" prop="chargeType" v-if="dataForm.type==0">
         <el-radio-group v-model="dataForm.chargeType">
           <el-radio :label="0">按件数</el-radio>
           <el-radio :label="1">按重量</el-radio>
@@ -224,16 +226,16 @@
           isDefault: false,
           enableDefaultFreight: true, //默认开启默认运费
           enableConditionFree: false,
-          freightDefaultEntityList:[{first: 0, firstFreight: 0, continuation:0, continuationFreight:0}], //默认运费
+          freightDefaultEntityList:[{first: 1, firstFreight: 0, continuation:1, continuationFreight:0}], //默认运费
           freightDefaultEntity: {},
           freightRuleEntityList: [{
             cityList:[],
             freightTemplateId: null,
             regionIdNames: '',
-            first: 0,
+            first: 1,
             firstFreight: 0,
-            continuation:0,
-            continuationFreight:0
+            continuation: 1,
+            continuationFreight: 0
           }],
           freightFreeRuleEntityList:[{
             cityList: [],
@@ -282,6 +284,7 @@
 
     methods: {
       init (id) {
+        console.log("id == "+ id)
         this.dataForm.id = id || 0
         this.visible = true;
         this.$nextTick( ()=> {
@@ -324,6 +327,9 @@
                 });
               }
             });
+          }else {
+            //清除信息
+            this.setInitDataList();
           }
         })
       },
@@ -334,9 +340,9 @@
         this.dataForm.freightRuleEntityList.push({
           cityList: [],
           regionIdNames:'',
-          first: 0,
+          first: 1,
           firstFreight: 0,
-          continuation:0,
+          continuation:1,
           continuationFreight:0}
         )
       },
@@ -410,6 +416,38 @@
         }
       },
 
+      //模板类型切换
+      changeType(type){
+        if (type == 0) {
+          this.setInitDataList();
+        }
+      },
+
+      setInitDataList(){
+        this.dataForm.freightDefaultEntityList = [{
+          first: 1,
+          firstFreight: 0,
+          continuation:1,
+          continuationFreight:0}];
+        this.dataForm.freightRuleEntityList = [{
+          cityList:[],
+          freightTemplateId: null,
+          regionIdNames: '',
+          first: 1,
+          firstFreight: 0,
+          continuation: 1,
+          continuationFreight: 0
+        }];
+        this.dataForm.freightFreeRuleEntityList=[{
+          cityList: [],
+          freightTemplateId: null,
+          regionIdNames: '',
+          freeCondition: 0,
+          money: 0,
+          quantity: 0
+        }]
+      },
+
       // 表单提交
       dataFormSubmit () {
         this.$refs['dataForm'].validate((valid) => {
@@ -446,7 +484,6 @@
               isDefault: this.dataForm.isDefault,
               createBy: this.createBy
             })
-            console.log("data=============================================",data)
             saveOrUpdate(data).then(({data}) => {
               if (data && data.code === "200") {
                 this.$message({
