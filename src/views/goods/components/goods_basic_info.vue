@@ -1,46 +1,52 @@
 <template>
   <div>
     <el-form :model="dataForm" :rules="dataRule" ref="dataForm" label-width="80px">
-      <el-form-item label="商品名称" prop="name">
-        <el-input v-model="dataForm.name" placeholder="商品名称"></el-input>
-      </el-form-item>
-      <el-form-item label="商品描述" prop="description">
-        <el-input v-model="dataForm.description" placeholder="商品描述"></el-input>
-      </el-form-item>
-      <el-form-item label="商品分类" prop="goodsCategoryIds">
-        <el-cascader
-          :options="goodsCategory"
-          clearable
-          v-model="dataForm.goodsCategoryIds"
-          :props="{ value: 'id',label: 'name',children: 'children'}">
-        </el-cascader>
-      </el-form-item>
-      <el-form-item label="所属品牌" prop="brandId">
-        <el-select v-model="dataForm.brandId" clearable placeholder="请选择">
-          <el-option
-            v-for="item in brandList"
-            :key="item.id"
-            :label="item.name"
-            :value="item.id">
-          </el-option>
-        </el-select>
-      </el-form-item>
-      <el-form-item label="所属商户" prop="merchantId">
-        <el-select v-model="dataForm.merchantId" clearable placeholder="请选择">
-          <el-option
-            v-for="item in merchantList"
-            :key="item.id"
-            :label="item.name"
-            :value="item.id">
-          </el-option>
-        </el-select>
-      </el-form-item>
-      <el-form-item label="商品编号" prop="code">
-        <el-input v-model="dataForm.code" placeholder="商品编号"></el-input>
-      </el-form-item>
-      <el-form-item label="商品单位" prop="unit">
-        <el-input v-model="dataForm.unit" placeholder="商品单位"></el-input>
-      </el-form-item>
+      <el-row>
+        <el-col :span="12">
+          <el-form-item label="商品名称" prop="name">
+            <el-input v-model="dataForm.name" placeholder="商品名称"></el-input>
+          </el-form-item>
+          <el-form-item label="商品编号" prop="code">
+            <el-input v-model="dataForm.code" placeholder="商品编号"></el-input>
+          </el-form-item>
+          <el-form-item label="商品单位" prop="unit">
+            <el-input v-model="dataForm.unit" placeholder="商品单位"></el-input>
+          </el-form-item>
+          <el-form-item label="商品描述" prop="description" style="width: 200%;">
+            <el-input type="textarea" :rows="3" v-model="dataForm.description" maxLength="200" placeholder="商品描述,最多200个字"></el-input>
+          </el-form-item>
+        </el-col>
+        <el-col :span="12">
+          <el-form-item label="所属品牌" prop="brandId">
+            <el-select v-model="dataForm.brandId" clearable placeholder="请选择">
+              <el-option
+                v-for="item in brandList"
+                :key="item.id"
+                :label="item.name"
+                :value="item.id">
+              </el-option>
+            </el-select>
+          </el-form-item>
+          <el-form-item label="所属商户" prop="adminUserId" v-if="userType == 0">
+            <el-select v-model="dataForm.adminUserId" clearable placeholder="请选择">
+              <el-option
+                v-for="item in merchantList"
+                :key="item.id"
+                :label="item.name"
+                :value="item.id">
+              </el-option>
+            </el-select>
+          </el-form-item>
+          <el-form-item label="商品分类" prop="goodsCategoryIds">
+            <el-cascader
+              :options="goodsCategory"
+              clearable
+              v-model="dataForm.goodsCategoryIds"
+              :props="{ value: 'id',label: 'name',children: 'children'}">
+            </el-cascader>
+          </el-form-item>
+        </el-col>
+      </el-row>
     </el-form>
   </div>
 </template>
@@ -48,6 +54,8 @@
 <script>
 import { getGoodsCategoryTree } from '@/api/mall-goods/goods-category'
 import { getBrandListAll } from '@/api/mall-brand/brand'
+import { getAdminListAll } from '@/api/mall-admin'
+import { getUserInfo } from '@/utils/auth'
 export default {
   data () {
     return {
@@ -72,12 +80,15 @@ export default {
       },
       goodsCategory:[], //商品分类
       brandList: [], //品牌列表
-      merchantList: [] //所属商户
+      merchantList: [], //所属商户
+      userType: null
     }
   },
   mounted() {
+    this.getUserInfo();
     this.getGoodsCategory();
     this.getBrandList();
+    this.getMerchantList();
   },
   methods: {
     // 获取商品分类列表
@@ -102,6 +113,16 @@ export default {
       })
     },
 
+    //获取商户列表（userType=1且auditStatus=1）
+    getMerchantList(){
+      var params =  this.axios.paramsHandler({userType: 1, auditStatus: 1},false)
+      getAdminListAll(params).then(({data}) => {
+        if (data && data.code === "200") {
+          this.merchantList = data.data
+        }
+      })
+    },
+
     /**
      * 获取品牌列表
      */
@@ -109,12 +130,21 @@ export default {
       getBrandListAll().then(({data})=>{
         this.brandList = data.data;
       });
+    },
+
+
+    /**
+     * cookie中获取当前登录的用户信息
+     */
+    getUserInfo() {
+      var userInfo = JSON.parse(getUserInfo(sessionStorage.getItem("userNameKey")));
+      this.userType = userInfo.userType;
     }
   }
 }
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
 .mod-goods-category {
   .menu-list__input,
   .icon-list__input {
@@ -163,10 +193,11 @@ export default {
   height: 450px;
 }
 .el-cascader {
-  width: 640px;
+  width: 100%;
 }
-.el-cascader-menu__wrap {
-  height: 500px;
+
+.el-select {
+  display: block; width: 100%;
 }
 
 </style>

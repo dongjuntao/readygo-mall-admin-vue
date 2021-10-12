@@ -13,6 +13,9 @@
           :on-remove="handleRemove">
           <i class="el-icon-plus"></i>
         </el-upload>
+        <el-dialog :visible.sync="dialogVisible" append-to-body>
+          <img width="100%" :src="dialogImageUrl" alt="">
+        </el-dialog>
       </el-form-item>
       <el-form-item label="商品详情" prop="infoDetail">
         <editor-bar v-model="dataForm.infoDetail" :isClear="isClear" @change="change"></editor-bar>
@@ -31,6 +34,8 @@ export default {
   data () {
     return {
       visible: false,
+      dialogVisible: false,
+      dialogImageUrl: '',
       dataForm: {
         images: [], //商品相册
         infoDetail: '' //商品详细信息
@@ -74,7 +79,7 @@ export default {
       return (isType || isType2) && isImg && fileNum
     },
 
-    //上传品牌logon
+    //上传品牌logo
     uploadFile(file){
       let formData = new FormData();
       formData.append("files", file.file);
@@ -87,7 +92,11 @@ export default {
 
     handleRemove() {
     },
-    handlePictureCardPreview(){},
+    //预览
+    handlePictureCardPreview(file){
+      this.dialogImageUrl = file.url;
+      this.dialogVisible = true;
+    },
     change(){
 
     }

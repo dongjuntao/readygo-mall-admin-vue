@@ -23,33 +23,41 @@
         width="50">
       </el-table-column>
       <el-table-column
-        prop="id"
-        header-align="center"
-        align="center"
-        width="80"
-        label="ID">
-      </el-table-column>
-      <el-table-column
         prop="name"
         header-align="center"
         align="center"
         label="商品名称"
-        width="200">
+        width="300">
       </el-table-column>
-      <el-table-column
-        prop="description"
+      <el-table-column v-if="userType === 0"
+        prop="merchantName"
         header-align="center"
         align="center"
-        label="商品描述">
+        label="所属商户">
       </el-table-column>
       <el-table-column
-        prop="createTime"
+        prop="brandName"
         header-align="center"
         align="center"
-        width="200"
-        label="创建时间">
-        <template  slot-scope="scope">{{scope.row.createTime | formatDateTime}}</template>
+        label="所属品牌">
       </el-table-column>
+      <el-table-column
+        prop="code"
+        header-align="center"
+        align="center"
+        label="商品编号">
+      </el-table-column>
+
+      <el-table-column
+        prop="onSale"
+        header-align="center"
+        align="center"
+        label="是否上架">
+        <template slot-scope="scope">
+          <el-switch v-model="scope.row.onSale" @change="setOnSale(scope.row)"></el-switch>
+        </template>
+      </el-table-column>
+
       <el-table-column
         header-align="center"
         align="center"
@@ -77,7 +85,8 @@
 
 <script>
 import AddOrUpdate from './goods-add-or-update'
-import { getGoodsList,deleteGoods } from '@/api/mall-goods/goods'
+import { getGoodsList, deleteGoods, updateOnSale } from '@/api/mall-goods/goods'
+import { getUserInfo } from '@/utils/auth'
 export default {
   data () {
     return {
@@ -90,14 +99,17 @@ export default {
       totalPage: 0,
       dataListLoading: false,
       dataListSelections: [],
-      addOrUpdateVisible: false
+      addOrUpdateVisible: false,
+      adminUserId: null,
+      userType: null
     }
   },
   components: {
     AddOrUpdate
   },
   activated () {
-    this.getDataList()
+    this.getUserInfo();
+    this.getDataList();
   },
   methods: {
     // 获取数据列表
@@ -106,7 +118,8 @@ export default {
       var params =  this.axios.paramsHandler({
         pageNum: this.pageNum,
         pageSize: this.pageSize,
-        name: this.dataForm.name
+        name: this.dataForm.name,
+        adminUserId: this.userType == 0 ? null : this.adminUserId
       })
       getGoodsList(params).then(({data}) => {
         if (data && data.code === "200") {
@@ -167,6 +180,47 @@ export default {
           }
         })
       }).catch(() => {})
+    },
+
+    //是否上架
+    setOnSale(row){
+      var goodsId = row.id;
+      var onSale = row.onSale;
+      var msg = onSale ? '上架' : '下架';
+      if (onSale) row.onSale = false; else row.onSale = true;
+      this.$confirm('是否确定' + msg, '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        var params = this.axios.paramsHandler({
+          goodsId: goodsId,
+          onSale: onSale
+        });
+        updateOnSale(params).then(async ({data}) => {
+          if (data && data.code === "200") {
+            this.$message({
+              message: msg + '成功',
+              type: 'success',
+              duration: 1500,
+              onClose: () => {
+                this.getDataList()
+              }
+            })
+          } else {
+            this.$message.error(data.message)
+          }
+        })
+      }).catch(() => {})
+    },
+
+    /**
+     * cookie中获取当前登录的用户信息
+     */
+    getUserInfo() {
+      var userInfo = JSON.parse(getUserInfo(sessionStorage.getItem("userNameKey")));
+      this.adminUserId = userInfo.userId;
+      this.userType = userInfo.userType;
     }
   }
 }

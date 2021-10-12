@@ -2,7 +2,7 @@
   <div>
     <el-form :model="dataForm" :rules="dataRule" ref="dataForm" label-width="80px">
       <el-form-item label="商品规格">
-        <el-select style="width: 35%" value-key="id" clearable placeholder="请选择规格" ref="selectedSpecifications" v-model="selectedSpecifications" @change="selectSpecificationValue">
+        <el-select style="width: 44%" value-key="id" clearable placeholder="请选择规格" ref="selectedSpecifications" v-model="selectedSpecifications" @change="selectSpecificationValue">
           <el-option
             v-for="item in specificationList"
             :key="item.id"
@@ -10,7 +10,7 @@
             :value="item">
           </el-option>
         </el-select>
-        <el-select style="width: 42%;" value-key="id" clearable placeholder="请选择规格值" ref="selectedSpecificationsValue" v-model="selectedSpecificationsValue" @change="addSelectedSpec">
+        <el-select style="width: 44%;" value-key="id" clearable placeholder="请选择规格值" ref="selectedSpecificationsValue" v-model="selectedSpecificationsValue" @change="addSelectedSpec">
           <el-option
             v-for="item in specificationValueList"
             :key="item.id"
@@ -18,7 +18,7 @@
             :value="item">
           </el-option>
         </el-select>
-        <el-button type="primary" @click="addSpecificationsHandle">新建商品规格</el-button>
+        <el-button type="primary" style="margin-left: 6px;" @click="addSpecificationsHandle">新建商品规格</el-button>
       </el-form-item>
 
       <el-form-item>
@@ -46,28 +46,17 @@
             header-align="center"
             align="center"
             label="sku编号"
-            width="120"
+            width="162"
             fixed>
             <template slot-scope="scope">
               <el-input v-model="scope.row.code"></el-input>
             </template>
           </el-table-column>
-
-          <el-table-column
-            header-align="center"
-            align="center"
-            label="sku名称"
-            width="120"
-            fixed>
-            <template slot-scope="scope">
-              <el-input v-model="scope.row.name"></el-input>
-            </template>
-          </el-table-column>
-
           <el-table-column
             v-if="selectedSpecificationsAndValueList.length>0"
             v-for="(selectedSpecifications,index) in selectedSpecificationsAndValueList"
             :key="index"
+            width="120"
             header-align="center"
             align="center"
             :label="selectedSpecifications.name">
@@ -79,46 +68,50 @@
             header-align="center"
             align="center"
             label="价格（元）"
-            width="120">
+            width="140">
             <template slot-scope="scope">
-              <el-input v-model="scope.row.price" ></el-input>
+              <el-input-number v-model="scope.row.price" controls-position="right" size="medium" :min="0" :max="999999">
+              </el-input-number>
             </template>
           </el-table-column>
           <el-table-column
             header-align="center"
             align="center"
             label="库存"
-            width="120">
+            width="140">
             <template slot-scope="scope">
-              <el-input v-model="scope.row.stock" ></el-input>
+              <el-input-number v-model="scope.row.stock" controls-position="right" size="medium" :min="0" :max="999999">
+              </el-input-number>
             </template>
           </el-table-column>
           <el-table-column
             header-align="center"
             align="center"
             label="重量（kg）"
-            width="120">
+            width="140">
             <template slot-scope="scope">
-              <el-input v-model="scope.row.weight" ></el-input>
+              <el-input-number v-model="scope.row.weight" controls-position="right" size="medium" :min="0" :max="999999">
+              </el-input-number>
             </template>
           </el-table-column>
           <el-table-column
             header-align="center"
             align="center"
             label="体积（m³）"
-            width="120">
+            width="140">
             <template slot-scope="scope">
-              <el-input v-model="scope.row.volume" ></el-input>
+              <el-input-number v-model="scope.row.volume" controls-position="right" size="medium" :min="0" :max="999999">
+              </el-input-number>
             </template>
           </el-table-column>
           <el-table-column
             header-align="center"
             align="center"
-            width="100"
-            label="操作"
-            fixed="right">
+            label="操作">
             <template slot-scope="scope">
-              <el-switch v-model="scope.row.enable"></el-switch>
+              <el-button v-if="!scope.row.enable" type="text" size="small" @click="updateEnable(scope.$index,scope.row.enable)">启用</el-button>
+              <el-button v-if="scope.row.enable" type="text" size="small" @click="updateEnable(scope.$index,scope.row.enable)">禁用</el-button>
+              <el-button type="text" size="small" @click="remove(scope.$index)">移除</el-button>
             </template>
           </el-table-column>
         </el-table>
@@ -127,40 +120,40 @@
       <el-form-item label="商品参数" prop="params">
         <el-button type="primary" plain @click="addGoodsParams">新增+</el-button>
       </el-form-item>
-      <el-table
-        :data="dataForm.params"
-        border
-        @selection-change=""
-        style="width: 100%;">
-        <el-table-column
-          header-align="center"
-          align="center"
-          label="参数名称"
-          width="220">
-          <template slot-scope="scope">
-            <el-input v-model="scope.row.name" placeholder="请输入参数名称" ></el-input>
-          </template>
-        </el-table-column>
-        <el-table-column
-          header-align="center"
-          align="center"
-          label="参数值"
-          width="400">
-          <template slot-scope="scope">
-            <el-input v-model="scope.row.value" placeholder="请输入参数值" ></el-input>
-          </template>
-        </el-table-column>
-        <el-table-column
-          header-align="center"
-          align="center"
-          width="98"
-          label="操作">
-          <template slot-scope="scope">
-            <el-button type="text" size="small" @click="deleteGoodsParams(scope.$index)">移除</el-button>
-          </template>
-        </el-table-column>
-      </el-table>
-
+      <el-form-item>
+        <el-table
+          :data="dataForm.params"
+          border
+          @selection-change=""
+          style="width: 100%;">
+          <el-table-column
+            header-align="center"
+            align="center"
+            label="参数名称"
+            width="400">
+            <template slot-scope="scope">
+              <el-input v-model="scope.row.name" placeholder="请输入参数名称" ></el-input>
+            </template>
+          </el-table-column>
+          <el-table-column
+            header-align="center"
+            align="center"
+            label="参数值"
+            width="600">
+            <template slot-scope="scope">
+              <el-input v-model="scope.row.value" placeholder="请输入参数值" ></el-input>
+            </template>
+          </el-table-column>
+          <el-table-column
+            header-align="center"
+            align="center"
+            label="操作">
+            <template slot-scope="scope">
+              <el-button type="text" size="small" @click="deleteGoodsParams(scope.$index)">移除</el-button>
+            </template>
+          </el-table-column>
+        </el-table>
+      </el-form-item>
     </el-form>
     <!-- 弹窗, 新增 -->
     <add-or-update v-if="addVisible" ref="addOrUpdate" @refreshDataList="getGoodsSpecificationsList"></add-or-update>
@@ -350,6 +343,14 @@ export default {
         }
       }
     },
+    // 启用、禁用
+    updateEnable(index, enable){
+      this.dataForm.goodsSpecificationsDetailEntityList[index].enable = !enable;
+    },
+    // 移除
+    remove(index){
+      this.dataForm.goodsSpecificationsDetailEntityList.splice(index,1);
+    },
 
     /**
      * 获取多个数组的组合，如[123][456] 组合为14,15,16,24,25,26,34,35,36
@@ -437,8 +438,14 @@ export default {
 //  overflow-x: hidden;
 //}
 
-.el-select-dropdown .el-scrollbar .el-scrollbar__wrap
-{
+.el-select-dropdown .el-scrollbar .el-scrollbar__wrap {
   overflow: scroll!important;
+}
+
+.el-input-number {
+  position: relative;
+  display: inline-block;
+  width: 118px;
+  line-height: 35px;
 }
 </style>

@@ -2,6 +2,7 @@
   <el-dialog
     :title="!dataForm.id ? '新增' : '修改'"
     :close-on-click-modal="false"
+    width="85%"
     :visible.sync="visible" :before-close="closeDialog">
 
     <el-steps style="margin-top: -20px;margin-bottom: 20px;" :active="active" align-center finish-status="success">
@@ -30,7 +31,7 @@
       v-show="showGoodsPromotionInfo"
       ref="goodsPromotionInfo">
     </GoodsPromotionInfo>
-    <div style="text-align: center">
+    <div style="text-align: center;">
       <el-button v-show="showGoodsBasicInfo" type="primary" @click="beforeNextStep(1,'goodsBasicInfo')">下一步，填写商品详细信息</el-button>
       <el-button v-show="showGoodsDetailInfo" type="primary" @click="previousStep(2)">上一步，填写商品基本信息</el-button>
       <el-button v-show="showGoodsDetailInfo" type="primary" @click="beforeNextStep(2,'goodsDetailInfo')">下一步，填写商品规格参数</el-button>
@@ -93,7 +94,7 @@ export default {
             /*直接push无法显示商品分类级联效果，故使用此方法*/
             goodsBasicInfo.goodsCategoryIds = [parseInt( data.data.goodsCategoryIds.split(",")[0]),parseInt(data.data.goodsCategoryIds.split(",")[1]),parseInt(data.data.goodsCategoryIds.split(",")[2])];
             goodsBasicInfo.brandId =  data.data.brandId;
-            goodsBasicInfo.merchantId =  data.data.merchantId;
+            goodsBasicInfo.adminUserId =  data.data.adminUserId;
             goodsBasicInfo.code =  data.data.code
             goodsBasicInfo.unit =  data.data.unit
             //商品详细信息
@@ -199,7 +200,7 @@ export default {
         description: goodsBasicInfo.description,//商品描述
         goodsCategoryIds: goodsBasicInfo.goodsCategoryIds.join(','),//处理商品分类字段,商品分类id集合，三级分类id,如 1,2,3
         brandId: goodsBasicInfo.brandId, //品牌id
-        merchantId: goodsBasicInfo.merchantId, //所属商户id
+        adminUserId: goodsBasicInfo.adminUserId, //所属商户id
         code: goodsBasicInfo.code, //商品编码
         unit: goodsBasicInfo.unit, //单位
         //商品详细信息

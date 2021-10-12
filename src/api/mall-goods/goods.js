@@ -57,3 +57,15 @@ export function getGoodsList(params) {
     params: params
   })
 }
+
+/**
+ * 上架 / 下架
+ */
+export function updateOnSale(params) {
+  return request({
+    url: prefix+'/goods/updateOnSale',
+    method: 'put',
+    params: params
+  })
+}
+

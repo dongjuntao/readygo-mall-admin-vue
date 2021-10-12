@@ -93,7 +93,9 @@ export default {
       }).then(() => {
         adminLogout().then(({data}) => {
             if (data && data.code === "200") {
-              clearLoginInfo()
+              clearLoginInfo();
+              //清空vuex状态（退出重新登录，直接进入home，不进入其他页面）
+              this.$store.commit('common/updateMenuActiveName','');
               //系统管理员用户，退出到系统管理员等了页面
               this.$router.push({ name: "admin-login" })
             }else {
