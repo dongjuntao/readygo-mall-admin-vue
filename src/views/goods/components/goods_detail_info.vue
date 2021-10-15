@@ -4,9 +4,9 @@
       <el-form-item label="商品相册" prop="images">
         <el-upload
           action="#"
+          list-type="picture-card"
           :show-file-list="true"
           :file-list="fileList"
-          list-type="picture-card"
           :http-request="uploadFile"
           :before-upload="beforeUpload"
           :on-preview="handlePictureCardPreview"
@@ -18,7 +18,7 @@
         </el-dialog>
       </el-form-item>
       <el-form-item label="商品详情" prop="infoDetail">
-        <editor-bar v-model="dataForm.infoDetail" :isClear="isClear" @change="change"></editor-bar>
+        <editor-bar v-model="dataForm.infoDetail" :isClear="isClear"></editor-bar>
       </el-form-item>
     </el-form>
   </div>
@@ -40,8 +40,7 @@ export default {
         images: [], //商品相册
         infoDetail: '' //商品详细信息
       },
-      fileList: [],
-
+      fileList: [], //已上传的文件，用于移除时删除记录
       dataRule: {
         name: [
           { required: true, message: '分类名称不能为空', trigger: 'blur' }
@@ -63,6 +62,7 @@ export default {
      * 上传前校验文件
      */
     beforeUpload(file){
+      console.log("this.dataForm.images==",this.dataForm.images)
       const isImg = (file.size / 1024 / 1024) < 3
       if (!isImg) {
         this.$message.error('上传头像图片大小不能超过 3MB!')
@@ -72,11 +72,16 @@ export default {
       if (!isType && !isType2) {
         this.$message.error('上传logo图片格式为png或jpg')
       }
-      const fileNum = this.fileList.length<8;
+      const fileNum = this.dataForm.images.length<8;
+
       if (!fileNum) {
         this.$message.error('只能上传8张图片')
       }
-      return (isType || isType2) && isImg && fileNum
+      const isRepeat =  !this.dataForm.images.find(image=>{return image.indexOf(file.name) > -1})
+      if(!isRepeat) {
+        this.$message.error('图片名称重复')
+      }
+      return (isType || isType2) && isImg && fileNum && isRepeat
     },
 
     //上传品牌logo
@@ -86,22 +91,30 @@ export default {
       var params = this.axios.paramsHandler({folderName: goodsConstant.goods_folder_name })
       fileUpload(formData, params).then(({data}) => {
         this.dataForm.images.push(data.data);
-        this.fileList.push({url: data.data});
       })
     },
 
-    handleRemove() {
-    },
     //预览
     handlePictureCardPreview(file){
       this.dialogImageUrl = file.url;
       this.dialogVisible = true;
     },
-    change(){
 
+    handleRemove(file) {
+      var find = this.dataForm.images.find(image=>{ return image === file.url});
+      if (find && file.status === 'success') {
+        this.dataForm.images.remove(find);
+      }
     }
   }
 }
+
+Array.prototype.remove = function(val) {
+  var index = this.indexOf(val);
+  if (index > -1) {
+    this.splice(index, 1);
+  }
+};
 </script>
 
 <style lang="scss">
@@ -150,7 +163,29 @@ export default {
   overflow-x: hidden;
 }
 
-.el-upload-list__item.is-ready {
-  display: none;
+.el-upload-list--picture-card .el-upload-list__item {
+  overflow: hidden;
+  background-color: #fff;
+  border: 1px solid #c0ccda;
+  border-radius: 6px;
+  -webkit-box-sizing: border-box;
+  box-sizing: border-box;
+  width: 120px;
+  height: 120px;
+  margin: 0 8px 8px 0;
+  display: inline-block;
 }
+
+.el-upload--picture-card {
+  background-color: #fbfdff;
+  border: 1px dashed #c0ccda;
+  border-radius: 6px;
+  -webkit-box-sizing: border-box;
+  box-sizing: border-box;
+  width: 120px;
+  height: 120px;
+  line-height: 130px;
+  vertical-align: top;
+}
+
 </style>

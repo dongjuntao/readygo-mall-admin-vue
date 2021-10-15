@@ -1,52 +1,49 @@
 <template>
   <div>
     <el-form :model="dataForm" :rules="dataRule" ref="dataForm" label-width="80px">
-      <el-row>
-        <el-col :span="12">
-          <el-form-item label="商品名称" prop="name">
-            <el-input v-model="dataForm.name" placeholder="商品名称"></el-input>
-          </el-form-item>
-          <el-form-item label="商品编号" prop="code">
-            <el-input v-model="dataForm.code" placeholder="商品编号"></el-input>
-          </el-form-item>
-          <el-form-item label="商品单位" prop="unit">
-            <el-input v-model="dataForm.unit" placeholder="商品单位"></el-input>
-          </el-form-item>
-          <el-form-item label="商品描述" prop="description" style="width: 200%;">
-            <el-input type="textarea" :rows="3" v-model="dataForm.description" maxLength="200" placeholder="商品描述,最多200个字"></el-input>
-          </el-form-item>
-        </el-col>
-        <el-col :span="12">
-          <el-form-item label="所属品牌" prop="brandId">
-            <el-select v-model="dataForm.brandId" clearable placeholder="请选择">
-              <el-option
-                v-for="item in brandList"
-                :key="item.id"
-                :label="item.name"
-                :value="item.id">
-              </el-option>
-            </el-select>
-          </el-form-item>
-          <el-form-item label="所属商户" prop="adminUserId" v-if="userType == 0">
-            <el-select v-model="dataForm.adminUserId" clearable placeholder="请选择">
-              <el-option
-                v-for="item in merchantList"
-                :key="item.id"
-                :label="item.name"
-                :value="item.id">
-              </el-option>
-            </el-select>
-          </el-form-item>
-          <el-form-item label="商品分类" prop="goodsCategoryIds">
-            <el-cascader
-              :options="goodsCategory"
-              clearable
-              v-model="dataForm.goodsCategoryIds"
-              :props="{ value: 'id',label: 'name',children: 'children'}">
-            </el-cascader>
-          </el-form-item>
-        </el-col>
-      </el-row>
+      <el-form-item label="商品名称" prop="name">
+        <el-input v-model="dataForm.name" placeholder="请输入商品名称"></el-input>
+      </el-form-item>
+      <el-form-item label="商品编号" prop="code">
+        <el-input v-model="dataForm.code" placeholder="请输入商品编号"></el-input>
+      </el-form-item>
+      <el-form-item label="商品描述" prop="description" >
+        <el-input type="textarea" :rows="3" v-model="dataForm.description"
+                  maxLength="200" placeholder="请填写商品描述,最多200个字">
+        </el-input>
+      </el-form-item>
+      <el-form-item label="所属品牌" prop="brandId">
+        <el-select v-model="dataForm.brandId" clearable placeholder="请选择所属品牌">
+          <el-option
+            v-for="item in brandList"
+            :key="item.id"
+            :label="item.name"
+            :value="item.id">
+          </el-option>
+        </el-select>
+      </el-form-item>
+      <el-form-item label="所属商户" prop="adminUserId" v-if="userType == 0">
+        <el-select v-model="dataForm.adminUserId" clearable placeholder="请选择所属商户">
+          <el-option
+            v-for="item in merchantList"
+            :key="item.id"
+            :label="item.name"
+            :value="item.id">
+          </el-option>
+        </el-select>
+      </el-form-item>
+      <el-form-item label="商品分类" prop="goodsCategoryIds">
+        <el-cascader
+          :options="goodsCategory"
+          clearable
+          placeholder="请选择商品分类"
+          v-model="dataForm.goodsCategoryIds"
+          :props="{ value: 'id',label: 'name',children: 'children'}">
+        </el-cascader>
+      </el-form-item>
+      <el-form-item label="商品单位" prop="unit">
+        <el-input v-model="dataForm.unit" placeholder="请输入商品单位（如个、件、套、袋、瓶等）"></el-input>
+      </el-form-item>
     </el-form>
   </div>
 </template>
@@ -66,7 +63,7 @@ export default {
         description: '',//商品描述
         goodsCategoryIds:[],//商品分类id集合，三级分类id,如 1,2,3
         brandId: null, //品牌id
-        merchantId: null, //所属商户id
+        adminUserId: null, //所属商户id
         code: '', //商品编码
         unit: '' //单位
       },

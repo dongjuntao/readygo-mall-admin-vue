@@ -27,7 +27,7 @@
         header-align="center"
         align="center"
         label="商品名称"
-        width="300">
+        width="350">
       </el-table-column>
       <el-table-column v-if="userType === 0"
         prop="merchantName"
@@ -39,12 +39,14 @@
         prop="brandName"
         header-align="center"
         align="center"
+        width="150"
         label="所属品牌">
       </el-table-column>
       <el-table-column
         prop="code"
         header-align="center"
         align="center"
+        width="150"
         label="商品编号">
       </el-table-column>
 
@@ -52,6 +54,7 @@
         prop="onSale"
         header-align="center"
         align="center"
+        width="80"
         label="是否上架">
         <template slot-scope="scope">
           <el-switch v-model="scope.row.onSale" @change="setOnSale(scope.row)"></el-switch>
@@ -61,7 +64,7 @@
       <el-table-column
         header-align="center"
         align="center"
-        width="150"
+        width="120"
         label="操作">
         <template slot-scope="scope">
           <el-button type="text" size="small" @click="addOrUpdateHandle(scope.row.id)">修改</el-button>

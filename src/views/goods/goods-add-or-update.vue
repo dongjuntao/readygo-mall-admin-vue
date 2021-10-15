@@ -107,6 +107,7 @@ export default {
                 goodsDetailInfo.images.push(image);
               });
             }
+            // goodsDetailInfo.images = data.data.images;
             goodsDetailInfo.infoDetail = data.data.infoDetail;
             //商品规格参数
             goodsSpecificationsInfo.goodsSpecificationsDetailEntityList = data.data.goodsSkuList
