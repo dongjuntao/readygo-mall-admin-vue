@@ -69,10 +69,19 @@ export default {
       },
       dataRule: {
         name: [
-          { required: true, message: '分类名称不能为空', trigger: 'blur' }
+          { required: true, message: '商品名称不能为空', trigger: 'change' }
         ],
-        parentName: [
-          { required: true, message: '上级分类不能为空', trigger: 'change' }
+        code: [
+          { required: true, message: '商品编号不能为空', trigger: 'change' }
+        ],
+        brandId: [
+          { required: true, message: '所属品牌不能为空', trigger: 'change' }
+        ],
+        adminUserId: [
+          { required: true, message: '所属商户不能为空', trigger: 'change' }
+        ],
+        goodsCategoryIds: [
+          { required: true, message: '商品分类不能为空', trigger: 'change' }
         ]
       },
       goodsCategory:[], //商品分类

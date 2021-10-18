@@ -84,6 +84,7 @@ export default {
         this.showGoodsPromotionInfo = false;
         if (this.dataForm.id) { //修改
           getGoodsById(this.axios.paramsHandler({id: this.dataForm.id})).then(({data})=>{
+            console.log("data==",data)
             var goodsBasicInfo = this.$refs['goodsBasicInfo'].$refs['dataForm'].model; //商品基本信息
             var goodsDetailInfo = this.$refs['goodsDetailInfo'].$refs['dataForm'].model;//商品详细信息
             var goodsSpecificationsInfo = this.$refs['goodsSpecificationsInfo'].$refs['dataForm'].model;//商品规格参数
@@ -98,16 +99,15 @@ export default {
             goodsBasicInfo.code =  data.data.code
             goodsBasicInfo.unit =  data.data.unit
             //商品详细信息
-            if (data.data.images.split(",") && data.data.images.split(",").length>0){
-              this.$refs['goodsDetailInfo'].fileList = [] //先清空
-              goodsDetailInfo.images = [];
+            this.$refs['goodsDetailInfo'].fileList = [] //先清空
+            goodsDetailInfo.images = [];
+            if (data.data.images && data.data.images.split(",") && data.data.images.split(",").length>0){
               //循环回显图片
               data.data.images.split(",").forEach(image=>{
                 this.$refs['goodsDetailInfo'].fileList.push({url:image})
                 goodsDetailInfo.images.push(image);
               });
             }
-            // goodsDetailInfo.images = data.data.images;
             goodsDetailInfo.infoDetail = data.data.infoDetail;
             //商品规格参数
             goodsSpecificationsInfo.goodsSpecificationsDetailEntityList = data.data.goodsSkuList

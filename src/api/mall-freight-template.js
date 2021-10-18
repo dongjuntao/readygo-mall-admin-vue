@@ -2,11 +2,22 @@ import request from '@/utils/httpRequest'
 const prefix = "/mall-admin";
 
 /**
- * 运费模板列表
+ * 运费模板列表（分页）
  */
 export function getFreightTemplateList(params) {
   return request({
     url: prefix+'/store/freightTemplate/list',
+    method: 'get',
+    params: params
+  })
+}
+
+/**
+ * 运费模板列表（不分页）
+ */
+export function getFreightTemplateListAll(params) {
+  return request({
+    url: prefix+'/store/freightTemplate/listAll',
     method: 'get',
     params: params
   })

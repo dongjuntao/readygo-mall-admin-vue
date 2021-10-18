@@ -2,7 +2,7 @@
   <div>
     <el-form :model="dataForm" :rules="dataRule" ref="dataForm" label-width="80px">
       <el-form-item label="积分赠送" prop="points">
-        <el-input-number v-model="dataForm.points" @change="" :min="1" :max="10" label="积分"></el-input-number>
+        <el-input-number v-model="dataForm.points" @change="" :min="0" :max="100" label="积分"></el-input-number>
       </el-form-item>
       <el-form-item label="商品推荐" prop="recommend">
         <el-checkbox-group v-model="dataForm.recommend">
@@ -35,6 +35,7 @@
 </template>
 
 <script>
+import { getFreightTemplateListAll } from '@/api/mall-freight-template'
 export default {
   data () {
     return {
@@ -45,28 +46,31 @@ export default {
         freightSetting: null, //运费设置
         recommend: [],//商品推荐
         keyword: '', //关键词
-        points: 1
+        points: 0
       },
-      freightList: [ //运费设置
-        {id:1, name: '包邮'},
-        {id:2, name: '不包邮'},
-        {id:3, name: '大陆包邮'},
-        {id:4, name: '港澳台不包邮'}
-      ],
-
+      freightList: [], //运费设置
       dataRule: {
-        name: [
-          { required: true, message: '分类名称不能为空', trigger: 'blur' }
-        ],
-        parentName: [
-          { required: true, message: '上级分类不能为空', trigger: 'change' }
+        freightSetting: [
+          { required: true, message: '运费设置不能为空', trigger: 'change' }
         ]
       }
     }
   },
   created () {
+    this.getFreightTemplateList();
   },
   methods: {
+    getFreightTemplateList() {
+      var params =  this.axios.paramsHandler({
+        adminUserId: this.userType == 0 ? null : this.adminUserId
+      })
+      getFreightTemplateListAll(params).then(({data}) => {
+        if (data && data.code === "200") {
+          this.freightList = data.data
+        }
+        console.log("this.freightList == ",this.freightList)
+      })
+    }
   }
 }
 </script>

@@ -29,6 +29,16 @@
         label="商品名称"
         width="350">
       </el-table-column>
+      <el-table-column
+        prop="images"
+        header-align="center"
+        align="center"
+        label="商品图片"
+        width="100">
+        <template slot-scope="scope">
+          <img v-if="scope.row.images" style="width: 50px; height: 50px;" :src="scope.row.images.split(',')[0]" >
+        </template>
+      </el-table-column>
       <el-table-column v-if="userType === 0"
         prop="merchantName"
         header-align="center"
@@ -64,7 +74,6 @@
       <el-table-column
         header-align="center"
         align="center"
-        width="120"
         label="操作">
         <template slot-scope="scope">
           <el-button type="text" size="small" @click="addOrUpdateHandle(scope.row.id)">修改</el-button>
@@ -179,7 +188,7 @@ export default {
               }
             })
           } else {
-            this.$message.error(data.msg)
+            this.$message.error(data.message)
           }
         })
       }).catch(() => {})

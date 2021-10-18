@@ -42,27 +42,19 @@ export default {
       },
       fileList: [], //已上传的文件，用于移除时删除记录
       dataRule: {
-        name: [
-          { required: true, message: '分类名称不能为空', trigger: 'blur' }
-        ],
-        parentName: [
-          { required: true, message: '上级分类不能为空', trigger: 'change' }
+        images: [
+          { required: true, message: '至少上传一张图片', trigger: 'change' }
         ]
       },
       isClear: false
     }
   },
-  created () {
-  },
-  mounted() {
 
-  },
   methods: {
     /**
      * 上传前校验文件
      */
     beforeUpload(file){
-      console.log("this.dataForm.images==",this.dataForm.images)
       const isImg = (file.size / 1024 / 1024) < 3
       if (!isImg) {
         this.$message.error('上传头像图片大小不能超过 3MB!')
@@ -73,7 +65,6 @@ export default {
         this.$message.error('上传logo图片格式为png或jpg')
       }
       const fileNum = this.dataForm.images.length<8;
-
       if (!fileNum) {
         this.$message.error('只能上传8张图片')
       }
