@@ -84,7 +84,6 @@ export default {
         this.showGoodsPromotionInfo = false;
         if (this.dataForm.id) { //修改
           getGoodsById(this.axios.paramsHandler({id: this.dataForm.id})).then(({data})=>{
-            console.log("data==",data)
             var goodsBasicInfo = this.$refs['goodsBasicInfo'].$refs['dataForm'].model; //商品基本信息
             var goodsDetailInfo = this.$refs['goodsDetailInfo'].$refs['dataForm'].model;//商品详细信息
             var goodsSpecificationsInfo = this.$refs['goodsSpecificationsInfo'].$refs['dataForm'].model;//商品规格参数

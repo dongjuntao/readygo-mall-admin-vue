@@ -763,9 +763,8 @@ input[type=checkbox]::after{
 }
 
 input[type=checkbox]:checked::after{
-  content: "✓";
+  content: "✔";
   font-size: 13px;
-  font-weight: bold;
 }
 .checkbox {
   margin-top: 48px;

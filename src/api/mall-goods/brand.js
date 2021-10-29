@@ -1,5 +1,5 @@
 import request from '@/utils/httpRequest'
-const prefix = "/mall-brand";
+const prefix = "/mall-goods";
 
 /**
  * 品牌列表（分页）

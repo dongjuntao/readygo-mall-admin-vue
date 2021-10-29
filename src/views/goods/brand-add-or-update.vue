@@ -27,17 +27,6 @@
           <div slot="tip" class="el-upload__tip">只能上传jpg/png文件，且不超过3MB</div>
         </el-upload>
       </el-form-item>
-
-      <el-form-item label="品牌分类" prop="brandCategoryId">
-        <el-select v-model="dataForm.brandCategoryId" placeholder="品牌分类">
-          <el-option
-            v-for="item in brandCategoryList"
-            :key="item.id"
-            :label="item.name"
-            :value="item.id">
-          </el-option>
-        </el-select>
-      </el-form-item>
     </el-form>
     <span slot="footer" class="dialog-footer">
       <el-button @click="visible = false">取消</el-button>
@@ -48,8 +37,7 @@
 </template>
 
 <script>
-import { getBrandById, saveBrand, updateBrand } from '@/api/mall-brand/brand'
-import { getBrandCategoryListAll } from '@/api/mall-brand/brand-category'
+import { getBrandById, saveBrand, updateBrand } from '@/api/mall-goods/brand'
 import {  fileUpload, fileDelete } from '@/api/mall-file/file'
 import { brandConstant } from "@/utils/constant";
 export default {
@@ -61,7 +49,6 @@ export default {
         name: '',
         description: '',
         logo: '',
-        brandCategoryId: null,
         enable: true
       },
       dataRule: {
@@ -73,9 +60,6 @@ export default {
         ],
         logo: [
           { required: true, message: '请上传品牌logo', trigger: 'blur' }
-        ],
-        brandCategoryId: [
-          { required: true, message: '请选择品牌分类', trigger: 'blur' }
         ]
       },
       fileList:[],
@@ -84,7 +68,6 @@ export default {
   },
 
   mounted() {
-    this.brandCategoryListAll();
   },
 
   methods: {
@@ -101,7 +84,6 @@ export default {
               this.dataForm.name = data.data.name
               this.dataForm.description = data.data.description
               this.dataForm.logo = data.data.logo
-              this.dataForm.brandCategoryId = data.data.brandCategoryId
               this.dataForm.enable = data.data.enable
               //logo回显
               if (this.dataForm.logo) {
@@ -128,7 +110,6 @@ export default {
             name: this.dataForm.name,
             description: this.dataForm.description,
             logo: this.dataForm.logo,
-            brandCategoryId: this.dataForm.brandCategoryId,
             enable: this.dataForm.enable
           })
           var saveOrUpdate =  this.dataForm.id ? updateBrand : saveBrand;
@@ -148,14 +129,6 @@ export default {
             }
           })
         }
-      })
-    },
-    /**
-     * 获取所有品牌分类列表
-     */
-    brandCategoryListAll() {
-      getBrandCategoryListAll().then(({data}) => {
-        this.brandCategoryList = data.data;
       })
     },
     /**

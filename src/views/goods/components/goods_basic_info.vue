@@ -50,7 +50,7 @@
 
 <script>
 import { getGoodsCategoryTree } from '@/api/mall-goods/goods-category'
-import { getBrandListAll } from '@/api/mall-brand/brand'
+import { getBrandListAll } from '@/api/mall-goods/brand'
 import { getAdminListAll } from '@/api/mall-admin'
 import { getUserInfo } from '@/utils/auth'
 export default {

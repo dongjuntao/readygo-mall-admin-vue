@@ -41,11 +41,6 @@
           <img :src="scope.row.logo" style="height: 50px; width: 50px;">
         </template>
       </el-table-column>
-      <el-table-column header-align="center" align="center" label="品牌分类" width="160px;">
-        <template slot-scope="scope">
-          {{brandCategoryList.find(ele=>{return ele.id == scope.row.brandCategoryId}).name}}
-        </template>
-      </el-table-column>
       <el-table-column
         prop="description"
         header-align="center"
@@ -87,8 +82,7 @@
 
 <script>
 import AddOrUpdate from './brand-add-or-update'
-import { getBrandList,deleteBrand } from '@/api/mall-brand/brand'
-import { getBrandCategoryListAll } from '@/api/mall-brand/brand-category'
+import { getBrandList,deleteBrand } from '@/api/mall-goods/brand'
 export default {
   data () {
     return {
@@ -101,8 +95,7 @@ export default {
       totalPage: 0,
       dataListLoading: false,
       dataListSelections: [],
-      addOrUpdateVisible: false,
-      brandCategoryList: []//所有品牌分类
+      addOrUpdateVisible: false
     }
   },
   components: {
@@ -110,7 +103,6 @@ export default {
   },
   activated () {
     this.getDataList()
-    this.brandCategoryListAll();
   },
   methods: {
     // 获取数据列表
@@ -122,7 +114,7 @@ export default {
         'name': this.dataForm.name
       })
       getBrandList(params).then(({data}) => {
-        this.brandCategoryListAll()
+        console.log("data===",data)
         if (data && data.code === "200") {
           this.dataList = data.data.list
           this.totalPage = data.data.totalCount
@@ -181,15 +173,7 @@ export default {
           }
         })
       }).catch(() => {})
-    },
-    /**
-     * 获取所有品牌分类列表
-     */
-    brandCategoryListAll() {
-      getBrandCategoryListAll().then(({data}) => {
-        this.brandCategoryList = data.data;
-      })
-    },
+    }
   }
 }
 </script>
