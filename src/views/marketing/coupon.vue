@@ -23,58 +23,86 @@
         width="50">
       </el-table-column>
       <el-table-column
-        prop="userName"
-        header-align="center"
-        align="center"
-        label="用户名"
-        width="150">
-      </el-table-column>
-      <el-table-column
         prop="name"
         header-align="center"
         align="center"
-        label="商家名称"
-        width="250">
+        label="优惠券名称"
+        width="200">
       </el-table-column>
-      <el-table-column header-align="center" align="center" label="商家头像" width="100px;">
+      <el-table-column
+        prop="type"
+        header-align="center"
+        align="center"
+        label="优惠券类型"
+        width="100">
         <template slot-scope="scope">
-          <img :src="scope.row.avatar" style="height: 50px; width: 50px;">
+          {{scope.row.type == 0 ? '满减券' : '满折券'}}
         </template>
       </el-table-column>
+
       <el-table-column
-        prop="mobile"
+        prop="source"
         header-align="center"
         align="center"
-        label="手机号"
-        width="120">
-      </el-table-column>
-      <el-table-column
-        prop="status"
-        header-align="center"
-        align="center"
-        label="审核状态">
+        label="优惠券来源"
+        width="250" v-if="userType == 0">
         <template slot-scope="scope">
-          <el-tag v-if="!scope.row.auditStatus || scope.row.auditStatus === 0" size="small" type="warning">待审核</el-tag>
-          <el-tag v-else-if="scope.row.auditStatus === 1" size="small" type="success">已通过</el-tag>
-          <el-tag v-else size="danger">已拒绝</el-tag>
+          {{scope.row.source == 0 ? '平台' : '商户'+"【"+scope.row.merchantName +"】"}}
         </template>
       </el-table-column>
+
       <el-table-column
-        prop="createTime"
+        prop="issueNumber"
         header-align="center"
         align="center"
-        width="180"
-        label="创建时间">
-        <template slot-scope="scope">{{scope.row.createTime | formatDateTime}}</template>
+        label="发行数量"
+        width="80">
       </el-table-column>
+
+      <el-table-column
+        prop="restNumber"
+        header-align="center"
+        align="center"
+        label="剩余数量"
+        width="80">
+      </el-table-column>
+
       <el-table-column
         header-align="center"
         align="center"
-        width="180"
+        width="298"
+        label="有效期">
+        <template slot-scope="scope">
+          {{scope.row.validStartTime | formatDateTime}}至{{scope.row.validEndTime | formatDateTime}}
+        </template>
+      </el-table-column>
+
+      <el-table-column
+        prop="source"
+        header-align="center"
+        align="center"
+        label="优惠额度"
+        width="150" v-if="userType != 0">
+        <template slot-scope="scope">
+          {{scope.row.type == 0 ? scope.row.discountAmount+'元' : scope.row.discountAmount+'折'}}
+        </template>
+      </el-table-column>
+
+      <el-table-column
+        header-align="center"
+        align="center"
+        label="状态"
+        width="65">
+        <template slot-scope="scope">
+          <el-switch v-model="scope.row.status" @change="changeStatus(scope.row.id, scope.row.status)"></el-switch>
+        </template>
+      </el-table-column>
+
+      <el-table-column
+        header-align="center"
+        align="center"
         label="操作">
         <template slot-scope="scope">
-          <el-button v-if="!scope.row.auditStatus || scope.row.auditStatus === 0" type="text" size="small" @click="auditOrDetailHandle(scope.row.id, 'audit')">审核</el-button>
-          <el-button v-if="scope.row.auditStatus === 1 || scope.row.auditStatus === 2" type="text" size="small" @click="auditOrDetailHandle(scope.row.id, 'detail')">详情</el-button>
           <el-button v-if="isAuth('marketing-coupon-update')" type="text" size="small" @click="addOrUpdateHandle(scope.row.id)">修改</el-button>
           <el-button v-if="isAuth('marketing-coupon-delete')" type="text" size="small" @click="deleteHandle(scope.row.id)">删除</el-button>
         </template>
@@ -97,8 +125,9 @@
 </template>
 
 <script>
+import { getUserInfo } from '@/utils/auth'
 import AddOrUpdate from './coupon-add-or-update'
-import { getCouponList, deleteCoupon } from '@/api/mall-coupon/coupon'
+import { getCouponList, deleteCoupon, updateStatus } from '@/api/mall-coupon/coupon'
 export default {
   data () {
     return {
@@ -109,8 +138,7 @@ export default {
       pageNum: 1,
       pageSize: 10,
       totalPage: 0,
-      userType: 1,
-      auditStatus: 1,
+      userType: 0,
       dataListLoading: false,
       dataListSelections: [],
       addOrUpdateVisible: false,
@@ -121,7 +149,8 @@ export default {
     AddOrUpdate
   },
   activated () {
-    this.getDataList()
+    this.getUserInfo();
+    this.getDataList();
   },
   methods: {
     // 获取数据列表
@@ -130,8 +159,8 @@ export default {
       var params = this.axios.paramsHandler({
         pageNum: this.pageNum,
         pageSize: this.pageSize,
-        userName: this.dataForm.userName,
-        userType: this.userType
+        name: this.dataForm.name,
+        adminUserId: this.userType == 0 ? null : this.adminUserId
       })
       getCouponList(params).then(({data})=> {
         if (data && data.code === "200") {
@@ -202,7 +231,39 @@ export default {
           }
         });
       }).catch(() => {})
-    }
+    },
+
+    /**
+     * 修改启停状态
+     */
+    changeStatus(id, status) {
+      var data = this.axios.paramsHandler({
+        couponId: id,
+        status: status
+      });
+      updateStatus(data).then(({data}) => {
+        if (data && data.code === "200") {
+          this.$message({
+            message: '操作成功',
+            type: 'success',
+            duration: 1500,
+            onClose: () => {
+              this.getDataList()
+            }
+          })
+        } else {
+          this.$message.error(data.msg)
+        }
+      });
+    },
+
+    /**
+     * cookie中获取当前登录的用户信息
+     */
+    getUserInfo() {
+      var userInfo = JSON.parse(getUserInfo(sessionStorage.getItem("userNameKey")));
+      this.userType = userInfo.userType;
+    },
   }
 }
 </script>

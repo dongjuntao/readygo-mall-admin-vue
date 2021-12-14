@@ -284,10 +284,9 @@
 
     methods: {
       init (id) {
-        console.log("id == "+ id)
         this.dataForm.id = id || 0
         this.visible = true;
-        this.$nextTick( ()=> {
+        this.$nextTick(()=> {
           this.$refs['dataForm'].resetFields()
           if (this.dataForm.id) {
             getFreightTemplateById(this.axios.paramsHandler({id: this.dataForm.id})).then (({data})=> {

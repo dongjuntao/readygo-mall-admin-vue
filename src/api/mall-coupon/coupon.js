@@ -57,7 +57,7 @@ export function getCouponById(params) {
 /**
  * 修改优惠券状态
  */
-export function updateStatus(id, params) {
+export function updateStatus(params) {
   return request({
     url: prefix+'/coupon/updateStatus',
     method: 'put',
