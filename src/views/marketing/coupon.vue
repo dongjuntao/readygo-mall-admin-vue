@@ -139,6 +139,7 @@ export default {
       pageSize: 10,
       totalPage: 0,
       userType: 0,
+      adminUserId:0,
       dataListLoading: false,
       dataListSelections: [],
       addOrUpdateVisible: false,
@@ -263,6 +264,7 @@ export default {
     getUserInfo() {
       var userInfo = JSON.parse(getUserInfo(sessionStorage.getItem("userNameKey")));
       this.userType = userInfo.userType;
+      this.adminUserId = userInfo.userId;
     },
   }
 }

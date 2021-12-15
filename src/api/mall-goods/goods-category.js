@@ -66,3 +66,14 @@ export function deleteGoodsCategory(pathParam) {
     method: 'delete'
   })
 }
+
+/**
+ * 获取所有子一级
+ */
+export function getSubFirst(params) {
+  return request({
+    url: prefix+'/goods/category/getSubFirst',
+    method: 'get',
+    params: params
+  })
+}

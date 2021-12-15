@@ -69,3 +69,14 @@ export function updateOnSale(params) {
   })
 }
 
+/**
+ * 商品列表（不分页）
+ */
+export function getAllGoodsList(params) {
+  return request({
+    url: prefix+'/goods/listAll',
+    method: 'get',
+    params: params
+  })
+}
+
