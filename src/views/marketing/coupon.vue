@@ -1,5 +1,13 @@
 <template>
   <div class="mod-user">
+
+    <el-radio-group v-model="couponSelect" style="margin-bottom: 30px;" @change="getDataList">
+      <el-radio-button :label="0">全部</el-radio-button>
+      <el-radio-button :label="1">待审核</el-radio-button>
+      <el-radio-button :label="2">已通过</el-radio-button>
+      <el-radio-button :label="3">已拒绝</el-radio-button>
+    </el-radio-group>
+
     <el-form :inline="true" :model="dataForm" @keyup.enter.native="getDataList()">
       <el-form-item>
         <el-input v-model="dataForm.name" placeholder="优惠券名称" clearable></el-input>
@@ -15,26 +23,29 @@
       border
       v-loading="dataListLoading"
       @selection-change="selectionChangeHandle"
-      style="width: 100%;">
+      style="width: 100%;"
+      :header-cell-style="{'font-size': '14px','background-color': '#f8f8f9', 'height': '50px','color':'#515a6e'}"
+      :cell-style="{'font-size':'13px'}"
+      element-loading-text="正在查询中...">
       <el-table-column
         type="selection"
         header-align="center"
         align="center"
-        width="50">
+        width="50" :key="1">
       </el-table-column>
       <el-table-column
         prop="name"
         header-align="center"
         align="center"
         label="优惠券名称"
-        width="200">
+        width="200" :key="2">
       </el-table-column>
       <el-table-column
         prop="type"
         header-align="center"
         align="center"
         label="优惠券类型"
-        width="100">
+        width="95" :key="3">
         <template slot-scope="scope">
           {{scope.row.type == 0 ? '满减券' : '满折券'}}
         </template>
@@ -45,7 +56,8 @@
         header-align="center"
         align="center"
         label="优惠券来源"
-        width="250" v-if="userType == 0">
+        width="250"
+        v-if="userType == 0" :key="4">
         <template slot-scope="scope">
           {{scope.row.source == 0 ? '平台' : '商户'+"【"+scope.row.merchantName +"】"}}
         </template>
@@ -56,24 +68,24 @@
         header-align="center"
         align="center"
         label="发行数量"
-        width="80">
+        width="78" :key="5">
       </el-table-column>
 
-      <el-table-column
-        prop="restNumber"
-        header-align="center"
-        align="center"
-        label="剩余数量"
-        width="80">
-      </el-table-column>
+<!--      <el-table-column-->
+<!--        prop="restNumber"-->
+<!--        header-align="center"-->
+<!--        align="center"-->
+<!--        label="剩余数量"-->
+<!--        width="78" :key="6">-->
+<!--      </el-table-column>-->
 
       <el-table-column
         header-align="center"
         align="center"
-        width="298"
-        label="有效期">
+        width="280"
+        label="有效期" :key="7">
         <template slot-scope="scope">
-          {{scope.row.validStartTime | formatDateTime}}至{{scope.row.validEndTime | formatDateTime}}
+          {{ scope.row.validPeriod.split(",")[0] }}至{{ scope.row.validPeriod.split(",")[1] }}
         </template>
       </el-table-column>
 
@@ -82,7 +94,8 @@
         header-align="center"
         align="center"
         label="优惠额度"
-        width="150" v-if="userType != 0">
+        width="150"
+        v-if="userType != 0" :key="8">
         <template slot-scope="scope">
           {{scope.row.type == 0 ? scope.row.discountAmount+'元' : scope.row.discountAmount+'折'}}
         </template>
@@ -92,7 +105,7 @@
         header-align="center"
         align="center"
         label="状态"
-        width="65">
+        width="65" :key="9">
         <template slot-scope="scope">
           <el-switch v-model="scope.row.status" @change="changeStatus(scope.row.id, scope.row.status)"></el-switch>
         </template>
@@ -101,10 +114,26 @@
       <el-table-column
         header-align="center"
         align="center"
-        label="操作">
+        label="审核状态"
+        width="80"
+        v-if="userType != 0" :key="10">
         <template slot-scope="scope">
-          <el-button v-if="isAuth('marketing-coupon-update')" type="text" size="small" @click="addOrUpdateHandle(scope.row.id)">修改</el-button>
-          <el-button v-if="isAuth('marketing-coupon-delete')" type="text" size="small" @click="deleteHandle(scope.row.id)">删除</el-button>
+          <span v-if="scope.row.authStatus == 0">待审核</span>
+          <span v-else-if="scope.row.authStatus == 1">已通过</span>
+          <span v-else>已拒绝</span>
+        </template>
+      </el-table-column>
+
+      <el-table-column
+        header-align="center"
+        align="center"
+        label="操作" :key="11">
+        <template slot-scope="scope">
+          <el-button type="text" size="small" @click="addOrUpdateHandle(scope.row.id)">领取情况</el-button>
+          <el-button v-if="scope.row.authStatus==2" type="text" size="small" @click="authOpinionHandle(scope.row.id)" >拒绝原因</el-button>
+          <el-button v-if="isAuth('marketing-coupon-update')" type="text" size="small" @click="addOrUpdateHandle(scope.row.id)" :disabled="scope.row.authStatus==1">修改</el-button>
+          <el-button v-if="isAuth('marketing-coupon-delete')" type="text" size="small" @click="deleteHandle(scope.row.id)" :disabled="scope.row.authStatus==1">删除</el-button>
+          <el-button v-if="isAuth('marketing-coupon-auth') && userType==0 && scope.row.authStatus==0" type="text" size="small" @click="authHandle(scope.row.id)">审核</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -119,14 +148,18 @@
     </el-pagination>
     <!-- 弹窗, 新增 / 修改 -->
     <add-or-update v-if="addOrUpdateVisible" ref="addOrUpdate" @refreshDataList="getDataList"></add-or-update>
-    <!-- 弹窗, 审核 / 详情-->
-    <audit-or-detail v-if="auditOrDetailVisible" ref="auditOrDetail" @refreshDataList="getDataList"></audit-or-detail>
+    <!-- 弹窗, 审核 -->
+    <auth v-if="authVisible" ref="auth" @refreshDataList="getDataList"></auth>
+    <!-- 弹窗, 拒绝原因 -->
+    <auth-opinion v-if="authOpinionVisible" ref="authOpinion" @refreshDataList="getDataList"></auth-opinion>
   </div>
 </template>
 
 <script>
 import { getUserInfo } from '@/utils/auth'
 import AddOrUpdate from './coupon-add-or-update'
+import Auth from './coupon-auth'
+import AuthOpinion from './coupon-auth-opinion'
 import { getCouponList, deleteCoupon, updateStatus } from '@/api/mall-coupon/coupon'
 export default {
   data () {
@@ -143,11 +176,15 @@ export default {
       dataListLoading: false,
       dataListSelections: [],
       addOrUpdateVisible: false,
-      auditOrDetailVisible: false
+      authVisible: false,
+      couponSelect: 0,
+      authOpinionVisible: false
     }
   },
   components: {
-    AddOrUpdate
+    AddOrUpdate,
+    Auth,
+    AuthOpinion
   },
   activated () {
     this.getUserInfo();
@@ -157,11 +194,22 @@ export default {
     // 获取数据列表
     getDataList () {
       this.dataListLoading = true;
+      var authStatus;
+      if (this.couponSelect == 0) {
+        authStatus = null; //全部
+      } else if(this.couponSelect == 1) {
+        authStatus = 0; //待审核
+      } else if(this.couponSelect == 2) {
+        authStatus = 1; //已通过
+      } else if(this.couponSelect == 3) {
+        authStatus = 2; //已拒绝
+      }
       var params = this.axios.paramsHandler({
         pageNum: this.pageNum,
         pageSize: this.pageSize,
         name: this.dataForm.name,
-        adminUserId: this.userType == 0 ? null : this.adminUserId
+        adminUserId: this.userType == 0 ? null : this.adminUserId,
+        authStatus: authStatus
       })
       getCouponList(params).then(({data})=> {
         if (data && data.code === "200") {
@@ -199,13 +247,22 @@ export default {
       })
     },
 
-    // 审核 / 详情
-    auditOrDetailHandle (id, type) {
-      this.auditOrDetailVisible = true
+    // 审核
+    authHandle (id, type) {
+      this.authVisible = true
       this.$nextTick(() => {
-        this.$refs.auditOrDetail.init(id, type)
+        this.$refs.auth.init(id, type)
       })
     },
+
+    // 拒绝原因
+    authOpinionHandle (id, type) {
+      this.authOpinionVisible = true
+      this.$nextTick(() => {
+        this.$refs.authOpinion.init(id, type)
+      })
+    },
+
     // 删除
     deleteHandle (id) {
       var couponIds = id ? [id] : this.dataListSelections.map(item => {

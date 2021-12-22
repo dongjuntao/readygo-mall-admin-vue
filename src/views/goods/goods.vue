@@ -15,7 +15,10 @@
       border
       v-loading="dataListLoading"
       @selection-change="selectionChangeHandle"
-      style="width: 100%;">
+      style="width: 100%;"
+      :header-cell-style="{'font-size': '14px','background-color': '#f8f8f9', 'height': '50px','color':'#515a6e'}"
+      :cell-style="{'font-size':'13px'}"
+      element-loading-text="正在查询中...">
       <el-table-column
         type="selection"
         header-align="center"

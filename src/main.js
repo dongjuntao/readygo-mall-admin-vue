@@ -26,7 +26,7 @@ NProgress.configure({
 
 import locale from 'element-ui/lib/locale/lang/zh-CN' // lang i18n
 import ElementUI from 'element-ui'
-Vue.use(ElementUI,{size: 'medium', locale })
+Vue.use(ElementUI,{size: 'small', locale })
 
 Vue.config.productionTip = false
 

@@ -19,7 +19,7 @@
     "babel-plugin-component": "0.10.1",
     "babel-polyfill": "6.26.0",
     "crypto-js": "^4.0.0",
-    "element-ui": "^2.15.3",
+    "element-ui": "^2.15.6",
     "js-cookie": "^2.2.1",
     "lodash": "^4.17.15",
     "moment": "^2.29.1",

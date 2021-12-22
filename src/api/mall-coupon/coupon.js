@@ -64,3 +64,14 @@ export function updateStatus(params) {
     params: params
   })
 }
+
+/**
+ * 优惠券审审核
+ */
+export function auth(params) {
+  return request({
+    url: prefix+'/coupon/auth',
+    method: 'put',
+    params: params
+  })
+}

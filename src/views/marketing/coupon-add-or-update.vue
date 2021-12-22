@@ -32,7 +32,6 @@
         </el-radio-group>
       </el-form-item>
 
-
       <el-form-item label="使用门槛" prop="useThreshold">
         <el-radio-group v-model="dataForm.useThreshold">
           <el-radio :label="0">无门槛</el-radio>
@@ -41,15 +40,13 @@
       </el-form-item>
 
       <el-form-item label="最低消费" prop="minConsumption" v-if="dataForm.useThreshold == 1">
-        <el-input-number v-model="dataForm.minConsumption" controls-position="right" size="small" :min="1" :max="999999"></el-input-number>
-        元
+        <el-input-number v-model="dataForm.minConsumption" controls-position="right" size="small" :min="0" :max="999999"></el-input-number>元
       </el-form-item>
-
       <el-form-item label="优惠额度" prop="discountAmount" v-if="dataForm.type==0">
         <el-input-number v-model="dataForm.discountAmount" controls-position="right" size="small" :min="0" :max="999999"></el-input-number>元
       </el-form-item>
       <el-form-item label="优惠折扣" prop="discountAmount" v-if="dataForm.type==1">
-        <el-input-number v-model="dataForm.discountAmount" controls-position="right" size="small" :min="0.01" :max="9.99"></el-input-number>折
+        <el-input-number v-model="dataForm.discountAmount" controls-position="right" size="small" :min="0" :max="9.99"></el-input-number>折
       </el-form-item>
 
       <el-form-item label="使用范围" prop="useScope">
@@ -93,26 +90,23 @@
         </el-checkbox-group>
       </el-form-item>
       <el-form-item label="发行数量" prop="issueNumber">
-        <el-input-number v-model="dataForm.issueNumber" controls-position="right"
-                         size="small" :min="1" :max="999999">
-        </el-input-number>
+        <el-input-number v-model="dataForm.issueNumber" controls-position="right" size="small" :min="1" :max="999999"></el-input-number>
       </el-form-item>
 
-      <el-form-item label="有效期" prop="validDateTime">
+      <el-form-item label="有效期" prop="validPeriod">
         <el-date-picker
-          v-model="validDateTime"
+          v-model="dataForm.validPeriod"
           type="datetimerange"
           range-separator="至"
           start-placeholder="开始日期"
           end-placeholder="结束日期"
+          format="yyyy-MM-dd HH:mm:ss"
           value-format="yyyy-MM-dd HH:mm:ss">
         </el-date-picker>
       </el-form-item>
       <el-form-item label="限领条件" prop="perLimit">
         每人限领
-        <el-input-number v-model="dataForm.perLimit" controls-position="right"
-                         size="small" :min="1" :max="99">
-        </el-input-number>
+        <el-input-number v-model="dataForm.perLimit" controls-position="right" size="small" :min="1" :max="99"></el-input-number>
         张
       </el-form-item>
 
@@ -138,19 +132,11 @@
   import { getCouponById, saveCoupon, updateCoupon } from '@/api/mall-coupon/coupon'
   export default {
     data () {
-      var validateApplicableMember = (rule, value, callback) => {
-        if (!value || value.length == 0) {
-          callback(new Error('请至少选择一种会员'))
-        } else {
-          callback()
-        }
-      }
       return {
         visible: false,
         isIndeterminate: false,
         checkAll: false,
         userType: null,
-        validDateTime: null,
         merchantList: [], //商户列表
         applicableMemberList:["普通会员","青铜会员","白银会员","黄金会员","铂金会员","钻石会员","最强买家"],
         dataForm: {
@@ -167,8 +153,7 @@
           goodsIds: [], //已选的商品
           applicableMember: [], //适用会员（普通会员，青铜会员，白银会员，黄金会员，铂金会员，钻石会员，最强买家）
           issueNumber: 0, //发行数量
-          validStartTime: null, //有效起始时间
-          validEndTime: null, //有效结束时间
+          validPeriod: [], //有效期
           perLimit: 0, //每人限领多少张
           status: false //状态（false：禁用；true：启用）
         },
@@ -184,7 +169,7 @@
           applicableMember: [
             { required: true, message: '请至少选择一种会员',trigger: 'blur' },
           ],
-          validDateTime: [
+          validPeriod: [
             { required: true, message: '请选择有效期', trigger: 'blur' }
           ]
         }
@@ -201,7 +186,14 @@
         this.visible = true;
         this.$nextTick(() => {
           this.$refs['dataForm'].resetFields();//清空选择框
-          this.validDateTime = null;
+          //由于以下字段默认初始化时时未显示状态，无法resetFields()重置，故在此重置
+          this.dataForm.minConsumption=0;
+          this.dataForm.discountAmount=0;
+          this.dataForm.goodsCategoryIds=[];
+          this.dataForm.goodsIds=[];
+          this.dataForm.type=0;
+          this.dataForm.useThreshold=0;
+          this.dataForm.useScope=0;
           if (this.dataForm.id) {
             getCouponById(this.axios.paramsHandler({couponId: this.dataForm.id})).then(({data}) => {
               if (data && data.code === "200") {
@@ -209,11 +201,11 @@
                 //处理”适用会员“
                 this.dataForm.applicableMember = data.data.applicableMember.split(",")
                 //处理有效期
-                var validDateTime = [];
-                if (data.data.validStartTime && data.data.validEndTime) {
-                  validDateTime.push(new Date(data.data.validStartTime));
-                  validDateTime.push(new Date(data.data.validEndTime));
-                  this.validDateTime = validDateTime
+                var validPeriod = [];
+                if (data.data.validPeriod) {
+                  validPeriod.push(data.data.validPeriod.split(",")[0]);
+                  validPeriod.push(data.data.validPeriod.split(",")[1]);
+                  this.dataForm.validPeriod = validPeriod
                 }
                 //处理指定分类
                 if (data.data.goodsCategoryIds) {
@@ -259,11 +251,10 @@
             if (applicableMemberStr) {
               applicableMemberStr = applicableMemberStr.substring(0,applicableMemberStr.length-1);
             }
-            var validStartTime;
-            var validEndTime;
-            if (this.validDateTime) {
-              validStartTime = new Date(this.validDateTime[0]);
-              validEndTime = new Date(this.validDateTime[1]);
+            var validPeriod;
+            console.log('this.dataForm.validPeriod==',this.dataForm.validPeriod)
+            if (this.dataForm.validPeriod) {
+              validPeriod = this.dataForm.validPeriod[0]+","+this.dataForm.validPeriod[1];
             }
             var goodsCategoryIdsTemp = "";
             if (this.dataForm.goodsCategoryIds) {
@@ -306,8 +297,7 @@
               goodsIds: goodsIdsTemp,
               applicableMember: applicableMemberStr, //适用会员（普通会员，青铜会员，白银会员，黄金会员，铂金会员，钻石会员，最强买家）
               issueNumber: this.dataForm.issueNumber, //发行数量
-              validStartTime: validStartTime, //有效起始时间
-              validEndTime: validEndTime, //有效结束时间
+              validPeriod: validPeriod,
               perLimit: this.dataForm.perLimit, //每人限领多少张
               status: this.dataForm.status //状态（0：禁用；1：启用）
             })

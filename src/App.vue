@@ -9,8 +9,11 @@
   }
 </script>
 
-<style type="text/css">
+<style lang="scss" type="text/css">
   .el-table--border th.gutter:last-of-type {
     display: block!important; width: 17px!important;
+  }
+  .el-form-item__label{
+    font-weight: 700;
   }
 </style>
