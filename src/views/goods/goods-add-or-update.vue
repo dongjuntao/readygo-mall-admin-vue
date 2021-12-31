@@ -109,7 +109,8 @@ export default {
             }
             goodsDetailInfo.infoDetail = data.data.infoDetail;
             //商品规格参数
-            goodsSpecificationsInfo.goodsSpecificationsDetailEntityList = data.data.goodsSkuList
+            goodsSpecificationsInfo.goodsSkuList = data.data.goodsSkuList
+            goodsSpecificationsInfo.specificationType = data.data.specificationType//规格类型
             goodsSpecificationsInfo.params = JSON.parse(data.data.params)
             if (data.data.goodsSkuList && data.data.goodsSkuList.length>0) {
               this.$refs['goodsSpecificationsInfo'].selectedSpecificationsAndValueList = JSON.parse(data.data.goodsSkuList[0].extendAttr);
@@ -119,6 +120,8 @@ export default {
             goodsPromotionInfo.recommend = data.data.recommend.split(",");
             goodsPromotionInfo.onSale = data.data.onSale;
             goodsPromotionInfo.freightSetting = data.data.freightSetting;
+            goodsPromotionInfo.weight = data.data.weight;
+            goodsPromotionInfo.volume = data.data.volume;
             goodsPromotionInfo.keyword = data.data.keyword;
           });
         }else { //新增
@@ -192,6 +195,12 @@ export default {
       var goodsDetailInfo = this.$refs['goodsDetailInfo'].$refs['dataForm'].model;//商品详细信息
       var goodsSpecificationsInfo = this.$refs['goodsSpecificationsInfo'].$refs['dataForm'].model;//商品规格参数
       var goodsPromotionInfo = this.$refs['goodsPromotionInfo'].$refs['dataForm'].model;//商品促销信息
+      var goodsSkuList;
+      if (goodsSpecificationsInfo.specificationType == 0) { //单规格
+        goodsSkuList = goodsSpecificationsInfo.goodsSkuList; //商品sku
+      }else {
+        goodsSkuList = goodsSpecificationsInfo.goodsSingleSkuList; //单品
+      }
       //组织提交的参数
       var data = {
         id: this.dataForm.id || undefined,
@@ -207,13 +216,16 @@ export default {
         images: goodsDetailInfo.images.join(","),//处理商品图片字段
         infoDetail: goodsDetailInfo.infoDetail, //商品详情
         //商品规格参数
-        goodsSkuList: goodsSpecificationsInfo.goodsSpecificationsDetailEntityList, //商品sku
+        goodsSkuList: goodsSpecificationsInfo.goodsSkuList, //商品sku
+        specificationType: goodsSpecificationsInfo.specificationType, //规格类型
         params: JSON.stringify(goodsSpecificationsInfo.params),//处理商品参数字段
         //商品促销信息
         points: goodsPromotionInfo.points, //积分
         recommend: goodsPromotionInfo.recommend.join(","), //商品推荐
         onSale: goodsPromotionInfo.onSale, //是否上架
         freightSetting: goodsPromotionInfo.freightSetting, //运费设置
+        weight: goodsPromotionInfo.weight,//重量
+        volume: goodsPromotionInfo.volume, //体积
         keyword: goodsPromotionInfo.keyword //关键词
       }
 

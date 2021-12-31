@@ -1,6 +1,6 @@
 <template>
   <div>
-    <el-form :model="dataForm" :rules="dataRule" ref="dataForm" label-width="80px">
+    <el-form :model="dataForm" :rules="dataRule" ref="dataForm" label-width="120px">
       <el-form-item label="积分赠送" prop="points">
         <el-input-number v-model="dataForm.points" @change="" :min="0" :max="100" label="积分"></el-input-number>
       </el-form-item>
@@ -18,7 +18,7 @@
         </el-switch>
       </el-form-item>
       <el-form-item label="运费设置" prop="freightSetting">
-        <el-select v-model="dataForm.freightSetting" clearable placeholder="请选择">
+        <el-select v-model="dataForm.freightSetting" clearable placeholder="请选择" @change="changeFreightSetting">
           <el-option
             v-for="item in freightList"
             :key="item.id"
@@ -27,6 +27,15 @@
           </el-option>
         </el-select>
       </el-form-item>
+
+      <el-form-item label="物流重量（kg）" prop="weight" v-if="chargeType == 1">
+        <el-input v-model="dataForm.weight" placeholder="物流重量（kg）"></el-input>
+      </el-form-item>
+
+      <el-form-item label="物流体积（m³）" prop="volume" v-if="chargeType == 2">
+        <el-input v-model="dataForm.volume" placeholder="物流体积（m³）"></el-input>
+      </el-form-item>
+
       <el-form-item label="关键词" prop="keyword">
         <el-input v-model="dataForm.keyword" placeholder="关键词"></el-input>
       </el-form-item>
@@ -46,9 +55,12 @@ export default {
         freightSetting: null, //运费设置
         recommend: [],//商品推荐
         keyword: '', //关键词
-        points: 0
+        points: 0,
+        weight: null, //重量
+        volume: null //体积
       },
       freightList: [], //运费设置
+      chargeType: null,
       dataRule: {
         freightSetting: [
           { required: true, message: '运费设置不能为空', trigger: 'change' }
@@ -68,8 +80,14 @@ export default {
         if (data && data.code === "200") {
           this.freightList = data.data
         }
-        console.log("this.freightList == ",this.freightList)
       })
+    },
+
+    changeFreightSetting(val) {
+      var freight = this.freightList.find(f=>f.id == val);
+      if (freight) {
+        this.chargeType = freight.chargeType;
+      }
     }
   }
 }

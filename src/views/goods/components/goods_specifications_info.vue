@@ -2,6 +2,13 @@
   <div>
     <el-form :model="dataForm" :rules="dataRule" ref="dataForm" label-width="80px">
       <el-form-item label="商品规格">
+        <el-radio-group v-model="dataForm.specificationType" @change="changeSpecificationType">
+          <el-radio :label="0">单规格</el-radio>
+          <el-radio :label="1">多规格</el-radio>
+        </el-radio-group>
+      </el-form-item>
+
+      <el-form-item label="" v-if="dataForm.specificationType==1">
         <el-select style="width: 44%" value-key="id" clearable placeholder="请选择规格" ref="selectedSpecifications" v-model="selectedSpecifications" @change="selectSpecificationValue">
           <el-option
             v-for="item in specificationList"
@@ -18,10 +25,10 @@
             :value="item">
           </el-option>
         </el-select>
-        <el-button type="primary" style="margin-left: 6px;" @click="addSpecificationsHandle">新建商品规格</el-button>
+        <el-button type="primary" style="margin-left: 12px;" @click="addSpecificationsHandle">新建商品规格</el-button>
       </el-form-item>
 
-      <el-form-item>
+      <el-form-item v-if="dataForm.specificationType==1">
         <el-card style="background: #F8F9FC;">
           <template v-for="selectedSpec in selectedSpecificationsAndValueList" ref="selectedSpecificationsAndValueList">
             <div class="tag-group">
@@ -36,27 +43,113 @@
         </el-card>
       </el-form-item>
 
-      <el-form-item prop="goodsSpecificationsDetailEntityList">
+      <!--单规格-->
+      <el-form-item prop="goodsSingleSkuList" v-if="dataForm.specificationType==0">
         <el-table
-          :data="dataForm.goodsSpecificationsDetailEntityList"
-          border
-          @selection-change=""
-          style="width: 100%;">
+          size="mini"
+          v-loading="dataListLoading"
+          :header-cell-style="{'background-color': '#f8f8f9','color':'#515a6e'}"
+          :cell-style="{'height': '50px'}"
+          :data="dataForm.goodsSingleSkuList"
+          style="width: 100%;"
+          element-loading-text="正在查询中...">
           <el-table-column
             header-align="center"
             align="center"
-            label="sku编号"
-            width="162"
+            label="商品编号"
+            width="160"
             fixed>
             <template slot-scope="scope">
-              <el-input v-model="scope.row.code"></el-input>
+              <el-input v-model="scope.row.code" maxlength="12"></el-input>
+            </template>
+          </el-table-column>
+          <el-table-column
+            header-align="center"
+            align="center"
+            label="原价（元）"
+            width="130">
+            <template slot-scope="scope">
+              <el-input v-model.trim="scope.row.originalPrice" controls-position="right" maxLength="10"></el-input>
+            </template>
+          </el-table-column>
+          <el-table-column
+            header-align="center"
+            align="center"
+            label="销售价（元）"
+            width="130">
+            <template slot-scope="scope">
+              <el-input v-model.trim="scope.row.sellingPrice" controls-position="right" maxLength="10"></el-input>
+            </template>
+          </el-table-column>
+          <el-table-column
+            header-align="center"
+            align="center"
+            label="库存"
+            width="130">
+            <template slot-scope="scope">
+              <el-input v-model="scope.row.stock" controls-position="right" maxLength="10"></el-input>
+            </template>
+          </el-table-column>
+          <el-table-column
+            prop="image"
+            header-align="center"
+            align="center"
+            label="图片">
+            <template slot-scope="scope">
+              <el-upload
+                class="avatar-uploader"
+                action="#"
+                :multiple="false"
+                :show-file-list="false"
+                :http-request="uploadFile"
+                :data="{index: scope.$index}"
+                :before-upload="beforeUpload">
+                <img style="width: 35px; height: 35px;" v-if="scope.row.image" :src="scope.row.image" class="avatar">
+                <i v-else >
+                  <el-button type="primary" plain>上传</el-button>
+                </i>
+              </el-upload>
+            </template>
+          </el-table-column>
+          <el-table-column
+            header-align="center"
+            align="center"
+            label="操作"
+            width="90">
+            <template slot-scope="scope">
+              <el-button v-if="!scope.row.enable" type="text" size="small" @click="updateEnable(scope.$index,scope.row.enable)">启用</el-button>
+              <el-button v-if="scope.row.enable" type="text" size="small" @click="updateEnable(scope.$index,scope.row.enable)">禁用</el-button>
+              <el-button type="text" size="small" @click="remove(scope.$index)">移除</el-button>
+            </template>
+          </el-table-column>
+        </el-table>
+      </el-form-item>
+
+      <!--多规格-->
+      <el-form-item prop="goodsSkuList" v-if="dataForm.specificationType==1">
+        <el-table
+          size="mini"
+          v-loading="dataListLoading"
+          :header-cell-style="{'background-color': '#f8f8f9','color':'#515a6e'}"
+          :cell-style="{'height': '50px'}"
+          :data="dataForm.goodsSkuList"
+          style="width: 100%;"
+          element-loading-text="正在查询中...">
+          <el-table-column
+            header-align="center"
+            align="center"
+            label="SKU编号"
+            width="160"
+            fixed>
+            <template slot-scope="scope">
+              <el-input v-model="scope.row.code" maxlength="12"></el-input>
             </template>
           </el-table-column>
           <el-table-column
             v-if="selectedSpecificationsAndValueList.length>0"
             v-for="(selectedSpecifications,index) in selectedSpecificationsAndValueList"
             :key="index"
-            width="120"
+            width="150"
             header-align="center"
             align="center"
             :label="selectedSpecifications.name">
@@ -67,47 +160,60 @@
           <el-table-column
             header-align="center"
             align="center"
-            label="价格（元）"
-            width="140">
+            label="原价（元）"
+            width="130">
             <template slot-scope="scope">
-              <el-input-number v-model="scope.row.price" controls-position="right" size="medium" :min="0" :max="999999">
-              </el-input-number>
+              <el-input v-model.trim="scope.row.originalPrice" controls-position="right" maxLength="10"></el-input>
             </template>
           </el-table-column>
+
+          <el-table-column
+            header-align="center"
+            align="center"
+            label="销售价（元）"
+            width="130">
+            <template slot-scope="scope">
+              <el-input v-model.trim="scope.row.sellingPrice" controls-position="right" maxLength="10"></el-input>
+            </template>
+          </el-table-column>
+
           <el-table-column
             header-align="center"
             align="center"
             label="库存"
-            width="140">
+            width="130">
             <template slot-scope="scope">
-              <el-input-number v-model="scope.row.stock" controls-position="right" size="medium" :min="0" :max="999999">
-              </el-input-number>
+              <el-input v-model="scope.row.stock" controls-position="right" maxLength="10"></el-input>
             </template>
           </el-table-column>
+
+          <el-table-column
+            prop="image"
+            header-align="center"
+            align="center"
+            label="图片">
+            <template slot-scope="scope">
+              <el-upload
+                class="avatar-uploader"
+                action="#"
+                :multiple="false"
+                :show-file-list="false"
+                :http-request="uploadFile"
+                :data="{index: scope.$index}"
+                :before-upload="beforeUpload">
+                <img style="width: 35px; height: 35px;" v-if="scope.row.image" :src="scope.row.image" class="avatar">
+                <i v-else >
+                  <el-button type="primary" plain>上传</el-button>
+                </i>
+              </el-upload>
+            </template>
+          </el-table-column>
+
           <el-table-column
             header-align="center"
             align="center"
-            label="重量（kg）"
-            width="140">
-            <template slot-scope="scope">
-              <el-input-number v-model="scope.row.weight" controls-position="right" size="medium" :min="0" :max="999999">
-              </el-input-number>
-            </template>
-          </el-table-column>
-          <el-table-column
-            header-align="center"
-            align="center"
-            label="体积（m³）"
-            width="140">
-            <template slot-scope="scope">
-              <el-input-number v-model="scope.row.volume" controls-position="right" size="medium" :min="0" :max="999999">
-              </el-input-number>
-            </template>
-          </el-table-column>
-          <el-table-column
-            header-align="center"
-            align="center"
-            label="操作">
+            label="操作"
+            width="90">
             <template slot-scope="scope">
               <el-button v-if="!scope.row.enable" type="text" size="small" @click="updateEnable(scope.$index,scope.row.enable)">启用</el-button>
               <el-button v-if="scope.row.enable" type="text" size="small" @click="updateEnable(scope.$index,scope.row.enable)">禁用</el-button>
@@ -163,16 +269,20 @@
 <script>
 import AddOrUpdate from '../specifications-add-or-update'
 import { getGoodsSpecificationsListAll } from '@/api/mall-goods/goods-specifications'
+import { goodsConstant } from '@/utils/constant';
+import { fileUpload } from '@/api/mall-file/file'
 
 export default {
   data () {
     return {
       visible: false,
       dataForm: {
-        goodsSpecificationsDetailEntityList: [],
-        params: []
+        goodsSingleSkuList : [], //单规格，只有一个
+        goodsSkuList: [],//多规格sku列表
+        params: [],
+        specificationType: 0 //默认单规格
       },
-
+      dataListLoading: false,
       dataRule: {
         name: [
           { required: true, message: '分类名称不能为空', trigger: 'blur' }
@@ -181,13 +291,12 @@ export default {
           { required: true, message: '上级分类不能为空', trigger: 'change' }
         ]
       },
-      goodsSpecificationsDetailEntity : {
+      goodsSkuEntity : {
         code: '',
         name: '',
-        price: '',
-        stock: '',
-        weight: '',
-        volume: null,
+        originalPrice: 0,
+        sellingPrice: 0,
+        stock: 0,
         enable: true,
         extendAttr: '',//扩展的属性
         extendValue: '' //扩展的属性值
@@ -205,6 +314,7 @@ export default {
     AddOrUpdate
   },
   mounted () {
+    this.addGoodsSingleSku();
     this.getGoodsSpecificationsList();
   },
   methods: {
@@ -279,6 +389,10 @@ export default {
       //自动生成sku
       this.generateSku();
     },
+    //单规格时，默认添加一个
+    addGoodsSingleSku() {
+      this.dataForm.goodsSingleSkuList.push(this.goodsSkuEntity);
+    },
 
     /**
      * 删除规格或规格值
@@ -320,7 +434,7 @@ export default {
           extendAttr.push(this.selectedSpecificationsAndValueList[i])
         }
       }
-      this.dataForm.goodsSpecificationsDetailEntityList = [];
+      this.dataForm.goodsSkuList = [];
       if (selectedSpecificationsValueListArray.length>0){
         //获取可能组合的结果
         var combinationResult = this.getCombinationResult(selectedSpecificationsValueListArray);
@@ -331,25 +445,63 @@ export default {
             for (var j=0; j<every.length; j++){
               extendValue.push({id: every[j].id, value: every[j].value})
             }
-            var goodsSpecificationsDetailEntity = Object.assign({}, this.goodsSpecificationsDetailEntity);
-            goodsSpecificationsDetailEntity.extendValue = JSON.stringify(extendValue);//扩展属性值
+            var goodsSkuEntity = Object.assign({}, this.goodsSkuEntity);
+            goodsSkuEntity.extendValue = JSON.stringify(extendValue);//扩展属性值
           }else {
-            var goodsSpecificationsDetailEntity = Object.assign({}, this.goodsSpecificationsDetailEntity);
+            var goodsSkuEntity = Object.assign({}, this.goodsSkuEntity);
             extendValue.push({id: every.id, value: every.value});
-            goodsSpecificationsDetailEntity.extendValue = JSON.stringify(extendValue);//扩展属性值
+            goodsSkuEntity.extendValue = JSON.stringify(extendValue);//扩展属性值
           }
-          goodsSpecificationsDetailEntity.extendAttr = JSON.stringify(extendAttr);
-          this.dataForm.goodsSpecificationsDetailEntityList.push(goodsSpecificationsDetailEntity)
+          goodsSkuEntity.extendAttr = JSON.stringify(extendAttr);
+          this.dataForm.goodsSkuList.push(goodsSkuEntity)
         }
       }
     },
     // 启用、禁用
     updateEnable(index, enable){
-      this.dataForm.goodsSpecificationsDetailEntityList[index].enable = !enable;
+      this.dataForm.goodsSkuList[index].enable = !enable;
     },
     // 移除
     remove(index){
-      this.dataForm.goodsSpecificationsDetailEntityList.splice(index,1);
+      this.dataForm.goodsSkuList.splice(index,1);
+    },
+
+    /**
+     * 切换单规格、多规格
+     */
+    changeSpecificationType() {
+      // selectedSpecifications: {}, //已选的规格
+      // selectedSpecificationsValue: {},//已选的规格值
+      // selectedSpecificationsAndValueList:[], //已选好的规格和规格值列表，可以删除
+
+    },
+
+    /**
+     * 上传前校验文件
+     */
+    beforeUpload(file){
+      const isImg = (file.size / 1024 / 1024) < 3
+      if (!isImg) {
+        this.$message.error('上传图片大小不能超过 3MB!')
+      }
+      const isType = file.type === "image/png"
+      const isType2 = file.type === "image/jpeg"
+      if (!isType && !isType2) {
+        this.$message.error('上传图片格式为png或jpg')
+      }
+      return (isType || isType2) && isImg
+    },
+
+    //上传商品SKU图
+    uploadFile(file){
+      let index = file.data.index;
+      let formData = new FormData();
+      formData.append("files", file.file);
+      var params = this.axios.paramsHandler({ folderName: goodsConstant.goods_sku_folder_name })
+      fileUpload(formData, params).then(({data}) => {
+        this.$forceUpdate()
+        this.dataForm.goodsSkuList[index].image = data.data;
+      })
     },
 
     /**

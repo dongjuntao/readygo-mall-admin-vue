@@ -23,37 +23,16 @@
           header-align="center"
           align="center"
           label="规格值"
-          width="300">
+          width="400">
           <template slot-scope="scope">
             <el-input v-model="scope.row.value" placeholder="请输入规格值" ></el-input>
-          </template>
-        </el-table-column>
-        <el-table-column
-          prop="bindImage"
-          header-align="center"
-          align="center"
-          label="绑定图片">
-          <template slot-scope="scope">
-            <el-upload
-              class="avatar-uploader"
-              action="#"
-              :multiple="false"
-              :show-file-list="false"
-              :http-request="uploadFile"
-              :data="{index: scope.$index}"
-              :before-upload="beforeUpload">
-              <img style="width: 50px; height: 50px;" v-if="scope.row.bindImage" :src="scope.row.bindImage" class="avatar">
-              <i v-else >
-                <el-button type="primary" plain>上传图片</el-button>
-              </i>
-            </el-upload>
           </template>
         </el-table-column>
         <el-table-column
           prop="enable"
           header-align="center"
           align="center"
-          width="100"
+          width="150"
           label="是否启用">
           <template slot-scope="scope">
             <el-switch v-model="scope.row.enable"></el-switch>
@@ -62,7 +41,6 @@
         <el-table-column
           header-align="center"
           align="center"
-          width="100"
           label="操作">
           <template slot-scope="scope">
             <el-button type="text" size="small" @click="deleteHandle(scope.$index)">移除</el-button>
@@ -143,7 +121,6 @@ export default {
       var goodsSpecificationsDetail = {
         goodsSpecificationsId: 0,
         value: '',
-        bindImage: '',
         enable: true
       }
       this.dataForm.goodsSpecificationsDetailEntityList.push(goodsSpecificationsDetail);
@@ -156,33 +133,6 @@ export default {
       this.dataForm.goodsSpecificationsDetailEntityList.splice(index,1);
     },
 
-    /**
-     * 上传前校验文件
-     */
-    beforeUpload(file){
-      const isImg = (file.size / 1024 / 1024) < 3
-      if (!isImg) {
-        this.$message.error('上传头像图片大小不能超过 3MB!')
-      }
-      const isType = file.type === "image/png"
-      const isType2 = file.type === "image/jpeg"
-      if (!isType && !isType2) {
-        this.$message.error('上传logo图片格式为png或jpg')
-      }
-      return (isType || isType2) && isImg
-    },
-
-    //上传商品规格绑定图
-    uploadFile(file){
-      let index = file.data.index;
-      let formData = new FormData();
-      formData.append("files", file.file);
-      var params = this.axios.paramsHandler({ folderName: goodsConstant.goods_specifications_folder_name })
-      fileUpload(formData, params).then(({data}) => {
-        this.dataForm.goodsSpecificationsDetailEntityList[index].bindImage = data.data;
-      })
-    },
-
     // 表单提交
     dataFormSubmit () {
       this.$refs['dataForm'].validate((valid) => {
@@ -191,8 +141,8 @@ export default {
             id: this.dataForm.id || undefined,
             name: this.dataForm.name,
             description: this.dataForm.description,
-            creatorId: JSON.parse(getUserInfo()).userId,
-            creatorName: JSON.parse(getUserInfo()).name,
+            creatorId: JSON.parse(getUserInfo(sessionStorage.getItem("userNameKey"))).userId,
+            creatorName: JSON.parse(getUserInfo(sessionStorage.getItem("userNameKey"))).name,
             goodsSpecificationsDetailEntityList: this.dataForm.goodsSpecificationsDetailEntityList
           })
           var saveOrUpdate =  this.dataForm.id ? updateGoodsSpecifications : saveGoodsSpecifications;

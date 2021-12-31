@@ -16,4 +16,7 @@
   .el-form-item__label{
     font-weight: 700;
   }
+  .el-form-item {
+    min-height: 20px;
+  }
 </style>
