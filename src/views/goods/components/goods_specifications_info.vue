@@ -1,15 +1,15 @@
 <template>
-  <div>
+  <div class="goods-specifications_info">
     <el-form :model="dataForm" :rules="dataRule" ref="dataForm" label-width="80px">
-      <el-form-item label="商品规格">
-        <el-radio-group v-model="dataForm.specificationType" @change="changeSpecificationType">
+      <el-form-item label="商品规格" prop="specificationType">
+        <el-radio-group v-model="dataForm.specificationType">
           <el-radio :label="0">单规格</el-radio>
           <el-radio :label="1">多规格</el-radio>
         </el-radio-group>
       </el-form-item>
 
-      <el-form-item label="" v-if="dataForm.specificationType==1">
-        <el-select style="width: 44%" value-key="id" clearable placeholder="请选择规格" ref="selectedSpecifications" v-model="selectedSpecifications" @change="selectSpecificationValue">
+      <el-form-item v-if="dataForm.specificationType==1">
+        <el-select style="width: 44%" value-key="id" clearable placeholder="请选择规格" v-model="selectedSpecifications" @change="selectSpecificationValue">
           <el-option
             v-for="item in specificationList"
             :key="item.id"
@@ -17,7 +17,7 @@
             :value="item">
           </el-option>
         </el-select>
-        <el-select style="width: 44%;" value-key="id" clearable placeholder="请选择规格值" ref="selectedSpecificationsValue" v-model="selectedSpecificationsValue" @change="addSelectedSpec">
+        <el-select style="width: 44%;" value-key="id" clearable placeholder="请选择规格值" v-model="selectedSpecificationsValue" @change="addSelectedSpec">
           <el-option
             v-for="item in specificationValueList"
             :key="item.id"
@@ -30,35 +30,33 @@
 
       <el-form-item v-if="dataForm.specificationType==1">
         <el-card style="background: #F8F9FC;">
-          <template v-for="selectedSpec in selectedSpecificationsAndValueList" ref="selectedSpecificationsAndValueList">
+          <template v-for="selectedSpec in selectedSpecificationsAndValueList">
             <div class="tag-group">
               <el-tag closable effect="dark" size="medium" type=""  @close="handleClose(selectedSpec)">
                 {{selectedSpec.name}}
               </el-tag>
             </div>
             <span style="margin-left: 5px;" v-for="item in selectedSpec.specificationsDetailList">
-              <el-tag closable size="small" @close="handleClose(selectedSpec,item)">{{ item.value }}</el-tag>
-            </span>
+            <el-tag closable size="small" @close="handleClose(selectedSpec,item)">{{ item.value }}</el-tag>
+          </span>
           </template>
         </el-card>
       </el-form-item>
 
       <!--单规格-->
-      <el-form-item prop="goodsSingleSkuList" v-if="dataForm.specificationType==0">
+      <el-form-item v-if="dataForm.specificationType==0">
         <el-table
           size="mini"
-          v-loading="dataListLoading"
+          border
           :header-cell-style="{'background-color': '#f8f8f9','color':'#515a6e'}"
           :cell-style="{'height': '50px'}"
           :data="dataForm.goodsSingleSkuList"
-          style="width: 100%;"
-          element-loading-text="正在查询中...">
+          style="width: 100%;">
           <el-table-column
             header-align="center"
             align="center"
             label="商品编号"
-            width="160"
-            fixed>
+            width="160">
             <template slot-scope="scope">
               <el-input v-model="scope.row.code" maxlength="12"></el-input>
             </template>
@@ -67,7 +65,7 @@
             header-align="center"
             align="center"
             label="原价（元）"
-            width="130">
+            width="140">
             <template slot-scope="scope">
               <el-input v-model.trim="scope.row.originalPrice" controls-position="right" maxLength="10"></el-input>
             </template>
@@ -76,7 +74,7 @@
             header-align="center"
             align="center"
             label="销售价（元）"
-            width="130">
+            width="140">
             <template slot-scope="scope">
               <el-input v-model.trim="scope.row.sellingPrice" controls-position="right" maxLength="10"></el-input>
             </template>
@@ -85,13 +83,12 @@
             header-align="center"
             align="center"
             label="库存"
-            width="130">
+            width="140">
             <template slot-scope="scope">
               <el-input v-model="scope.row.stock" controls-position="right" maxLength="10"></el-input>
             </template>
           </el-table-column>
           <el-table-column
-            prop="image"
             header-align="center"
             align="center"
             label="图片">
@@ -106,7 +103,7 @@
                 :before-upload="beforeUpload">
                 <img style="width: 35px; height: 35px;" v-if="scope.row.image" :src="scope.row.image" class="avatar">
                 <i v-else >
-                  <el-button type="primary" plain>上传</el-button>
+                  <el-button type="primary" size="mini" plain>上传</el-button>
                 </i>
               </el-upload>
             </template>
@@ -117,30 +114,29 @@
             label="操作"
             width="90">
             <template slot-scope="scope">
-              <el-button v-if="!scope.row.enable" type="text" size="small" @click="updateEnable(scope.$index,scope.row.enable)">启用</el-button>
-              <el-button v-if="scope.row.enable" type="text" size="small" @click="updateEnable(scope.$index,scope.row.enable)">禁用</el-button>
-              <el-button type="text" size="small" @click="remove(scope.$index)">移除</el-button>
+              <el-button v-if="!scope.row.enable" type="text" size="mini" @click="updateEnable(scope.$index,scope.row.enable)">启用</el-button>
+              <el-button v-if="scope.row.enable" type="text" size="mini" @click="updateEnable(scope.$index,scope.row.enable)">禁用</el-button>
             </template>
           </el-table-column>
         </el-table>
       </el-form-item>
 
       <!--多规格-->
-      <el-form-item prop="goodsSkuList" v-if="dataForm.specificationType==1">
+      <el-form-item v-if="dataForm.specificationType==1">
         <el-table
           size="mini"
+          border
           v-loading="dataListLoading"
           :header-cell-style="{'background-color': '#f8f8f9','color':'#515a6e'}"
           :cell-style="{'height': '50px'}"
           :data="dataForm.goodsSkuList"
           style="width: 100%;"
-          element-loading-text="正在查询中...">
+          element-loading-text="正在生成SKU列表，请稍等...">
           <el-table-column
             header-align="center"
             align="center"
             label="SKU编号"
-            width="160"
-            fixed>
+            width="160">
             <template slot-scope="scope">
               <el-input v-model="scope.row.code" maxlength="12"></el-input>
             </template>
@@ -149,7 +145,7 @@
             v-if="selectedSpecificationsAndValueList.length>0"
             v-for="(selectedSpecifications,index) in selectedSpecificationsAndValueList"
             :key="index"
-            width="150"
+            width="110"
             header-align="center"
             align="center"
             :label="selectedSpecifications.name">
@@ -161,34 +157,30 @@
             header-align="center"
             align="center"
             label="原价（元）"
-            width="130">
+            width="140">
             <template slot-scope="scope">
               <el-input v-model.trim="scope.row.originalPrice" controls-position="right" maxLength="10"></el-input>
             </template>
           </el-table-column>
-
           <el-table-column
             header-align="center"
             align="center"
             label="销售价（元）"
-            width="130">
+            width="140">
             <template slot-scope="scope">
               <el-input v-model.trim="scope.row.sellingPrice" controls-position="right" maxLength="10"></el-input>
             </template>
           </el-table-column>
-
           <el-table-column
             header-align="center"
             align="center"
             label="库存"
-            width="130">
+            width="140">
             <template slot-scope="scope">
               <el-input v-model="scope.row.stock" controls-position="right" maxLength="10"></el-input>
             </template>
           </el-table-column>
-
           <el-table-column
-            prop="image"
             header-align="center"
             align="center"
             label="图片">
@@ -203,40 +195,39 @@
                 :before-upload="beforeUpload">
                 <img style="width: 35px; height: 35px;" v-if="scope.row.image" :src="scope.row.image" class="avatar">
                 <i v-else >
-                  <el-button type="primary" plain>上传</el-button>
+                  <el-button type="primary" size="mini" plain>上传</el-button>
                 </i>
               </el-upload>
             </template>
           </el-table-column>
-
           <el-table-column
             header-align="center"
             align="center"
             label="操作"
             width="90">
             <template slot-scope="scope">
-              <el-button v-if="!scope.row.enable" type="text" size="small" @click="updateEnable(scope.$index,scope.row.enable)">启用</el-button>
-              <el-button v-if="scope.row.enable" type="text" size="small" @click="updateEnable(scope.$index,scope.row.enable)">禁用</el-button>
+              <el-button v-if="!scope.row.enable" type="text" size="mini" @click="updateEnable(scope.$index,scope.row.enable)">启用</el-button>
+              <el-button v-if="scope.row.enable" type="text" size="mini" @click="updateEnable(scope.$index,scope.row.enable)">禁用</el-button>
               <el-button type="text" size="small" @click="remove(scope.$index)">移除</el-button>
             </template>
           </el-table-column>
         </el-table>
       </el-form-item>
 
-      <el-form-item label="商品参数" prop="params">
+      <!--商品参数-->
+      <el-form-item label="商品参数">
         <el-button type="primary" plain @click="addGoodsParams">新增+</el-button>
       </el-form-item>
       <el-form-item>
         <el-table
           :data="dataForm.params"
           border
-          @selection-change=""
           style="width: 100%;">
           <el-table-column
             header-align="center"
             align="center"
             label="参数名称"
-            width="400">
+            width="440">
             <template slot-scope="scope">
               <el-input v-model="scope.row.name" placeholder="请输入参数名称" ></el-input>
             </template>
@@ -244,8 +235,7 @@
           <el-table-column
             header-align="center"
             align="center"
-            label="参数值"
-            width="600">
+            label="参数值">
             <template slot-scope="scope">
               <el-input v-model="scope.row.value" placeholder="请输入参数值" ></el-input>
             </template>
@@ -253,13 +243,14 @@
           <el-table-column
             header-align="center"
             align="center"
-            label="操作">
+            label="操作" width="90">
             <template slot-scope="scope">
               <el-button type="text" size="small" @click="deleteGoodsParams(scope.$index)">移除</el-button>
             </template>
           </el-table-column>
         </el-table>
       </el-form-item>
+
     </el-form>
     <!-- 弹窗, 新增 -->
     <add-or-update v-if="addVisible" ref="addOrUpdate" @refreshDataList="getGoodsSpecificationsList"></add-or-update>
@@ -277,7 +268,15 @@ export default {
     return {
       visible: false,
       dataForm: {
-        goodsSingleSkuList : [], //单规格，只有一个
+        goodsSingleSkuList : [{
+          code: '',
+          name: '',
+          originalPrice: 0,
+          sellingPrice: 0,
+          stock: 0,
+          image: null,
+          enable: true
+        }], //单规格，只有一个
         goodsSkuList: [],//多规格sku列表
         params: [],
         specificationType: 0 //默认单规格
@@ -297,6 +296,7 @@ export default {
         originalPrice: 0,
         sellingPrice: 0,
         stock: 0,
+        image: null,
         enable: true,
         extendAttr: '',//扩展的属性
         extendValue: '' //扩展的属性值
@@ -314,7 +314,6 @@ export default {
     AddOrUpdate
   },
   mounted () {
-    this.addGoodsSingleSku();
     this.getGoodsSpecificationsList();
   },
   methods: {
@@ -388,10 +387,6 @@ export default {
       }
       //自动生成sku
       this.generateSku();
-    },
-    //单规格时，默认添加一个
-    addGoodsSingleSku() {
-      this.dataForm.goodsSingleSkuList.push(this.goodsSkuEntity);
     },
 
     /**
@@ -467,16 +462,6 @@ export default {
     },
 
     /**
-     * 切换单规格、多规格
-     */
-    changeSpecificationType() {
-      // selectedSpecifications: {}, //已选的规格
-      // selectedSpecificationsValue: {},//已选的规格值
-      // selectedSpecificationsAndValueList:[], //已选好的规格和规格值列表，可以删除
-
-    },
-
-    /**
      * 上传前校验文件
      */
     beforeUpload(file){
@@ -499,8 +484,12 @@ export default {
       formData.append("files", file.file);
       var params = this.axios.paramsHandler({ folderName: goodsConstant.goods_sku_folder_name })
       fileUpload(formData, params).then(({data}) => {
-        this.$forceUpdate()
-        this.dataForm.goodsSkuList[index].image = data.data;
+        this.$forceUpdate();
+        if (this.dataForm.specificationType == 0) {
+          this.dataForm.goodsSingleSkuList[index].image = data.data;
+        } else {
+          this.dataForm.goodsSkuList[index].image = data.data;
+        }
       })
     },
 
@@ -544,60 +533,9 @@ export default {
 }
 </script>
 
-<style lang="scss">
-.mod-goods-category {
-  .menu-list__input,
-  .icon-list__input {
-    > .el-input__inner {
-      cursor: pointer;
-    }
+<style lang="scss" >
+  .el-select-dropdown .el-scrollbar .el-scrollbar__wrap {
+    overflow: scroll!important;
   }
-  &__icon-popover {
-    width: 458px;
-    overflow: hidden;
-  }
-  &__icon-inner {
-    width: 478px;
-    max-height: 258px;
-    overflow-x: hidden;
-    overflow-y: auto;
-  }
-  &__icon-list {
-    width: 458px;
-    padding: 0;
-    margin: -8px 0 0 -8px;
-    > .el-button {
-      padding: 8px;
-      margin: 8px 0 0 8px;
-      > span {
-        display: inline-block;
-        vertical-align: middle;
-        width: 18px;
-        height: 18px;
-        font-size: 18px;
-      }
-    }
-  }
-  .icon-list__tips {
-    font-size: 18px;
-    text-align: center;
-    color: #e6a23c;
-    cursor: pointer;
-  }
-}
-//去除el-scrollbar下方横向滚动条
-//.el-scrollbar__wrap {
-//  overflow-x: hidden;
-//}
 
-.el-select-dropdown .el-scrollbar .el-scrollbar__wrap {
-  overflow: scroll!important;
-}
-
-.el-input-number {
-  position: relative;
-  display: inline-block;
-  width: 118px;
-  line-height: 35px;
-}
 </style>

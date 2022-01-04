@@ -1,6 +1,6 @@
 <template>
   <div>
-    <el-form :model="dataForm" :rules="dataRule" ref="dataForm" label-width="120px">
+    <el-form :model="dataForm" :rules="dataRule" ref="dataForm" label-width="125px">
       <el-form-item label="积分赠送" prop="points">
         <el-input-number v-model="dataForm.points" @change="" :min="0" :max="100" label="积分"></el-input-number>
       </el-form-item>
@@ -13,9 +13,7 @@
         </el-checkbox-group>
       </el-form-item>
       <el-form-item label="是否上架" prop="onSale">
-        <el-switch active-color="#13ce66"
-                   v-model="dataForm.onSale">
-        </el-switch>
+        <el-switch active-color="#13ce66" v-model="dataForm.onSale"></el-switch>
       </el-form-item>
       <el-form-item label="运费设置" prop="freightSetting">
         <el-select v-model="dataForm.freightSetting" clearable placeholder="请选择" @change="changeFreightSetting">
@@ -29,11 +27,11 @@
       </el-form-item>
 
       <el-form-item label="物流重量（kg）" prop="weight" v-if="chargeType == 1">
-        <el-input v-model="dataForm.weight" placeholder="物流重量（kg）"></el-input>
+        <el-input v-model="dataForm.weight" placeholder="物流重量（kg），运费模板为按重量计费时，需要填写物流重量"></el-input>
       </el-form-item>
 
       <el-form-item label="物流体积（m³）" prop="volume" v-if="chargeType == 2">
-        <el-input v-model="dataForm.volume" placeholder="物流体积（m³）"></el-input>
+        <el-input v-model="dataForm.volume" placeholder="物流体积（m³），运费模板为按体积计费时，需要填写物流体积"></el-input>
       </el-form-item>
 
       <el-form-item label="关键词" prop="keyword">
@@ -64,6 +62,12 @@ export default {
       dataRule: {
         freightSetting: [
           { required: true, message: '运费设置不能为空', trigger: 'change' }
+        ],
+        weight: [
+          { required: true, message: '物流重量不能为空', trigger: 'change' }
+        ],
+        volume: [
+          { required: true, message: '物流体积不能为空', trigger: 'change' }
         ]
       }
     }

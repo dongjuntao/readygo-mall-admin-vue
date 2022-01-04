@@ -38,7 +38,9 @@
       <el-button v-show="showGoodsSpecificationsInfo" type="primary" @click="previousStep(3)">上一步，填写商品详细信息</el-button>
       <el-button v-show="showGoodsSpecificationsInfo" type="primary" @click="beforeNextStep(3, 'goodsSpecificationsInfo')">下一步，填写商品促销信息</el-button>
       <el-button v-show="showGoodsPromotionInfo" type="primary" @click="previousStep(4, 'goodsPromotionInfo')">上一步，填写商品规格参数</el-button>
-      <el-button v-show="showGoodsPromotionInfo" type="primary" @click="dataFormSubmit()">确认提交</el-button>
+<!--      <el-button v-show="showGoodsPromotionInfo" type="primary" @click="dataFormSubmit()">确认提交</el-button>-->
+      <el-button v-show="showGoodsPromotionInfo" type="primary" @click="beforeNextStep(4,'goodsPromotionInfo')">确认提交</el-button>
+
     </div>
   </el-dialog>
 </template>
@@ -82,13 +84,13 @@ export default {
         this.showGoodsSpecificationsInfo = false;
         this.showGoodsDetailInfo = false;
         this.showGoodsPromotionInfo = false;
-        if (this.dataForm.id) { //修改
+        if (this.dataForm.id) { //id存在，此步骤是"修改"操作
           getGoodsById(this.axios.paramsHandler({id: this.dataForm.id})).then(({data})=>{
             var goodsBasicInfo = this.$refs['goodsBasicInfo'].$refs['dataForm'].model; //商品基本信息
             var goodsDetailInfo = this.$refs['goodsDetailInfo'].$refs['dataForm'].model;//商品详细信息
             var goodsSpecificationsInfo = this.$refs['goodsSpecificationsInfo'].$refs['dataForm'].model;//商品规格参数
             var goodsPromotionInfo = this.$refs['goodsPromotionInfo'].$refs['dataForm'].model;//商品促销信息
-            //商品基本信息
+            //-----------------------------商品基本信息----------------------------
             goodsBasicInfo.name = data.data.name;
             goodsBasicInfo.description = data.data.description;
             /*直接push无法显示商品分类级联效果，故使用此方法*/
@@ -97,7 +99,7 @@ export default {
             goodsBasicInfo.adminUserId =  data.data.adminUserId;
             goodsBasicInfo.code =  data.data.code
             goodsBasicInfo.unit =  data.data.unit
-            //商品详细信息
+            //-----------------------------商品详细信息----------------------------
             this.$refs['goodsDetailInfo'].fileList = [] //先清空
             goodsDetailInfo.images = [];
             if (data.data.images && data.data.images.split(",") && data.data.images.split(",").length>0){
@@ -108,14 +110,23 @@ export default {
               });
             }
             goodsDetailInfo.infoDetail = data.data.infoDetail;
-            //商品规格参数
-            goodsSpecificationsInfo.goodsSkuList = data.data.goodsSkuList
+            //-----------------------------商品规格参数----------------------------
             goodsSpecificationsInfo.specificationType = data.data.specificationType//规格类型
-            goodsSpecificationsInfo.params = JSON.parse(data.data.params)
-            if (data.data.goodsSkuList && data.data.goodsSkuList.length>0) {
+            if(goodsSpecificationsInfo.specificationType == 0) {
+              goodsSpecificationsInfo.goodsSingleSkuList = data.data.goodsSkuList //单品详细信息
+              goodsSpecificationsInfo.goodsSkuLis = [];
+            }else {
+              goodsSpecificationsInfo.goodsSkuList = data.data.goodsSkuList //sku详细信息
+              goodsSpecificationsInfo.goodsSingleSkuList = [{
+                code: '', name: '', originalPrice: 0, sellingPrice: 0, stock: 0, image: null, enable: true
+              }]
+            }
+            goodsSpecificationsInfo.params = JSON.parse(data.data.params) //商品参数
+            if (goodsSpecificationsInfo.specificationType == 1 && data.data.goodsSkuList
+                && data.data.goodsSkuList.length>0) {
               this.$refs['goodsSpecificationsInfo'].selectedSpecificationsAndValueList = JSON.parse(data.data.goodsSkuList[0].extendAttr);
             }
-            //商品促销信息
+            //-----------------------------商品促销信息----------------------------
             goodsPromotionInfo.points = data.data.points;
             goodsPromotionInfo.recommend = data.data.recommend.split(",");
             goodsPromotionInfo.onSale = data.data.onSale;
@@ -124,17 +135,23 @@ export default {
             goodsPromotionInfo.volume = data.data.volume;
             goodsPromotionInfo.keyword = data.data.keyword;
           });
-        }else { //新增
+        }else { //id不存在，此步骤是"新增"操作
           this.$refs['goodsBasicInfo'].$refs['dataForm'].resetFields(); //清空商品基本信息
           this.$refs['goodsDetailInfo'].$refs['dataForm'].resetFields();//清空商品详细信息
           this.$refs['goodsSpecificationsInfo'].$refs['dataForm'].resetFields();//清空商品规格参数
           this.$refs['goodsPromotionInfo'].$refs['dataForm'].resetFields();//清空商品促销信息
+          //清空商品详细信息中的图片
+          this.$refs['goodsDetailInfo'].fileList = [] //清空图片
           //清空规格参数信息（部分数据无法通过resetFields()清空）
           this.$refs['goodsSpecificationsInfo'].selectedSpecifications = null;
           this.$refs['goodsSpecificationsInfo'].selectedSpecificationsValue = null;
           this.$refs['goodsSpecificationsInfo'].selectedSpecificationsAndValueList = [];
-          this.$refs['goodsSpecificationsInfo'].params = [];
-          this.$refs['goodsDetailInfo'].fileList = [] //清空图片
+          this.$refs['goodsSpecificationsInfo'].dataForm.params = [];
+          this.$refs['goodsSpecificationsInfo'].dataForm.goodsSingleSkuList = [{
+            code: '', name: '', originalPrice: 0, sellingPrice: 0, stock: 0, image: null, enable: true
+          }];
+          this.$refs['goodsSpecificationsInfo'].dataForm.goodsSkuList = [];
+          this.$refs['goodsSpecificationsInfo'].dataForm.specificationType = 0;
         }
       })
     },
@@ -168,6 +185,8 @@ export default {
         this.showGoodsSpecificationsInfo=false;
         this.showGoodsPromotionInfo=true;
         this.active=3;
+      } else { //最后一步，提交数据
+        this.dataFormSubmit()
       }
     },
     /**
@@ -189,7 +208,7 @@ export default {
         this.active=2;
       }
     },
-    // 表单提交
+    // 表单提交（保存商品信息）
     dataFormSubmit () {
       var goodsBasicInfo = this.$refs['goodsBasicInfo'].$refs['dataForm'].model; //商品基本信息
       var goodsDetailInfo = this.$refs['goodsDetailInfo'].$refs['dataForm'].model;//商品详细信息
@@ -197,9 +216,9 @@ export default {
       var goodsPromotionInfo = this.$refs['goodsPromotionInfo'].$refs['dataForm'].model;//商品促销信息
       var goodsSkuList;
       if (goodsSpecificationsInfo.specificationType == 0) { //单规格
-        goodsSkuList = goodsSpecificationsInfo.goodsSkuList; //商品sku
+        goodsSkuList = goodsSpecificationsInfo.goodsSingleSkuList; //商品sku
       }else {
-        goodsSkuList = goodsSpecificationsInfo.goodsSingleSkuList; //单品
+        goodsSkuList = goodsSpecificationsInfo.goodsSkuList; //单品
       }
       //组织提交的参数
       var data = {
@@ -216,7 +235,7 @@ export default {
         images: goodsDetailInfo.images.join(","),//处理商品图片字段
         infoDetail: goodsDetailInfo.infoDetail, //商品详情
         //商品规格参数
-        goodsSkuList: goodsSpecificationsInfo.goodsSkuList, //商品sku
+        goodsSkuList: goodsSkuList, //商品sku
         specificationType: goodsSpecificationsInfo.specificationType, //规格类型
         params: JSON.stringify(goodsSpecificationsInfo.params),//处理商品参数字段
         //商品促销信息
@@ -245,7 +264,6 @@ export default {
           this.$message.error(data.msg)
         }
       })
-
     },
 
     /**

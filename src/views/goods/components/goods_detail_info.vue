@@ -57,12 +57,12 @@ export default {
     beforeUpload(file){
       const isImg = (file.size / 1024 / 1024) < 3
       if (!isImg) {
-        this.$message.error('上传头像图片大小不能超过 3MB!')
+        this.$message.error('上传图片大小不能超过 3MB!')
       }
       const isType = file.type === "image/png"
       const isType2 = file.type === "image/jpeg"
       if (!isType && !isType2) {
-        this.$message.error('上传logo图片格式为png或jpg')
+        this.$message.error('上传图片格式为png或jpg')
       }
       const fileNum = this.dataForm.images.length<8;
       if (!fileNum) {
@@ -75,7 +75,7 @@ export default {
       return (isType || isType2) && isImg && fileNum && isRepeat
     },
 
-    //上传品牌logo
+    //上传相册
     uploadFile(file){
       let formData = new FormData();
       formData.append("files", file.file);
