@@ -1,7 +1,7 @@
 <template>
   <div class="mod-user">
 
-    <el-radio-group v-model="couponSelect" style="margin-bottom: 30px;" @change="getDataList">
+    <el-radio-group v-model="seckillConfigSelect" style="margin-bottom: 30px;" @change="getDataList">
       <el-radio-button :label="0">全部</el-radio-button>
       <el-radio-button :label="1">待审核</el-radio-button>
       <el-radio-button :label="2">已通过</el-radio-button>
@@ -10,12 +10,12 @@
 
     <el-form :inline="true" :model="dataForm" @keyup.enter.native="getDataList()">
       <el-form-item>
-        <el-input v-model="dataForm.name" placeholder="优惠券名称" clearable></el-input>
+        <el-input v-model="dataForm.name" placeholder="秒杀商品名称" clearable></el-input>
       </el-form-item>
       <el-form-item>
         <el-button @click="getDataList()">查询</el-button>
-        <el-button v-if="isAuth('marketing-coupon-create')" type="primary" @click="addOrUpdateHandle()">新增</el-button>
-        <el-button v-if="isAuth('marketing-coupon-batchDelete')" type="danger" @click="deleteHandle()" :disabled="dataListSelections.length <= 0">批量删除</el-button>
+        <el-button v-if="isAuth('marketing-seckill-create')" type="primary" @click="addOrUpdateHandle()">新增</el-button>
+        <el-button v-if="isAuth('marketing-seckill-batchDelete')" type="danger" @click="deleteHandle()" :disabled="dataListSelections.length <= 0">批量删除</el-button>
       </el-form-item>
     </el-form>
     <el-table
@@ -34,70 +34,30 @@
         width="50" :key="1">
       </el-table-column>
       <el-table-column
-        prop="name"
+        prop="goodsName"
         header-align="center"
         align="center"
-        label="优惠券名称"
-        width="200" :key="2">
+        label="秒杀商品名称"
+        width="400" :key="2">
       </el-table-column>
+
       <el-table-column
-        prop="type"
         header-align="center"
         align="center"
-        label="优惠券类型"
-        width="95" :key="3">
+        width="200"
+        label="秒杀起始日期" :key="3">
         <template slot-scope="scope">
-          {{scope.row.type == 0 ? '满减券' : '满折券'}}
+          {{ scope.row.seckillStartDate|formatDate }}至{{ scope.row.seckillEndDate|formatDate }}
         </template>
       </el-table-column>
 
       <el-table-column
-        prop="source"
         header-align="center"
         align="center"
-        label="优惠券来源"
-        width="250"
-        v-if="userType == 0" :key="4">
+        width="200"
+        label="秒杀起始时间" :key="4">
         <template slot-scope="scope">
-          {{scope.row.source == 0 ? '平台' : '商户'+"【"+scope.row.merchantName +"】"}}
-        </template>
-      </el-table-column>
-
-      <el-table-column
-        prop="issueNumber"
-        header-align="center"
-        align="center"
-        label="发行数量"
-        width="78" :key="5">
-      </el-table-column>
-
-<!--      <el-table-column-->
-<!--        prop="restNumber"-->
-<!--        header-align="center"-->
-<!--        align="center"-->
-<!--        label="剩余数量"-->
-<!--        width="78" :key="6">-->
-<!--      </el-table-column>-->
-
-      <el-table-column
-        header-align="center"
-        align="center"
-        width="280"
-        label="有效期" :key="7">
-        <template slot-scope="scope">
-          {{ scope.row.validPeriod.split(",")[0] }}至{{ scope.row.validPeriod.split(",")[1] }}
-        </template>
-      </el-table-column>
-
-      <el-table-column
-        prop="source"
-        header-align="center"
-        align="center"
-        label="优惠额度"
-        width="150"
-        v-if="userType != 0" :key="8">
-        <template slot-scope="scope">
-          {{scope.row.type == 0 ? scope.row.discountAmount+'元' : scope.row.discountAmount+'折'}}
+          {{ scope.row.seckillStartTime }}至{{ scope.row.seckillEndTime }}
         </template>
       </el-table-column>
 
@@ -105,35 +65,29 @@
         header-align="center"
         align="center"
         label="状态"
-        width="65" :key="9">
+        width="65" :key="5">
         <template slot-scope="scope">
           <el-switch v-model="scope.row.status" @change="changeStatus(scope.row.id, scope.row.status)"></el-switch>
         </template>
       </el-table-column>
 
       <el-table-column
+        prop="perLimit"
         header-align="center"
         align="center"
-        label="审核状态"
-        width="80"
-        v-if="userType != 0" :key="10">
-        <template slot-scope="scope">
-          <span v-if="scope.row.authStatus == 0">待审核</span>
-          <span v-else-if="scope.row.authStatus == 1">已通过</span>
-          <span v-else>已拒绝</span>
-        </template>
+        label="限购"
+        width="78" :key="6">
       </el-table-column>
 
       <el-table-column
         header-align="center"
         align="center"
-        label="操作" :key="11">
+        label="操作" :key="7">
         <template slot-scope="scope">
-          <el-button type="text" size="small" @click="addOrUpdateHandle(scope.row.id)">领取情况</el-button>
           <el-button v-if="scope.row.authStatus==2" type="text" size="mini" @click="authOpinionHandle(scope.row.id)" >拒绝原因</el-button>
-          <el-button v-if="isAuth('marketing-coupon-update')" type="text" size="mini" @click="addOrUpdateHandle(scope.row.id)" :disabled="scope.row.authStatus==1">修改</el-button>
-          <el-button v-if="isAuth('marketing-coupon-delete')" type="text" size="mini" @click="deleteHandle(scope.row.id)" :disabled="scope.row.authStatus==1">删除</el-button>
-          <el-button v-if="isAuth('marketing-coupon-auth') && userType==0 && scope.row.authStatus==0" type="text" size="mini" @click="authHandle(scope.row.id)">审核</el-button>
+          <el-button v-if="isAuth('marketing-seckill-update')" type="text" size="mini" @click="addOrUpdateHandle(scope.row.id)" :disabled="scope.row.authStatus==1">修改</el-button>
+          <el-button v-if="isAuth('marketing-seckill-delete')" type="text" size="mini" @click="deleteHandle(scope.row.id)" :disabled="scope.row.authStatus==1">删除</el-button>
+          <el-button v-if="isAuth('marketing-seckill-auth') && userType==0 && scope.row.authStatus==0" type="text" size="mini" @click="authHandle(scope.row.id)">审核</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -157,10 +111,10 @@
 
 <script>
 import { getUserInfo } from '@/utils/auth'
-import AddOrUpdate from './coupon-add-or-update'
-import Auth from './coupon-auth'
-import AuthOpinion from './coupon-auth-opinion'
-import { getCouponList, deleteCoupon, updateStatus } from '@/api/mall-coupon/coupon'
+import AddOrUpdate from './seckill-add-or-update'
+import Auth from './seckill-auth'
+import AuthOpinion from './seckill-auth-opinion'
+import { getSeckillConfigList, deleteSeckillConfig, updateStatus } from '@/api/mall-seckill/seckill-config'
 export default {
   data () {
     return {
@@ -177,7 +131,7 @@ export default {
       dataListSelections: [],
       addOrUpdateVisible: false,
       authVisible: false,
-      couponSelect: 0,
+      seckillConfigSelect: 0,
       authOpinionVisible: false
     }
   },
@@ -195,13 +149,13 @@ export default {
     getDataList () {
       this.dataListLoading = true;
       var authStatus;
-      if (this.couponSelect == 0) {
+      if (this.seckillConfigSelect == 0) {
         authStatus = null; //全部
-      } else if(this.couponSelect == 1) {
+      } else if(this.seckillConfigSelect == 1) {
         authStatus = 0; //待审核
-      } else if(this.couponSelect == 2) {
+      } else if(this.seckillConfigSelect == 2) {
         authStatus = 1; //已通过
-      } else if(this.couponSelect == 3) {
+      } else if(this.seckillConfigSelect == 3) {
         authStatus = 2; //已拒绝
       }
       var params = this.axios.paramsHandler({
@@ -211,7 +165,7 @@ export default {
         adminUserId: this.userType == 0 ? null : this.adminUserId,
         authStatus: authStatus
       })
-      getCouponList(params).then(({data})=> {
+      getSeckillConfigList(params).then(({data})=> {
         if (data && data.code === "200") {
           this.dataList = data.data.list
           this.totalPage = data.data.totalCount
@@ -265,16 +219,16 @@ export default {
 
     // 删除
     deleteHandle (id) {
-      var couponIds = id ? [id] : this.dataListSelections.map(item => {
+      var seckillConfigIds = id ? [id] : this.dataListSelections.map(item => {
         return item.id
       })
-      this.$confirm(`确定对[id=${couponIds.join(',')}]进行[${id ? '删除' : '批量删除'}]操作?`, '提示', {
+      this.$confirm(`确定对[id=${seckillConfigIds.join(',')}]进行[${id ? '删除' : '批量删除'}]操作?`, '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning'
       }).then(() => {
-        var postData = this.axios.dataHandler(couponIds, false);
-        deleteCoupon(postData).then(({data})=>{
+        var postData = this.axios.dataHandler(seckillConfigIds, false);
+        deleteSeckillConfig(postData).then(({data})=>{
           if (data && data.code === "200") {
             this.$message({
               message: '操作成功',
@@ -296,7 +250,7 @@ export default {
      */
     changeStatus(id, status) {
       var data = this.axios.paramsHandler({
-        couponId: id,
+        seckillConfigId: id,
         status: status
       });
       updateStatus(data).then(({data}) => {
