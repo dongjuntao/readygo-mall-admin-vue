@@ -21,8 +21,7 @@
       </el-form-item>
       <el-form-item label="角色" size="mini" prop="roleIdList">
         <el-checkbox-group v-model="dataForm.roleIdList">
-          <!--平台管理员新增时，不可选择"入驻商户"和"平台自营商户"-->
-          <el-checkbox :disabled="role.id==2||role.id==3" v-for="role in roleList" :key="role.id" :label="role.id">{{ role.name }}</el-checkbox>
+          <el-checkbox :disabled="role.id!=3" v-for="role in roleList" :key="role.id" :label="role.id">{{ role.name }}</el-checkbox>
         </el-checkbox-group>
       </el-form-item>
       <el-form-item label="状态" size="mini" prop="status">

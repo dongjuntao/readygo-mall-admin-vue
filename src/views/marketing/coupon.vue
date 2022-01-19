@@ -13,7 +13,7 @@
         <el-input v-model="dataForm.name" placeholder="优惠券名称" clearable></el-input>
       </el-form-item>
       <el-form-item>
-        <el-button @click="getDataList()">查询</el-button>
+        <el-button @click="getDataList()" v-if="isAuth('marketing-coupon-search')">查询</el-button>
         <el-button v-if="isAuth('marketing-coupon-create')" type="primary" @click="addOrUpdateHandle()">新增</el-button>
         <el-button v-if="isAuth('marketing-coupon-batchDelete')" type="danger" @click="deleteHandle()" :disabled="dataListSelections.length <= 0">批量删除</el-button>
       </el-form-item>
@@ -129,8 +129,8 @@
         align="center"
         label="操作" :key="11">
         <template slot-scope="scope">
-          <el-button type="text" size="small" @click="addOrUpdateHandle(scope.row.id)">领取情况</el-button>
-          <el-button v-if="scope.row.authStatus==2" type="text" size="mini" @click="authOpinionHandle(scope.row.id)" >拒绝原因</el-button>
+          <el-button v-if="isAuth('marketing-coupon-receiveDetail')" type="text" size="small" @click="addOrUpdateHandle(scope.row.id)">领取情况</el-button>
+          <el-button v-if="scope.row.authStatus==2 && isAuth('marketing-coupon-opinion')" type="text" size="mini" @click="authOpinionHandle(scope.row.id)" >拒绝原因</el-button>
           <el-button v-if="isAuth('marketing-coupon-update')" type="text" size="mini" @click="addOrUpdateHandle(scope.row.id)" :disabled="scope.row.authStatus==1">修改</el-button>
           <el-button v-if="isAuth('marketing-coupon-delete')" type="text" size="mini" @click="deleteHandle(scope.row.id)" :disabled="scope.row.authStatus==1">删除</el-button>
           <el-button v-if="isAuth('marketing-coupon-auth') && userType==0 && scope.row.authStatus==0" type="text" size="mini" @click="authHandle(scope.row.id)">审核</el-button>

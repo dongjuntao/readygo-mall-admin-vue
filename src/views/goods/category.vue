@@ -2,7 +2,7 @@
   <div class="mod-goods-category">
     <el-form :inline="true" :model="dataForm">
       <el-form-item>
-        <el-button type="primary" @click="addOrUpdateHandle()">新增</el-button>
+        <el-button type="primary" @click="addOrUpdateHandle()" v-if="isAuth('goods-category-create')">新增</el-button>
       </el-form-item>
     </el-form>
 
@@ -11,6 +11,8 @@
       row-key="id"
       border
       v-loading="dataListLoading"
+      :header-cell-style="{'font-size': '13px','background-color': '#f8f8f9', 'height': '50px','color':'#515a6e'}"
+      :cell-style="{'font-size':'13px'}"
       style="width: 100%; ">
       <el-table-column
         prop="name"
@@ -39,8 +41,8 @@
         width="200"
         label="操作">
         <template slot-scope="scope">
-          <el-button type="text" size="small" @click="addOrUpdateHandle(scope.row.id)">修改</el-button>
-          <el-button type="text" size="small" @click="deleteHandle(scope.row.id)">删除</el-button>
+          <el-button type="text" size="small" @click="addOrUpdateHandle(scope.row.id)" v-if="isAuth('goods-category-update')">修改</el-button>
+          <el-button type="text" size="small" @click="deleteHandle(scope.row.id)" v-if="isAuth('goods-category-delete')">删除</el-button>
         </template>
       </el-table-column>
     </el-table>

@@ -23,13 +23,6 @@
         width="50">
       </el-table-column>
       <el-table-column
-        prop="id"
-        header-align="center"
-        align="center"
-        width="80"
-        label="ID">
-      </el-table-column>
-      <el-table-column
         prop="name"
         header-align="center"
         align="center"
@@ -56,7 +49,8 @@
         label="操作">
         <template slot-scope="scope">
           <el-button v-if="isAuth('system-role-update')" type="text" size="small" @click="addOrUpdateHandle(scope.row.id)">修改</el-button>
-          <el-button v-if="isAuth('system-role-delete')" type="text" size="small" @click="deleteHandle(scope.row.id)">删除</el-button>
+          <!--系统中初始化的三个角色不能删除-->
+          <el-button :disabled="scope.row.id==1||scope.row.id==2||scope.row.id==3" v-if="isAuth('system-role-delete')" type="text" size="small" @click="deleteHandle(scope.row.id)">删除</el-button>
         </template>
       </el-table-column>
     </el-table>

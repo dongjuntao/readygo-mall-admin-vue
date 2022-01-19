@@ -1,19 +1,19 @@
 <template>
   <div class="mod-user">
     <el-form :inline="true" :model="searchForm" @keyup.enter.native="getDataList()">
-      <el-form-item label="公司全称">
+      <el-form-item>
         <el-input v-model="searchForm.name" placeholder="公司全称" clearable></el-input>
       </el-form-item>
-      <el-form-item label="公司简称">
+      <el-form-item>
         <el-input v-model="searchForm.abbreviation" placeholder="公司简称" clearable></el-input>
       </el-form-item>
-      <el-form-item label="公司编码">
+      <el-form-item>
         <el-input v-model="searchForm.code" placeholder="公司编码" clearable></el-input>
       </el-form-item>
       <el-form-item>
-        <el-button @click="getDataList()">查询</el-button>
-        <el-button v-if="isAuth('system-admin-create')" type="primary" @click="addOrUpdateHandle()">新增</el-button>
-        <el-button v-if="isAuth('system-admin-delete')" type="danger" @click="deleteHandle()" :disabled="dataListSelections.length <= 0">批量删除</el-button>
+        <el-button @click="getDataList()" v-if="isAuth('logistics-company-search')" >查询</el-button>
+        <el-button v-if="isAuth('logistics-company-create')" type="primary" @click="addOrUpdateHandle()">新增</el-button>
+        <el-button v-if="isAuth('logistics-company-batchDelete')" type="danger" @click="deleteHandle()" :disabled="dataListSelections.length <= 0">批量删除</el-button>
       </el-form-item>
     </el-form>
     <el-table
@@ -21,6 +21,8 @@
       border
       v-loading="dataListLoading"
       @selection-change="selectionChangeHandle"
+      :header-cell-style="{'font-size': '13px','background-color': '#f8f8f9', 'height': '50px','color':'#515a6e'}"
+      :cell-style="{'font-size':'13px'}"
       style="width: 100%;">
       <el-table-column
         type="selection"
@@ -76,8 +78,8 @@
         align="center"
         label="操作">
         <template slot-scope="scope">
-          <el-button v-if="isAuth('system-admin-update')" type="text" size="small" @click="addOrUpdateHandle(scope.row.id)">修改</el-button>
-          <el-button v-if="isAuth('system-admin-delete')" type="text" size="small" @click="deleteHandle(scope.row.id)">删除</el-button>
+          <el-button v-if="isAuth('logistics-company-update')" type="text" size="small" @click="addOrUpdateHandle(scope.row.id)">修改</el-button>
+          <el-button v-if="isAuth('logistics-company-delete')" type="text" size="small" @click="deleteHandle(scope.row.id)">删除</el-button>
         </template>
       </el-table-column>
     </el-table>
