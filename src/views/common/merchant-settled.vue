@@ -85,7 +85,7 @@
         </el-form-item>
 
         <el-form-item style="margin-top: 50px;text-align: center;">
-          <el-button style="width: 20%" type="primary" :loading="loading" @click="dataFormSubmit">申 请 入 驻</el-button>
+          <el-button style="width: 20%" size="medium" type="primary" :loading="loading" @click="dataFormSubmit">申 请 入 驻</el-button>
         </el-form-item>
       </el-form>
     </el-card>
@@ -102,16 +102,44 @@ import {saveAdmin} from "../../api/mall-admin";
 
 export default {
   data () {
-    var surePasswordValidator = (rule, value, callback)=>{
-      if (value !== this.dataForm.password) {
-        callback(new Error('两次输入密码不一致!'))
+    //密码校验
+    var surePasswordValidator = (rule, value, callback) => {
+      if (!this.dataForm.id && !/\S/.test(value)) {
+        callback(new Error('确认密码不能为空'))
+      } else if (this.dataForm.password !== value) {
+        callback(new Error('确认密码与密码输入不一致'))
       } else {
         callback()
       }
     }
+    //校验邮箱
+    var validateEmail = (rule, value, callback) => {
+      if (!isEmail(value)) {
+        callback(new Error('邮箱格式错误'))
+      } else {
+        callback()
+      }
+    }
+    //资质证明检验
     var qualificationMaterialsValidator = (rule, value, callback)=>{
       if (!this.qualificationMaterialsList || this.qualificationMaterialsList.length == 0) {
         callback(new Error('请上传商户资质材料！'))
+      } else {
+        callback()
+      }
+    }
+    //地区检验
+    var regionsValidator = (rule, value, callback)=>{
+      if (!this.province || !this.city || !this.area) {
+        callback(new Error('请选择地区!'))
+      } else {
+        callback()
+      }
+    }
+    //检验手机号
+    var validateMobile = (rule, value, callback) => {
+      if (!isMobile(value)) {
+        callback(new Error('手机号格式错误'))
       } else {
         callback()
       }
@@ -139,14 +167,25 @@ export default {
         password: [
           { required: true, message: '密码不能为空', trigger: 'blur' }
         ],
+        avatar: [
+          { required: true, message: '请上传头像', trigger: 'blur' }
+        ],
         name: [
           { required: true, message: '商户真实名称不能为空', trigger: 'blur' }
         ],
         mobile: [
-          { required: true, message: '手机号码不能为空', trigger: 'blur' }
+          { required: true, message: '手机号码不能为空', trigger: 'blur' },
+          { validator: validateMobile, trigger: 'blur' }
+        ],
+        email: [
+          { required: true, message: '邮箱不能为空', trigger: 'blur' },
+          { validator: validateEmail, trigger: 'blur' }
         ],
         address: [
           { required: true, message: '详细地址不能为空', trigger: 'blur' }
+        ],
+        regions: [
+          { required: true, validator:regionsValidator, trigger: 'blur' }
         ],
         qualificationMaterials: [
           { required: true, validator:qualificationMaterialsValidator, trigger: 'blur' }
@@ -334,9 +373,9 @@ export default {
   width: 800px;
   min-height: 700px;
   margin: 100px auto;
-  border-top: 3px solid #3399ff;
   background-color: #FFFFFFFF;
   font-weight: 700;
+  opacity: 0.8;
 }
 
 .login-title {

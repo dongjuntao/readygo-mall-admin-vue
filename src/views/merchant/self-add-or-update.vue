@@ -144,6 +144,7 @@
               email: this.dataForm.email,
               mobile: this.dataForm.mobile,
               status: this.dataForm.status,
+              authStatus: 1, //默认审核通过
               roleIdList: this.dataForm.roleIdList
             })
             saveOrUpdate(data).then(({data}) => {

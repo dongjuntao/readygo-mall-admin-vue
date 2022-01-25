@@ -1,6 +1,6 @@
 <template>
   <div>
-    <el-form :model="dataForm" :rules="dataRule" ref="dataForm" label-width="80px">
+    <el-form :model="dataForm" :rules="dataRule" ref="dataForm" label-width="80px" >
       <el-form-item label="商品名称" prop="name">
         <el-input v-model="dataForm.name" placeholder="请输入商品名称"></el-input>
       </el-form-item>
@@ -22,8 +22,8 @@
           </el-option>
         </el-select>
       </el-form-item>
-      <el-form-item label="所属商户" prop="adminUserId" v-if="userType == 0">
-        <el-select v-model="dataForm.adminUserId" clearable placeholder="请选择所属商户">
+      <el-form-item label="所属店铺" prop="adminUserId" v-if="userType == 0">
+        <el-select v-model="dataForm.adminUserId" clearable placeholder="请选择所属商户"  width="90%">
           <el-option
             v-for="item in merchantList"
             :key="item.id"
@@ -31,6 +31,7 @@
             :value="item.id">
           </el-option>
         </el-select>
+        <el-tooltip class="item" effect="light" content="此处店铺为自营店铺" placement="right"><i class="el-icon-question" /></el-tooltip>
       </el-form-item>
       <el-form-item label="商品分类" prop="goodsCategoryIds">
         <el-cascader
@@ -119,9 +120,9 @@ export default {
       })
     },
 
-    //获取商户列表（userType=1且auditStatus=1）
+    //获取商户列表（userType=1,auditStatus=1,merchantType=1）
     getMerchantList(){
-      var params =  this.axios.paramsHandler({userType: 1, auditStatus: 1},false)
+      var params =  this.axios.paramsHandler({userType: 1, authStatus: 1, merchantType: 1},false)
       getAdminListAll(params).then(({data}) => {
         if (data && data.code === "200") {
           this.merchantList = data.data

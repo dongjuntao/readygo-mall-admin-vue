@@ -1,6 +1,6 @@
 <template>
   <el-dialog
-    :title="type=='audit' ? '审核' : '详情'"
+    :title="type=='auth' ? '审核' : '详情'"
     :close-on-click-modal="false"
     :visible.sync="visible">
     <el-form :model="dataForm" ref="dataForm" label-width="80px">

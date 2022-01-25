@@ -116,7 +116,7 @@ export default {
         pageNum: this.pageNum,
         pageSize: this.pageSize,
         userName: this.dataForm.userName,
-        userType: this.userType
+        userType: this.userType //用户类型【平台管理员】
       })
       getAdminList(params).then(({data})=> {
         if (data && data.code === "200") {

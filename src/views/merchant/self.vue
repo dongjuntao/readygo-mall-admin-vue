@@ -36,10 +36,10 @@
         prop="name"
         header-align="center"
         align="center"
-        label="商家名称"
+        label="店铺名称"
         width="250">
       </el-table-column>
-      <el-table-column header-align="center" align="center" label="商家头像" width="100px;">
+      <el-table-column header-align="center" align="center" label="商家头像" width="80px;">
         <template slot-scope="scope">
           <img :src="scope.row.avatar" style="height: 50px; width: 50px;">
         </template>
@@ -50,6 +50,16 @@
         align="center"
         label="手机号"
         width="120">
+      </el-table-column>
+      <el-table-column
+        prop="status"
+        header-align="center"
+        align="center"
+        label="店铺状态">
+        <template slot-scope="scope">
+          <el-tag v-if="scope.row.status === 1" size="small" type="success">正常</el-tag>
+          <el-tag v-else-if="scope.row.status === 0" size="small" type="danger">禁用</el-tag>
+        </template>
       </el-table-column>
       <el-table-column
         prop="createTime"
@@ -64,8 +74,7 @@
         align="center"
         label="操作">
         <template slot-scope="scope">
-          <el-button v-if="(scope.row.auditStatus === 1 || scope.row.auditStatus === 2) && isAuth('merchant-self-detail')"
-                     type="text" size="small" @click="auditOrDetailHandle(scope.row.id, 'detail')">详情</el-button>
+          <el-button v-if="isAuth('merchant-self-detail')" type="text" size="small" @click="auditOrDetailHandle(scope.row.id, 'detail')">详情</el-button>
           <el-button v-if="isAuth('merchant-self-update')" type="text" size="small" @click="addOrUpdateHandle(scope.row.id)">修改</el-button>
           <el-button v-if="isAuth('merchant-self-delete')" type="text" size="small" @click="deleteHandle(scope.row.id)">删除</el-button>
         </template>
@@ -101,7 +110,8 @@ export default {
       pageNum: 1,
       pageSize: 10,
       totalPage: 0,
-      userType: 2,
+      userType: 1,
+      merchantType: 1,
       auditStatus: 1,
       dataListLoading: false,
       dataListSelections: [],
@@ -124,7 +134,8 @@ export default {
         pageNum: this.pageNum,
         pageSize: this.pageSize,
         userName: this.dataForm.userName,
-        userType: this.userType
+        userType: this.userType, //用户类型:【店铺管理员】
+        merchantType: this.merchantType //店铺类型【自营店铺】
       })
       getAdminList(params).then(({data})=> {
         if (data && data.code === "200") {
