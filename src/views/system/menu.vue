@@ -84,7 +84,7 @@
 <script>
   import AddOrUpdate from './menu-add-or-update'
   import { treeDataTranslate } from '@/utils'
-  import { getMenuList,deleteMenu } from '@/api/mall-menu'
+  import { getMenuList,deleteMenu } from '@/api/mall-admin/mall-menu'
   export default {
     data () {
       return {

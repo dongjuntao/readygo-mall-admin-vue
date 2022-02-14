@@ -107,9 +107,9 @@
 
 <script>
   import { isEmail, isMobile } from '@/utils/validate'
-  import { select } from '@/api/mall-role'
-  import { getUserById, saveAdmin, updateAdmin } from '@/api/mall-admin'
-  import { getRegionList } from '@/api/mall-region'
+  import { select } from '@/api/mall-admin/mall-role'
+  import { getUserById, saveAdmin, updateAdmin } from '@/api/mall-admin/mall-admin'
+  import { getRegionList } from '@/api/mall-admin/mall-region'
   import {  fileUpload } from '@/api/mall-file/file'
   import { adminUserConstant } from "@/utils/constant";
   export default {

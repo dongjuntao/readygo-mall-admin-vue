@@ -10,7 +10,7 @@
       <el-form-item label="备注" prop="remark">
         <el-input v-model="dataForm.remark" placeholder="备注"></el-input>
       </el-form-item>
-      <el-form-item size="mini" label="授权">
+      <el-form-item size="mini" label="菜单权限">
         <el-tree
           show-checkbox
           default-expand-all
@@ -30,8 +30,8 @@
 
 <script>
   import { treeDataTranslate } from '@/utils'
-  import { getMenuList } from '@/api/mall-menu'
-  import { getRoleInfo, saveRole, updateRole } from '@/api/mall-role'
+  import { getMenuList } from '@/api/mall-admin/mall-menu'
+  import { getRoleInfo, saveRole, updateRole } from '@/api/mall-admin/mall-role'
   export default {
     data () {
       return {

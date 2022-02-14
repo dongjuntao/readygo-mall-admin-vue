@@ -85,7 +85,7 @@
 
 <script>
 import AddOrUpdate from './admin-add-or-update'
-import { getAdminList, deleteAdmin } from '@/api/mall-admin'
+import { getAdminList, deleteAdmin } from '@/api/mall-admin/mall-admin'
 export default {
   data () {
     return {

@@ -36,7 +36,7 @@
 
 <script>
 import { treeDataTranslate } from '@/utils'
-import { getRegionById, getRegionList, saveRegion,updateRegion } from '@/api/mall-region'
+import { getRegionById, getRegionList, saveRegion,updateRegion } from '@/api/mall-admin/mall-region'
 export default {
   data () {
     return {

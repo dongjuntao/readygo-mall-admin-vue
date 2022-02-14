@@ -94,11 +94,11 @@
 </template>
 
 <script>
-import { getRegionList } from '@/api/mall-region'
+import { getRegionList } from '@/api/mall-admin/mall-region'
 import merchant_settled_background from '@/assets/img/merchant_settled_background.png';
 import { adminUserConstant } from "@/utils/constant";
 import {  fileUpload } from '@/api/mall-file/file'
-import {saveAdmin} from "../../api/mall-admin";
+import {saveAdmin} from "@/api/mall-admin/mall-admin";
 
 export default {
   data () {

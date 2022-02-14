@@ -42,7 +42,7 @@
 </template>
 
 <script>
-import { getFreightTemplateListAll } from '@/api/mall-freight-template'
+import { getFreightTemplateListAll } from '@/api/mall-admin/mall-freight-template'
 export default {
   data () {
     return {

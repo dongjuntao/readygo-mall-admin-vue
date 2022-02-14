@@ -81,9 +81,9 @@
 </template>
 
 <script>
-import { getListWithExpressSetting } from '@/api/mall-logistics-company'
+import { getListWithExpressSetting } from '@/api/mall-admin/mall-logistics-company'
 import { getUserInfo } from '@/utils/auth'
-import { saveExpressSetting, deleteExpressSetting, updateIsDefault } from '@/api/mall-expressSetting'
+import { saveExpressSetting, deleteExpressSetting, updateIsDefault } from '@/api/mall-admin/mall-expressSetting'
 export default {
   data () {
     return {

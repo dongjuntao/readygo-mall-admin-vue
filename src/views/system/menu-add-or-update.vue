@@ -80,7 +80,7 @@
 <script>
   import { treeDataTranslate } from '@/utils'
   import Icon from '@/icons'
-  import { select,getMenuInfo,saveMenu,updateMenu} from '@/api/mall-menu'
+  import { select,getMenuInfo,saveMenu,updateMenu} from '@/api/mall-admin/mall-menu'
   export default {
     data () {
       var validateUrl = (rule, value, callback) => {

@@ -121,7 +121,7 @@
 <script>
 import AddOrUpdate from './merchant-add-or-update'
 import AuditOrDetail from './merchant-audit-or-detail'
-import { getAdminList, deleteAdmin } from '@/api/mall-admin'
+import { getAdminList, deleteAdmin } from '@/api/mall-admin/mall-admin'
 export default {
   data () {
     return {

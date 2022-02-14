@@ -12,7 +12,6 @@
           <el-radio :label="0">平台</el-radio>
           <el-radio :label="1">商户</el-radio>
         </el-radio-group>
-        <el-tooltip class="item" effect="light" content="此处商户为自营店铺" placement="right-start"><i class="el-icon-question" /></el-tooltip>
       </el-form-item>
 
       <el-form-item label="所属商户" prop="adminUserId" v-if="userType == 0 && dataForm.source == 1">
@@ -127,7 +126,7 @@
 
 <script>
   import { getUserInfo } from '@/utils/auth'
-  import { getAdminListAll } from '@/api/mall-admin'
+  import { getAdminListAll } from '@/api/mall-admin/mall-admin'
   import { getSubFirst } from '@/api/mall-goods/goods-category'
   import { getAllGoodsList } from '@/api/mall-goods/goods'
   import { getCouponById, saveCoupon, updateCoupon } from '@/api/mall-coupon/coupon'
@@ -338,7 +337,7 @@
 
       //获取商户列表（userType=1且auditStatus=1）
       getMerchantList(){
-        var params =  this.axios.paramsHandler({userType: 1, authStatus: 1, merchantType: 1},false)
+        var params =  this.axios.paramsHandler({userType: 1, authStatus: 1},false)
         getAdminListAll(params).then(({data}) => {
           if (data && data.code === "200") {
             this.merchantList = data.data

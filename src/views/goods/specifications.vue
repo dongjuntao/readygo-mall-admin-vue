@@ -25,13 +25,6 @@
         width="50">
       </el-table-column>
       <el-table-column
-        prop="id"
-        header-align="center"
-        align="center"
-        width="80"
-        label="ID">
-      </el-table-column>
-      <el-table-column
         prop="name"
         header-align="center"
         align="center"
@@ -45,17 +38,25 @@
         label="规格值">
       </el-table-column>
       <el-table-column
+        v-if="userType === 0"
+        prop="merchantName"
+        header-align="center"
+        align="center"
+        label="所属店铺"
+        width="200">
+      </el-table-column>
+      <el-table-column
         prop="createTime"
         header-align="center"
         align="center"
-        width="200"
+        width="150"
         label="创建时间">
         <template  slot-scope="scope">{{scope.row.createTime | formatDateTime}}</template>
       </el-table-column>
       <el-table-column
         header-align="center"
         align="center"
-        width="150"
+        width="100"
         label="操作">
         <template slot-scope="scope">
           <el-button type="text" size="small" @click="addOrUpdateHandle(scope.row.id)" v-if="isAuth('goods-specifications-update')">修改</el-button>
@@ -80,12 +81,16 @@
 <script>
 import AddOrUpdate from './specifications-add-or-update'
 import { getGoodsSpecificationsList,deleteGoodsSpecifications } from '@/api/mall-goods/goods-specifications'
+import { getUserInfo } from '@/utils/auth'
+
 export default {
   data () {
     return {
       dataForm: {
         name: ''
       },
+      userType: null,
+      userId: null,
       dataList: [],
       pageNum: 1,
       pageSize: 10,
@@ -99,7 +104,8 @@ export default {
     AddOrUpdate
   },
   activated () {
-    this.getDataList()
+    this.getUserInfo();
+    this.getDataList();
   },
   methods: {
     // 获取数据列表
@@ -108,8 +114,10 @@ export default {
       var params =  this.axios.paramsHandler({
         pageNum: this.pageNum,
         pageSize: this.pageSize,
-        name: this.dataForm.name
+        name: this.dataForm.name,
+        adminUserId: this.userType===0 ? null : this.userId
       })
+
       getGoodsSpecificationsList(params).then(({data}) => {
         if (data && data.code === "200") {
           this.dataList = data.data.list
@@ -179,7 +187,18 @@ export default {
           }
         })
       }).catch(() => {})
-    }
+    },
+
+    /**
+     * cookie中获取当前登录的用户信息
+     */
+    getUserInfo() {
+      var userInfo = JSON.parse(getUserInfo(sessionStorage.getItem("userNameKey")));
+      this.userType = userInfo.userType;
+      this.userId = userInfo.userId;
+      console.log("this.userType==", this.userType)
+      console.log("this.userId==", this.userId)
+    },
   }
 }
 </script>

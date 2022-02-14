@@ -77,9 +77,9 @@
 
 <script>
 import AddOrUpdate from './freightTemplate-add-or-update'
-import { getFreightTemplateList, updateIsDefault, deleteFreightTemplate } from '@/api/mall-freight-template'
+import { getFreightTemplateList, updateIsDefault, deleteFreightTemplate } from '@/api/mall-admin/mall-freight-template'
 import { getUserInfo } from '@/utils/auth'
-import { getAdminListAll } from '@/api/mall-admin'
+import { getAdminListAll } from '@/api/mall-admin/mall-admin'
 export default {
   data () {
     return {

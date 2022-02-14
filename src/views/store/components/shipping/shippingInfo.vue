@@ -109,9 +109,9 @@
 <script>
 import AddOrUpdate from './shippingInfo-add-or-update'
 import Detail from './shipping-detail'
-import { getShippingInfoList, deleteShippingInfo, updateIsDefault } from '@/api/mall-shipping-info'
+import { getShippingInfoList, deleteShippingInfo, updateIsDefault } from '@/api/mall-admin/mall-shipping-info'
 import { getUserInfo } from '@/utils/auth'
-import { getAdminListAll } from '@/api/mall-admin'
+import { getAdminListAll } from '@/api/mall-admin/mall-admin'
 export default {
   data () {
     return {

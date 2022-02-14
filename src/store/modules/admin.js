@@ -1,4 +1,4 @@
-import { adminLogin } from '@/api/mall-admin'
+import { adminLogin } from '@/api/mall-admin/mall-admin'
 import {setToken, setUserInfo} from "@/utils/auth";
 
 const admin = {

@@ -209,8 +209,8 @@
 </template>
 
 <script>
-  import { getRegionList } from '@/api/mall-region'
-  import { saveFreightTemplate, updateFreightTemplate, getFreightTemplateById } from '@/api/mall-freight-template'
+  import { getRegionList } from '@/api/mall-admin/mall-region'
+  import { saveFreightTemplate, updateFreightTemplate, getFreightTemplateById } from '@/api/mall-admin/mall-freight-template'
   import { getUserInfo } from '@/utils/auth'
   import RegionSelect from './regionSelect'
 

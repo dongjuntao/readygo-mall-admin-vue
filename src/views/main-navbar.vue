@@ -46,7 +46,7 @@
 <script>
 import UpdatePassword from './main-navbar-update-password'
 import { clearLoginInfo, getUserInfo } from '@/utils/auth'
-import { adminLogout } from '@/api/mall-admin'
+import { adminLogout } from '@/api/mall-admin/mall-admin'
 export default {
   data () {
     return {

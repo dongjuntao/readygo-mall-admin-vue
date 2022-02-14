@@ -39,7 +39,7 @@
 
 <script>
 import AddOrUpdate from './region-add-or-update'
-import { getRegionList, deleteRegion } from '@/api/mall-region'
+import { getRegionList, deleteRegion } from '@/api/mall-admin/mall-region'
 import { treeDataTranslate } from '@/utils'
 export default {
   data () {

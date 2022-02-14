@@ -4,6 +4,16 @@
     :close-on-click-modal="false"
     :visible.sync="visible" append-to-body>
     <el-form :model="dataForm" :rules="dataRule" ref="dataForm" @keyup.enter.native="dataFormSubmit()" label-width="80px">
+      <el-form-item label="所属店铺" prop="adminUserId" v-if="userType == 0">
+        <el-select v-model="dataForm.adminUserId" clearable placeholder="请选择所属店铺">
+          <el-option
+            v-for="item in merchantList"
+            :key="item.id"
+            :label="item.name"
+            :value="item.id">
+          </el-option>
+        </el-select>
+      </el-form-item>
       <el-form-item label="规格名称" prop="name">
         <el-input v-model="dataForm.name" placeholder="规格名称"></el-input>
       </el-form-item>
@@ -62,6 +72,7 @@ import { getGoodsSpecificationsById,saveGoodsSpecifications,updateGoodsSpecifica
 import { fileUpload, fileDelete } from '@/api/mall-file/file'
 import { goodsConstant } from '@/utils/constant';
 import { getUserInfo } from '@/utils/auth'
+import { getAdminListAll } from '@/api/mall-admin/mall-admin'
 
 export default {
   data () {
@@ -71,10 +82,11 @@ export default {
         id: 0,
         name: '',
         description: '',
-        creatorId: 0,
-        creatorName: '',
+        adminUserId: null,
         goodsSpecificationsDetailEntityList: [],
       },
+      userType: null,
+      merchantList: [], //所属商户
       dataRule: {
         name: [
           { required: true, message: '规格名称不能为空', trigger: 'blur' }
@@ -83,6 +95,8 @@ export default {
     }
   },
   mounted() {
+    this.getMerchantList();
+    this.getUserInfo();
   },
   methods: {
     init (id) {
@@ -94,11 +108,11 @@ export default {
           var params = this.axios.paramsHandler({id: this.dataForm.id});
           getGoodsSpecificationsById(params).then(({data}) => {
             if (data && data.code === "200") {
+              console.log("data.data==",data.data)
               this.dataForm.id = data.data.id
               this.dataForm.name = data.data.name
               this.dataForm.description = data.data.description
-              this.dataForm.creatorId = data.data.creatorId;
-              this.dataForm.creatorName = data.data.creatorName;
+              this.dataForm.adminUserId = data.data.adminUserId;
               this.dataForm.goodsSpecificationsDetailEntityList = data.data.goodsSpecificationsDetailEntityList
             }
           })
@@ -107,8 +121,7 @@ export default {
           this.dataForm.id = 0
           this.dataForm.name = ''
           this.dataForm.description = ''
-          this.dataForm.creatorId = 0
-          this.dataForm.creatorName = ''
+          this.dataForm.adminUserId = null
           this.dataForm.goodsSpecificationsDetailEntityList = []
         }
       })
@@ -133,6 +146,25 @@ export default {
       this.dataForm.goodsSpecificationsDetailEntityList.splice(index,1);
     },
 
+    /**
+     * cookie中获取当前登录的用户信息
+     */
+    getUserInfo() {
+      var userInfo = JSON.parse(getUserInfo(sessionStorage.getItem("userNameKey")));
+      this.userType = userInfo.userType;
+      this.dataForm.adminUserId = userInfo.userId;
+    },
+
+    //获取所有商户列表（userType=1,auditStatus=1）
+    getMerchantList(){
+      var params =  this.axios.paramsHandler({userType: 1, authStatus: 1},false)
+      getAdminListAll(params).then(({data}) => {
+        if (data && data.code === "200") {
+          this.merchantList = data.data
+        }
+      })
+    },
+
     // 表单提交
     dataFormSubmit () {
       this.$refs['dataForm'].validate((valid) => {
@@ -141,8 +173,7 @@ export default {
             id: this.dataForm.id || undefined,
             name: this.dataForm.name,
             description: this.dataForm.description,
-            creatorId: JSON.parse(getUserInfo(sessionStorage.getItem("userNameKey"))).userId,
-            creatorName: JSON.parse(getUserInfo(sessionStorage.getItem("userNameKey"))).name,
+            adminUserId: this.dataForm.adminUserId,
             goodsSpecificationsDetailEntityList: this.dataForm.goodsSpecificationsDetailEntityList
           })
           var saveOrUpdate =  this.dataForm.id ? updateGoodsSpecifications : saveGoodsSpecifications;

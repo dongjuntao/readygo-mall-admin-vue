@@ -41,9 +41,9 @@
 
 <script>
 import { isMobile } from '@/utils/validate'
-import { getAdminListAll } from '@/api/mall-admin'
-import { getRegionList } from '@/api/mall-region'
-import { saveShippingInfo, updateShippingInfo, getShippingInfoById } from '@/api/mall-shipping-info'
+import { getAdminListAll } from '@/api/mall-admin/mall-admin'
+import { getRegionList } from '@/api/mall-admin/mall-region'
+import { saveShippingInfo, updateShippingInfo, getShippingInfoById } from '@/api/mall-admin/mall-shipping-info'
 import { getUserInfo } from '@/utils/auth'
 
 export default {

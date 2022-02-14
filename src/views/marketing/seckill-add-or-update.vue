@@ -15,7 +15,6 @@
           :value="item.id">
         </el-option>
       </el-select>
-      <el-tooltip class="item" effect="light" content="此处商户为自营店铺" placement="right-start"><i class="el-icon-question" /></el-tooltip>
     </el-form-item>
 
       <el-form-item label="选择商品" prop="goodsId">
@@ -154,7 +153,7 @@
 
 <script>
   import { getUserInfo } from '@/utils/auth'
-  import { getAdminListAll } from '@/api/mall-admin'
+  import { getAdminListAll } from '@/api/mall-admin/mall-admin'
   import { getAllGoodsList, getGoodsById } from '@/api/mall-goods/goods'
   import { getSeckillConfigById, saveSeckillConfig, updateSeckillConfig } from '@/api/mall-seckill/seckill-config'
   import { getSeckillGoodsSkuList } from '@/api/mall-seckill/seckill-goods-sku'
@@ -278,9 +277,9 @@
         this.dataForm.currentUserId = userInfo.userId;
       },
 
-      //获取商户列表（userType=1且auditStatus=1,merchantType=1）
+      //获取商户列表（userType=1且auditStatus=1）
       getMerchantList(){
-        var params =  this.axios.paramsHandler({userType: 1, authStatus: 1, merchantType:1},false)
+        var params =  this.axios.paramsHandler({userType: 1, authStatus: 1},false)
         getAdminListAll(params).then(({data}) => {
           if (data && data.code === "200") {
             this.merchantList = data.data

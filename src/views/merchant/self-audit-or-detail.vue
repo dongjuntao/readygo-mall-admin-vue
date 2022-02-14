@@ -77,9 +77,9 @@
 </template>
 
 <script>
-  import { select } from '@/api/mall-role'
-  import { getUserById, auditAdmin } from '@/api/mall-admin'
-  import { getRegionsNameByRegions } from '@/api/mall-region'
+  import { select } from '@/api/mall-admin/mall-role'
+  import { getUserById, auditAdmin } from '@/api/mall-admin/mall-admin'
+  import { getRegionsNameByRegions } from '@/api/mall-admin/mall-region'
   import { getUserInfo, setUserInfo} from '@/utils/auth'
 
   export default {

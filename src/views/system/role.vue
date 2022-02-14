@@ -70,7 +70,7 @@
 
 <script>
   import AddOrUpdate from './role-add-or-update'
-  import { getRoleList,deleteRole } from '@/api/mall-role'
+  import { getRoleList,deleteRole } from '@/api/mall-admin/mall-role'
   export default {
     data () {
       return {

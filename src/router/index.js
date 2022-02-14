@@ -9,7 +9,7 @@ import Router from 'vue-router'
 import http from '@/utils/httpRequest'
 import { isURL } from '@/utils/validate'
 import { getToken,getUserInfo} from '@/utils/auth'
-import { getNavbar } from '@/api/mall-menu'
+import { getNavbar } from '@/api/mall-admin/mall-menu'
 import NProgress from 'nprogress' // Progress 进度条
 import 'nprogress/nprogress.css'// Progress 进度条样式
 

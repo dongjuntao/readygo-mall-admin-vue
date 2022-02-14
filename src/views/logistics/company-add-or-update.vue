@@ -28,8 +28,8 @@
 </template>
 
 <script>
-  import { select } from '@/api/mall-role'
-  import { getLogisticsCompanyById, saveLogisticsCompany, updateLogisticsCompany } from '@/api/mall-logistics-company'
+  import { select } from '@/api/mall-admin/mall-role'
+  import { getLogisticsCompanyById, saveLogisticsCompany, updateLogisticsCompany } from '@/api/mall-admin/mall-logistics-company'
   export default {
     data () {
       return {

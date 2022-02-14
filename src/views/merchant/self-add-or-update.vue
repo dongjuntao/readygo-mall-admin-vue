@@ -40,8 +40,8 @@
 
 <script>
   import { isEmail, isMobile } from '@/utils/validate'
-  import { select } from '@/api/mall-role'
-  import { getUserById, saveAdmin, updateAdmin } from '@/api/mall-admin'
+  import { select } from '@/api/mall-admin/mall-role'
+  import { getUserById, saveAdmin, updateAdmin } from '@/api/mall-admin/mall-admin'
   export default {
     data () {
       var validatePassword = (rule, value, callback) => {

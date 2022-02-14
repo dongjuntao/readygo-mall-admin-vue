@@ -23,7 +23,7 @@
 
 <script>
 const cityOptions = [];
-import { getRegionList } from '@/api/mall-region'
+import { getRegionList } from '@/api/mall-admin/mall-region'
 export default {
   data() {
     return {

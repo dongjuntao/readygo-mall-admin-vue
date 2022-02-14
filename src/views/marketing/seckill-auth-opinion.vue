@@ -17,7 +17,7 @@
 
 <script>
 import { getUserInfo } from '@/utils/auth'
-import { getAdminListAll } from '@/api/mall-admin'
+import { getAdminListAll } from '@/api/mall-admin/mall-admin'
 import { getSubFirst } from '@/api/mall-goods/goods-category'
 import { getAllGoodsList } from '@/api/mall-goods/goods'
 import { getCouponById, auth } from '@/api/mall-coupon/coupon'
