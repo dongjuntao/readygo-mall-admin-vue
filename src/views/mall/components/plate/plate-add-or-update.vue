@@ -7,6 +7,9 @@
       <el-form-item label="板块名称" prop="name">
         <el-input v-model="dataForm.name" placeholder="板块名称"></el-input>
       </el-form-item>
+      <el-form-item label="类型" prop="type">
+        <el-input disabled v-model="dataForm.type" placeholder="类型"></el-input>
+      </el-form-item>
       <el-form-item label="板块二级名称" prop="secondName">
         <el-input v-model="dataForm.secondName" placeholder="板块二级名称"></el-input>
       </el-form-item>
@@ -37,6 +40,7 @@
         dataForm: {
           id: 0,
           name: '', //板块名称
+          type: '', //类型
           secondName: '', //板块二级名称
           maxLimit: null,//最大容纳商品量
           enable: false //状态（false：禁用；true：启用）
@@ -75,6 +79,7 @@
             var data = this.axios.dataHandler({
               id: this.dataForm.id || undefined,
               name: this.dataForm.name,
+              type: this.dataForm.type,
               secondName: this.dataForm.secondName,
               maxLimit: this.dataForm.maxLimit,
               enable: this.dataForm.enable,

@@ -17,9 +17,15 @@ const adminUserConstant = {
   admin_qualification_materials: "/admin/qualificationMaterials/" //资质材料
 }
 
+//首页录播图
+const homepageConstant = {
+  homepage_carousel_folder_name: "/homepage/carousel/images/" //首页轮播图文件夹路径前缀
+}
+
 
 export {
   brandConstant,
   goodsConstant,
-  adminUserConstant
+  adminUserConstant,
+  homepageConstant
 };

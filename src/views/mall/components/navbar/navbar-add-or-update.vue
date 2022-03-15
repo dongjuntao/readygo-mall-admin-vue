@@ -43,10 +43,10 @@
         },
         dataRule: {
           name: [
-            { required: true, message: '导航栏名称名称', trigger: 'blur' }
+            { required: true, message: '导航栏名称', trigger: 'blur' }
           ],
           linkUrl: [
-            { required: true, message: '导航栏名称名称', trigger: 'blur' }
+            { required: true, message: '导航栏名称', trigger: 'blur' }
           ]
         }
       }

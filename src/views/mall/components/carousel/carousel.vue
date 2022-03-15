@@ -2,10 +2,12 @@
   <div class="mod-user">
     <el-form :inline="true" :model="searchForm" @keyup.enter.native="getDataList()">
       <el-form-item>
-        <el-input v-model="searchForm.name" placeholder="板块名称" clearable></el-input>
+        <el-input v-model="searchForm.name" placeholder="导航栏名称" clearable></el-input>
       </el-form-item>
       <el-form-item>
         <el-button @click="getDataList()">查询</el-button>
+        <el-button type="primary" @click="addOrUpdateHandle()">新增</el-button>
+        <el-button type="danger" @click="deleteHandle()" :disabled="dataListSelections.length <= 0">批量删除</el-button>
       </el-form-item>
     </el-form>
     <el-table
@@ -26,35 +28,28 @@
         prop="name"
         header-align="center"
         align="center"
-        label="板块名称"
-        width="350">
-      </el-table-column>
-      <el-table-column
-        prop="type"
-        header-align="center"
-        label="类型"
-        align="center"
+        label="轮播图名称"
         width="250">
       </el-table-column>
       <el-table-column
-        prop="secondName"
+        prop="url"
         header-align="center"
         align="center"
-        label="板块二级名称"
-        width="200">
+        label="图片地址"
+        width="600">
       </el-table-column>
       <el-table-column
-        prop="maxLimit"
+        prop="sortNum"
         header-align="center"
         align="center"
-        label="板块内最大容纳量"
-        width="130">
+        label="排序"
+        width="80">
       </el-table-column>
       <el-table-column
         header-align="center"
         align="center"
         label="是否启用"
-        width="100">
+        width="90">
         <template slot-scope="scope">
           <el-switch v-model="scope.row.enable" @change="changeEnable(scope.row.id, scope.row.enable)"></el-switch>
         </template>
@@ -64,8 +59,8 @@
         align="center"
         label="操作">
         <template slot-scope="scope">
-          <el-button :disabled="scope.row.type==='seckill'"  type="text" size="small" @click="addOrUpdateHandle(scope.row.id)">关联商品</el-button>
           <el-button type="text" size="small" @click="addOrUpdateHandle(scope.row.id)">修改</el-button>
+          <el-button type="text" size="small" @click="deleteHandle(scope.row.id)">删除</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -86,8 +81,8 @@
 
 <script>
 import { getUserInfo } from '@/utils/auth'
-import { getHomepagePlateList, enable, deleteHomepagePlate } from '@/api/mall-admin/mall-homepage-plate'
-import AddOrUpdate from './plate-add-or-update'
+import AddOrUpdate from './carousel-add-or-update'
+import { getHomepageCarouselList, enable, deleteHomepageCarousel } from '@/api/mall-admin/mall-homepage-carousel'
 
 export default {
   data () {
@@ -101,14 +96,13 @@ export default {
       totalPage: 0,
       dataListLoading: false,
       addOrUpdateVisible: false,
-      dataListSelections: []
+      dataListSelections: [],
     }
   },
   components: {
-    AddOrUpdate
+    AddOrUpdate,
   },
   activated () {
-    // this.getUserInfo()
     this.getDataList()
   },
   methods: {
@@ -120,7 +114,7 @@ export default {
         pageSize: this.pageSize,
         name: this.searchForm.name
       })
-      getHomepagePlateList(params).then(({data})=> {
+      getHomepageCarouselList(params).then(({data})=> {
         if (data && data.code === "200") {
           this.dataList = data.data.list
           this.totalPage = data.data.totalCount
@@ -140,6 +134,11 @@ export default {
       })
     },
 
+    // 多选
+    selectionChangeHandle (val) {
+      this.dataListSelections = val
+    },
+
     // 每页数
     sizeChangeHandle (val) {
       this.pageSize = val
@@ -152,17 +151,12 @@ export default {
       this.getDataList()
     },
 
-    // 多选
-    selectionChangeHandle (val) {
-      this.dataListSelections = val
-    },
-
     /** 启用 禁用 */
     changeEnable(id, en) {
       //开启
       if (en) {
         var params = this.axios.paramsHandler({
-          plateId: id,
+          navbarId: id,
           enable: true
         });
         enable(params).then(({data}) => {
@@ -181,7 +175,7 @@ export default {
         });
       } else { //关闭
         var params = this.axios.paramsHandler({
-          plateId: id,
+          navbarId: id,
           enable: false
         });
         enable(params).then(({data})=>{
@@ -201,12 +195,32 @@ export default {
       }
     },
 
-    /**
-     * cookie中获取当前登录的用户信息
-     */
-    getUserInfo() {
-      var userInfo = JSON.parse(getUserInfo(sessionStorage.getItem("userNameKey")));
-      this.adminUserId = userInfo.userId;
+    // 删除
+    deleteHandle (id) {
+      var navbarIds = id ? [id] : this.dataListSelections.map(item => {
+        return item.id
+      })
+      this.$confirm(`确定对[id=${navbarIds.join(',')}]进行[${id ? '删除' : '批量删除'}]操作?`, '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        var postData = this.axios.dataHandler(navbarIds, false);
+        deleteHomepageCarousel(postData).then(({data})=>{
+          if (data && data.code === "200") {
+            this.$message({
+              message: '操作成功',
+              type: 'success',
+              duration: 1500,
+              onClose: () => {
+                this.getDataList()
+              }
+            })
+          } else {
+            this.$message.error(data.msg)
+          }
+        });
+      }).catch(() => {})
     }
 
   }
