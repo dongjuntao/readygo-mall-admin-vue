@@ -209,4 +209,8 @@
 .el-upload-list__item.is-ready {
   display: none;
 }
+.el-upload-list__item {
+  transition: none !important;
+}
+
 </style>

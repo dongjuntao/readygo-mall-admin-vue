@@ -29,27 +29,25 @@
         header-align="center"
         align="center"
         label="轮播图名称"
-        width="250">
+        width="500">
       </el-table-column>
-      <el-table-column
-        prop="url"
-        header-align="center"
-        align="center"
-        label="图片地址"
-        width="600">
+      <el-table-column header-align="center" align="center" label="图片" width="150px;">
+        <template slot-scope="scope">
+          <img :src="scope.row.url" style="height: 50px; width: 50px;">
+        </template>
       </el-table-column>
       <el-table-column
         prop="sortNum"
         header-align="center"
         align="center"
         label="排序"
-        width="80">
+        width="120">
       </el-table-column>
       <el-table-column
         header-align="center"
         align="center"
         label="是否启用"
-        width="90">
+        width="120">
         <template slot-scope="scope">
           <el-switch v-model="scope.row.enable" @change="changeEnable(scope.row.id, scope.row.enable)"></el-switch>
         </template>
