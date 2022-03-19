@@ -83,7 +83,7 @@
 <script>
 import { getListWithExpressSetting } from '@/api/mall-admin/mall-logistics-company'
 import { getUserInfo } from '@/utils/auth'
-import { saveExpressSetting, deleteExpressSetting, updateIsDefault } from '@/api/mall-admin/mall-expressSetting'
+import { saveExpressSetting, deleteExpressSetting, updateIsDefault } from '@/api/mall-admin/mall-express-setting'
 export default {
   data () {
     return {

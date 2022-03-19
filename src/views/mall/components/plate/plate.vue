@@ -64,7 +64,7 @@
         align="center"
         label="操作">
         <template slot-scope="scope">
-          <el-button :disabled="scope.row.type==='seckill'"  type="text" size="small" @click="addOrUpdateHandle(scope.row.id)">关联商品</el-button>
+          <el-button :disabled="scope.row.type==='seckill'"  type="text" size="small" @click="relatedGoodsHandle(scope.row.id)">关联商品</el-button>
           <el-button type="text" size="small" @click="addOrUpdateHandle(scope.row.id)">修改</el-button>
         </template>
       </el-table-column>
@@ -81,13 +81,17 @@
 
     <!-- 弹窗, 新增 / 修改 -->
     <add-or-update v-if="addOrUpdateVisible" ref="addOrUpdate" @refreshDataList="getDataList"></add-or-update>
+
+    <!-- 关联的商品，用于商城前台的商品展示 -->
+    <related-goods v-if="relatedGoodsVisible" ref="relatedGoods" @refreshDataList="getDataList"></related-goods>
   </div>
 </template>
 
 <script>
 import { getUserInfo } from '@/utils/auth'
-import { getHomepagePlateList, enable, deleteHomepagePlate } from '@/api/mall-admin/mall-homepage-plate'
+import { getHomepagePlateList, enable } from '@/api/mall-admin/mall-homepage-plate'
 import AddOrUpdate from './plate-add-or-update'
+import RelatedGoods from './related-goods'
 
 export default {
   data () {
@@ -101,11 +105,13 @@ export default {
       totalPage: 0,
       dataListLoading: false,
       addOrUpdateVisible: false,
+      relatedGoodsVisible: false, //关联的商品信息，用于在商城前台
       dataListSelections: []
     }
   },
   components: {
-    AddOrUpdate
+    AddOrUpdate,
+    RelatedGoods
   },
   activated () {
     // this.getUserInfo()
@@ -137,6 +143,14 @@ export default {
       this.addOrUpdateVisible = true
       this.$nextTick(() => {
         this.$refs.addOrUpdate.init(id)
+      })
+    },
+
+    //关联商品，用于商城前台商品展示
+    relatedGoodsHandle (id) {
+      this.relatedGoodsVisible = true
+      this.$nextTick(() => {
+        this.$refs.relatedGoods.init(id)
       })
     },
 

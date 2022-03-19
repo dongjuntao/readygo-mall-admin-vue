@@ -154,7 +154,7 @@
 <script>
   import { getUserInfo } from '@/utils/auth'
   import { getAdminListAll } from '@/api/mall-admin/mall-admin'
-  import { getAllGoodsList, getGoodsById } from '@/api/mall-goods/goods'
+  import { getAllGoodsList } from '@/api/mall-goods/goods'
   import { getSeckillConfigById, saveSeckillConfig, updateSeckillConfig } from '@/api/mall-seckill/seckill-config'
   import { getSeckillGoodsSkuList } from '@/api/mall-seckill/seckill-goods-sku'
 

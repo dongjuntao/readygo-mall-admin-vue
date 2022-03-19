@@ -78,3 +78,23 @@ export function enable(params) {
   })
 }
 
+/**
+ * 关联商品，用于商城首页展示
+ */
+export function relateGoods(plateId,data) {
+  return request({
+    url: prefix+'/homepage/plate/relateGoods/'+plateId,
+    method: 'post',
+    data: data
+  })
+}
+
+/**
+ *  根据板块id获取关联商品
+ */
+export function getRelatedGoods(plateId) {
+  return request({
+    url: prefix+'/homepage/plate/getRelatedGoods/'+plateId,
+    method: 'get'
+  })
+}
