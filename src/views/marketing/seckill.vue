@@ -47,7 +47,7 @@
         width="200"
         label="秒杀起始日期" :key="3">
         <template slot-scope="scope">
-          {{ scope.row.seckillStartDate|formatDate }}至{{ scope.row.seckillEndDate|formatDate }}
+          {{ scope.row.seckillStartDate|formatDate }} - {{ scope.row.seckillEndDate|formatDate }}
         </template>
       </el-table-column>
 
@@ -57,7 +57,7 @@
         width="200"
         label="秒杀起始时间" :key="4">
         <template slot-scope="scope">
-          {{ scope.row.seckillStartTime }}至{{ scope.row.seckillEndTime }}
+          {{ scope.row.seckillStartTime }} - {{ scope.row.seckillEndTime }}
         </template>
       </el-table-column>
 

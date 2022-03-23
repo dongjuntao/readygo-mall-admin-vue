@@ -32,7 +32,7 @@
         <el-date-picker
           v-model="dataForm.startAndEndDate"
           type="daterange"
-          range-separator="至"
+          range-separator="-"
           start-placeholder="开始日期"
           end-placeholder="结束日期"
           format="yyyy-MM-dd"
@@ -40,17 +40,19 @@
         </el-date-picker>
       </el-form-item>
 
-      <el-form-item label="秒杀起始时间" prop="startAndEndTime">
-        <el-time-picker
-          is-range
-          v-model="dataForm.startAndEndTime"
-          range-separator="至"
-          start-placeholder="开始时间"
-          end-placeholder="结束时间"
-          placeholder="选择时间范围"
-          format="HH:mm:ss"
-          value-format="HH:mm:ss">
-        </el-time-picker>
+      <el-form-item label="秒杀时间段" prop="startAndEndTime">
+        <el-select v-model="dataForm.startAndEndTime" clearable placeholder="请选择">
+          <el-option value="00:00:00 - 02:00:00"></el-option>
+          <el-option value="06:00:00 - 08:00:00"></el-option>
+          <el-option value="08:00:00 - 10:00:00"></el-option>
+          <el-option value="10:00:00 - 12:00:00"></el-option>
+          <el-option value="12:00:00 - 14:00:00"></el-option>
+          <el-option value="14:00:00 - 16:00:00"></el-option>
+          <el-option value="16:00:00 - 18:00:00"></el-option>
+          <el-option value="18:00:00 - 20:00:00"></el-option>
+          <el-option value="20:00:00 - 22:00:00"></el-option>
+          <el-option value="22:00:00 - 24:00:00"></el-option>
+        </el-select>
       </el-form-item>
 
       <el-form-item label="限购条件" prop="perLimit">
@@ -191,7 +193,7 @@
             { required: true, message: '请选择秒杀起始日期', trigger: 'blur' }
           ],
           startAndEndTime: [
-            { required: true, message: '请选择秒杀起始时间', trigger: 'blur' }
+            { required: true, message: '请选择秒杀时间段', trigger: 'blur' }
           ]
         }
       }
@@ -217,8 +219,7 @@
                 this.$set(this.dataForm, 'startAndEndDate', [ data.data.seckillStartDate, data.data.seckillEndDate ])
                 //处理秒杀起始时间
                 // this.dataForm.startAndEndTime = [ data.data.seckillStartTime, data.data.seckillEndTime ];
-                this.$set(this.dataForm, 'startAndEndTime', [ data.data.seckillStartTime, data.data.seckillEndTime ])
-
+                this.$set(this.dataForm, 'startAndEndTime', data.data.seckillStartTime + " - " + data.data.seckillEndTime)
                 //展示商品详细信息
                 this.dataForm.goodsSkuList = this.dataForm.goodsSkuList
                 //商品设置展示（秒杀商品详细信息）
@@ -242,8 +243,9 @@
               goodsId: this.dataForm.goodsId,
               seckillStartDate: this.dataForm.startAndEndDate[0],
               seckillEndDate: this.dataForm.startAndEndDate[1],
-              seckillStartTime: this.dataForm.startAndEndTime[0],
-              seckillEndTime: this.dataForm.startAndEndTime[1],
+              // seckillStartTime: this.dataForm.startAndEndTime[0],
+              // seckillEndTime: this.dataForm.startAndEndTime[1],
+              startAndEndTime: this.dataForm.startAndEndTime,
               perLimit: this.dataForm.perLimit, //每人限领多少张
               status: this.dataForm.status, //状态（0：禁用；1：启用）
               createBy: this.dataForm.currentUserId,
@@ -326,6 +328,13 @@
           }
         })
       }
+    }
+  }
+
+  function parserDate(date) {
+    var t = Date.parse(date)
+    if (!isNaN(t)) {
+      return new Date(Date.parse(date.replace(/-/g, '/')))
     }
   }
 </script>
