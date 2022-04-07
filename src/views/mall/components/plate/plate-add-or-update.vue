@@ -13,6 +13,9 @@
       <el-form-item label="板块二级名称" prop="secondName">
         <el-input v-model="dataForm.secondName" placeholder="板块二级名称"></el-input>
       </el-form-item>
+      <el-form-item label="板块背景色" prop="bgColor">
+        <el-color-picker v-model="dataForm.bgColor" placeholder="板块背景色"></el-color-picker>
+      </el-form-item>
       <el-form-item label="最大容纳商品量" prop="maxLimit">
         <el-input-number v-model="dataForm.maxLimit" controls-position="right" size="small" :min="0" :max="999999"></el-input-number>
       </el-form-item>
@@ -42,6 +45,7 @@
           name: '', //板块名称
           type: '', //类型
           secondName: '', //板块二级名称
+          bgColor: '', //板块背景色
           maxLimit: null,//最大容纳商品量
           enable: false //状态（false：禁用；true：启用）
         },
@@ -81,6 +85,7 @@
               name: this.dataForm.name,
               type: this.dataForm.type,
               secondName: this.dataForm.secondName,
+              bgColor: this.dataForm.bgColor,
               maxLimit: this.dataForm.maxLimit,
               enable: this.dataForm.enable,
             })
@@ -96,7 +101,7 @@
                   }
                 })
               } else {
-                this.$message.error(data.msg)
+                this.$message.error(data.message)
               }
             });
           }

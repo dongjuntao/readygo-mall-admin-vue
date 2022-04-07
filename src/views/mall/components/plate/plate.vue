@@ -34,14 +34,21 @@
         header-align="center"
         label="类型"
         align="center"
-        width="250">
+        width="200">
       </el-table-column>
       <el-table-column
         prop="secondName"
         header-align="center"
         align="center"
         label="板块二级名称"
-        width="200">
+        width="150">
+      </el-table-column>
+      <el-table-column
+        prop="bgColor"
+        header-align="center"
+        align="center"
+        label="板块背景色"
+        width="100">
       </el-table-column>
       <el-table-column
         prop="maxLimit"
