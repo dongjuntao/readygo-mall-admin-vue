@@ -36,6 +36,9 @@
       <el-form-item label="排序号" prop="orderNum">
         <el-input-number v-model="dataForm.orderNum" controls-position="right" :min="0" label="排序号"></el-input-number>
       </el-form-item>
+      <el-form-item label="分组号" prop="groupNum" v-if="dataForm.parentId == 0">
+        <el-input-number v-model="dataForm.groupNum" controls-position="right" :min="0" label="分组号"></el-input-number>
+      </el-form-item>
     </el-form>
     <span slot="footer" class="dialog-footer">
       <el-button @click="visible = false">取消</el-button>
@@ -55,7 +58,8 @@
           name: '',
           parentId: 0,
           parentName: '',
-          orderNum: 0
+          orderNum: 0,
+          groupNum: 0
         },
         dataRule: {
           name: [
@@ -102,6 +106,9 @@
               this.dataForm.name = data.data.goodsCategoryEntity.name
               this.dataForm.parentId = data.data.goodsCategoryEntity.parentId
               this.dataForm.orderNum = data.data.goodsCategoryEntity.orderNum
+              if (this.dataForm.parentId == 0) {
+                this.dataForm.groupNum = data.data.goodsCategoryEntity.groupNum
+              }
               this.goodsCategoryListTreeSetCurrentNode()
             })
           }
@@ -109,6 +116,7 @@
       },
       // 菜单树选中
       goodsCategoryListTreeCurrentChangeHandle (data, node) {
+        console.log("parentId==",data.id)
         this.dataForm.parentId = data.id
         this.dataForm.parentName = data.name
       },
@@ -126,7 +134,8 @@
               id: this.dataForm.id || undefined,
               name: this.dataForm.name,
               parentId: this.dataForm.parentId,
-              orderNum: this.dataForm.orderNum
+              orderNum: this.dataForm.orderNum,
+              groupNum: this.dataForm.parentId==0 ? this.dataForm.groupNum : null
             })
             saveOrUpdate(data).then(({data}) => {
               if (data && data.code === "200") {

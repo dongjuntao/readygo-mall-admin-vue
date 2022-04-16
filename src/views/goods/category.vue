@@ -28,6 +28,13 @@
         label="排序号">
       </el-table-column>
       <el-table-column
+        prop="groupNum"
+        header-align="center"
+        align="center"
+        width="120"
+        label="分组号">
+      </el-table-column>
+      <el-table-column
         prop="createTime"
         header-align="center"
         align="center"
