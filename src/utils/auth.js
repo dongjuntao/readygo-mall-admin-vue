@@ -24,6 +24,10 @@ export function getUserInfo(key) {
   return Cookies.get(UserInfoKey+"-"+key)
 }
 
+export function removeUserInfo(key){
+  return Cookies.remove(UserInfoKey+"-"+key)
+}
+
 /**
  * 是否有权限
  * @param {*} key
@@ -38,4 +42,6 @@ export function isAuth (key) {
 export function clearLoginInfo () {
   removeToken(sessionStorage.getItem("userNameKey"));
   router.options.isAddDynamicMenuRoutes = false
+  removeUserInfo(sessionStorage.getItem("userNameKey"))
+  sessionStorage.clear();
 }

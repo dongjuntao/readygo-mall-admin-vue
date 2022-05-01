@@ -18,7 +18,8 @@ const http = axios.create({
  * 请求拦截
  */
 http.interceptors.request.use(config => {
-  config.headers['Authorization'] = 'Bearer ' + getToken(sessionStorage.getItem("userNameKey")) // 请求头带上token
+  let token = getToken(sessionStorage.getItem("userNameKey"))
+  config.headers['Authorization'] = token ?  ('Bearer ' + token) : "" // 如果有token,就带上token, 没有token,就传空串
   return config
 }, error => {
   return Promise.reject(error)
