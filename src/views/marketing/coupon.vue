@@ -131,8 +131,8 @@
         <template slot-scope="scope">
           <el-button v-if="isAuth('marketing-coupon-receiveDetail')" type="text" size="small" @click="addOrUpdateHandle(scope.row.id)">领取情况</el-button>
           <el-button v-if="scope.row.authStatus==2 && isAuth('marketing-coupon-opinion')" type="text" size="mini" @click="authOpinionHandle(scope.row.id)" >拒绝原因</el-button>
-          <el-button v-if="isAuth('marketing-coupon-update')" type="text" size="mini" @click="addOrUpdateHandle(scope.row.id)" :disabled="scope.row.authStatus==1">修改</el-button>
-          <el-button v-if="isAuth('marketing-coupon-delete')" type="text" size="mini" @click="deleteHandle(scope.row.id)" :disabled="scope.row.authStatus==1">删除</el-button>
+          <el-button v-if="isAuth('marketing-coupon-update')" type="text" size="mini" @click="addOrUpdateHandle(scope.row.id)" :disabled="userType!=0&&scope.row.authStatus==1">修改</el-button>
+          <el-button v-if="isAuth('marketing-coupon-delete')" type="text" size="mini" @click="deleteHandle(scope.row.id)" :disabled="userType!=0&&scope.row.authStatus==1">删除</el-button>
           <el-button v-if="isAuth('marketing-coupon-auth') && userType==0 && scope.row.authStatus==0" type="text" size="mini" @click="authHandle(scope.row.id)">审核</el-button>
         </template>
       </el-table-column>

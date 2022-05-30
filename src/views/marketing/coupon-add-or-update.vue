@@ -57,7 +57,7 @@
         </el-radio-group>
       </el-form-item>
       <el-form-item label="选择分类" prop="goodsCategoryIds" v-if="userType==0 && dataForm.source==0 && dataForm.useScope==1">
-        <el-select v-model="dataForm.goodsCategoryIds" filterable placeholder="请选择">
+        <el-select style="width: 100%" v-model="dataForm.goodsCategoryIds" filterable multiple placeholder="请选择">
           <el-option
             v-for="item in categoryList"
             :key="item.id"
@@ -149,7 +149,7 @@
           minConsumption: 0, //有门槛时最低消费
           discountAmount: 0, //优惠额度（如果是满减券，该字段是减钱数，如果是满折券，该字段是打折数）
           useScope: 0, //使用范围（0：全部商品；1：(如果是平台优惠券，则为指定分类；如果是商家优惠券则为指定商品）
-          goodsCategoryIds: null, //已选的分类
+          goodsCategoryIds: '', //已选的分类
           goodsIds: [], //已选的商品
           applicableMember: [], //适用会员（普通会员，青铜会员，白银会员，黄金会员，铂金会员，钻石会员，最强买家）
           issueNumber: 0, //发行数量
@@ -189,8 +189,8 @@
           //由于以下字段默认初始化时时未显示状态，无法resetFields()重置，故在此重置
           this.dataForm.minConsumption=0;
           this.dataForm.discountAmount=0;
-          this.dataForm.goodsCategoryIds=[];
-          this.dataForm.goodsIds=[];
+          this.dataForm.goodsCategoryIds="";
+          this.dataForm.goodsIds="";
           this.dataForm.type=0;
           this.dataForm.useThreshold=0;
           this.dataForm.useScope=0;
@@ -209,7 +209,12 @@
                 }
                 //处理指定分类
                 if (data.data.goodsCategoryIds) {
-                  this.dataForm.goodsCategoryIds = parseInt(data.data.goodsCategoryIds)
+                  var goodsCategoryIds = []
+                  var goodsCategoryIdsArray = data.data.goodsCategoryIds.split(",");
+                  for (var i=0; i<goodsCategoryIdsArray.length; i++) {
+                    goodsCategoryIds.push(parseInt(goodsCategoryIdsArray[i]))
+                  }
+                  this.dataForm.goodsCategoryIds = goodsCategoryIds;
                 }
                 //获取该用户所有商品
                 this.selectGoods()
@@ -252,15 +257,17 @@
               applicableMemberStr = applicableMemberStr.substring(0,applicableMemberStr.length-1);
             }
             var validPeriod;
-            console.log('this.dataForm.validPeriod==',this.dataForm.validPeriod)
             if (this.dataForm.validPeriod) {
               validPeriod = this.dataForm.validPeriod[0]+","+this.dataForm.validPeriod[1];
             }
             var goodsCategoryIdsTemp = "";
             if (this.dataForm.goodsCategoryIds) {
-              goodsCategoryIdsTemp = this.dataForm.goodsCategoryIds;
+              for (var i=0; i<this.dataForm.goodsCategoryIds.length; i++) {
+                goodsCategoryIdsTemp += this.dataForm.goodsCategoryIds[i] + ",";
+              }
+              goodsCategoryIdsTemp = goodsCategoryIdsTemp.substring(0, goodsCategoryIdsTemp.length-1)
             }else {
-              goodsCategoryIdsTemp = null;
+              goodsCategoryIdsTemp = "";
             }
             var goodsIdsTemp = "";
             if (this.dataForm.goodsIds) {
@@ -269,7 +276,7 @@
               }
               goodsIdsTemp = goodsIdsTemp.substring(0, goodsIdsTemp.length-1)
             }else {
-              goodsIdsTemp = null;
+              goodsIdsTemp = "";
             }
             //如果是全部商品，则选择分类和选择商品的内容清空
             if (this.dataForm.useScope == 0) {
@@ -279,9 +286,9 @@
             //如果是平台，清空adminUserId和所选商品，如果是商户，清空所选分类
             if (this.dataForm.source==0) {
               this.dataForm.adminUserId = null;
-              this.dataForm.goodsIds = []
+              this.dataForm.goodsIds = ""
             }else {
-              this.dataForm.goodsCategoryIds = [];
+              this.dataForm.goodsCategoryIds = "";
             }
             var data = this.axios.dataHandler({
               id: this.dataForm.id || undefined,
@@ -301,6 +308,7 @@
               perLimit: this.dataForm.perLimit, //每人限领多少张
               status: this.dataForm.status //状态（0：禁用；1：启用）
             })
+            console.log("data === ", data)
             saveOrUpdate(data).then(({data}) => {
               if (data && data.code === "200") {
                 this.$message({
@@ -373,7 +381,7 @@
       },
       //选择商品分类
       selectGoodsCategory() {
-        var subFirstParams =  this.axios.paramsHandler({},false)
+        var subFirstParams = this.axios.paramsHandler({goodsCategoryId: 0},false)
         getSubFirst(subFirstParams).then(({data}) => {
           if (data && data.code === "200") {
             this.categoryList = data.data
@@ -382,7 +390,7 @@
       },
       //切换所属商户
       changeAdminUserId() {
-        this.dataForm.goodsIds = []
+        this.dataForm.goodsIds = ''
         this.selectGoods();
       }
     }
