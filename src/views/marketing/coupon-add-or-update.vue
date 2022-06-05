@@ -90,7 +90,10 @@
         </el-checkbox-group>
       </el-form-item>
       <el-form-item label="发行数量" prop="issueNumber">
-        <el-input-number v-model="dataForm.issueNumber" controls-position="right" size="small" :min="1" :max="999999"></el-input-number>
+        <el-input-number v-model="dataForm.issueNumber" controls-position="right" size="small" :min="dataForm.issueNumber" :max="999999"></el-input-number>
+        <el-tooltip class="item" effect="light" content="发行量不能低于现有的发行量" placement="right-start">
+          <i class="el-icon-question" />
+        </el-tooltip>
       </el-form-item>
 
       <el-form-item label="有效期" prop="validPeriod">
@@ -100,8 +103,10 @@
           range-separator="至"
           start-placeholder="开始日期"
           end-placeholder="结束日期"
+          clearable
           format="yyyy-MM-dd HH:mm:ss"
-          value-format="yyyy-MM-dd HH:mm:ss">
+          value-format="yyyy-MM-dd HH:mm:ss"
+          >
         </el-date-picker>
       </el-form-item>
       <el-form-item label="限领条件" prop="perLimit">
@@ -201,11 +206,8 @@
                 //处理”适用会员“
                 this.dataForm.applicableMember = data.data.applicableMember.split(",")
                 //处理有效期
-                var validPeriod = [];
-                if (data.data.validPeriod) {
-                  validPeriod.push(data.data.validPeriod.split(",")[0]);
-                  validPeriod.push(data.data.validPeriod.split(",")[1]);
-                  this.dataForm.validPeriod = validPeriod
+                if (data.data.validPeriodStart && data.data.validPeriodEnd) {
+                  this.$set(this.dataForm,"validPeriod",[ data.data.validPeriodStart,data.data.validPeriodEnd])//使用该方法赋值
                 }
                 //处理指定分类
                 if (data.data.goodsCategoryIds) {
@@ -256,9 +258,11 @@
             if (applicableMemberStr) {
               applicableMemberStr = applicableMemberStr.substring(0,applicableMemberStr.length-1);
             }
-            var validPeriod;
+            var validPeriodStart;
+            var validPeriodEnd;
             if (this.dataForm.validPeriod) {
-              validPeriod = this.dataForm.validPeriod[0]+","+this.dataForm.validPeriod[1];
+              validPeriodStart = this.dataForm.validPeriod[0];
+              validPeriodEnd =  this.dataForm.validPeriod[1];
             }
             var goodsCategoryIdsTemp = "";
             if (this.dataForm.goodsCategoryIds) {
@@ -304,7 +308,8 @@
               goodsIds: goodsIdsTemp,
               applicableMember: applicableMemberStr, //适用会员（普通会员，青铜会员，白银会员，黄金会员，铂金会员，钻石会员，最强买家）
               issueNumber: this.dataForm.issueNumber, //发行数量
-              validPeriod: validPeriod,
+              validPeriodStart: validPeriodStart,
+              validPeriodEnd: validPeriodEnd,
               perLimit: this.dataForm.perLimit, //每人限领多少张
               status: this.dataForm.status //状态（0：禁用；1：启用）
             })

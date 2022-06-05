@@ -94,7 +94,7 @@ export default {
             goodsBasicInfo.name = data.data.name;
             goodsBasicInfo.description = data.data.description;
             /*直接push无法显示商品分类级联效果，故使用此方法*/
-            goodsBasicInfo.goodsCategoryIds = [parseInt( data.data.goodsCategoryIds.split(",")[0]),parseInt(data.data.goodsCategoryIds.split(",")[1]),parseInt(data.data.goodsCategoryIds.split(",")[2])];
+            goodsBasicInfo.goodsCategoryIds = [parseInt( data.data.goodsCategoryIdFirst),parseInt(data.data.goodsCategoryIdSecond),parseInt(data.data.goodsCategoryIdThird)];
             goodsBasicInfo.brandId =  data.data.brandId;
             goodsBasicInfo.adminUserId =  data.data.adminUserId;
             goodsBasicInfo.code =  data.data.code
@@ -226,7 +226,9 @@ export default {
         //商品基本信息
         name: goodsBasicInfo.name, //商品名称
         description: goodsBasicInfo.description,//商品描述
-        goodsCategoryIds: goodsBasicInfo.goodsCategoryIds.join(','),//处理商品分类字段,商品分类id集合，三级分类id,如 1,2,3
+        goodsCategoryIdFirst:  goodsBasicInfo.goodsCategoryIds[0], //商品一级分类id
+        goodsCategoryIdSecond:  goodsBasicInfo.goodsCategoryIds[1], //商品二级分类id
+        goodsCategoryIdThird:  goodsBasicInfo.goodsCategoryIds[2], //商品三级分类id
         brandId: goodsBasicInfo.brandId, //品牌id
         adminUserId: goodsBasicInfo.adminUserId, //所属商户id
         code: goodsBasicInfo.code, //商品编码

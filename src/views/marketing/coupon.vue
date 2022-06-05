@@ -85,7 +85,7 @@
         width="280"
         label="有效期" :key="7">
         <template slot-scope="scope">
-          {{ scope.row.validPeriod.split(",")[0] }}至{{ scope.row.validPeriod.split(",")[1] }}
+          {{ scope.row.validPeriodStart | formatDateTime }}至{{ scope.row.validPeriodEnd | formatDateTime}}
         </template>
       </el-table-column>
 
