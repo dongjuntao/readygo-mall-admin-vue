@@ -22,10 +22,16 @@ const homepageConstant = {
   homepage_carousel_folder_name: "/homepage/carousel/images/" //首页轮播图文件夹路径前缀
 }
 
+//支付相关
+const payConstant = {
+  pay_logo_folder_name: "/pay/logo/images/" //支付文件夹路径前缀
+}
+
 
 export {
   brandConstant,
   goodsConstant,
   adminUserConstant,
-  homepageConstant
+  homepageConstant,
+  payConstant
 };
