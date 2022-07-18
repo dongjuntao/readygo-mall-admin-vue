@@ -1,9 +1,9 @@
 <template>
   <nav class="site-navbar" :class="'site-navbar--' + navbarLayoutType">
-    <div class="site-navbar__header">
+    <div class="site-navbar__header" style="background-color: #f4f4f4">
       <h1 class="site-navbar__brand" @click="$router.push({ name: 'home' })">
-        <a class="site-navbar__brand-lg" href="javascript:;">商城管理系统</a>
-        <a class="site-navbar__brand-mini" href="javascript:;">商城</a>
+        <img class="site-navbar__brand-lg" href="javascript:;" width="160" height="40" src="../assets/img/logo.png">
+        <img class="site-navbar__brand-mini" href="javascript:;" width="38" height="38" src="../assets/img/small-logo.png">
       </h1>
     </div>
     <div class="site-navbar__body clearfix">
@@ -47,6 +47,7 @@
 import UpdatePassword from './main-navbar-update-password'
 import { clearLoginInfo, getUserInfo } from '@/utils/auth'
 import { adminLogout } from '@/api/mall-admin/mall-admin'
+
 export default {
   data () {
     return {
