@@ -2,12 +2,20 @@
   <div class="mod-user">
     <el-form :inline="true" :model="dataForm" @keyup.enter.native="getDataList()">
       <el-form-item>
-        <el-input v-model="dataForm.userName" placeholder="用户名" clearable></el-input>
+        <el-input v-model="dataForm.code" placeholder="订单号" clearable></el-input>
+      </el-form-item>
+      <el-form-item>
+        <el-select v-model="dataForm.status"  placeholder="订单状态" clearable>
+          <el-option key="UNPAID" value="UNPAID" label="待付款"></el-option>
+          <el-option key="PAID" value="PAID" label="已付款"></el-option>
+          <el-option key="UNDELIVERED" value="UNDELIVERED" label="待发货"></el-option>
+          <el-option key="DELIVERED" value="DELIVERED" label="已发货"></el-option>
+          <el-option key="FINISHED" value="FINISHED" label="已完成"></el-option>
+          <el-option key="CANCELLED" value="CANCELLED" label="已取消"></el-option>
+        </el-select>
       </el-form-item>
       <el-form-item>
         <el-button @click="getDataList()" v-if="isAuth('system-admin-search')">查询</el-button>
-        <el-button v-if="isAuth('system-admin-create')" type="primary" @click="addOrUpdateHandle()">新增</el-button>
-        <el-button v-if="isAuth('system-admin-batchDelete')" type="danger" @click="deleteHandle()" :disabled="dataListSelections.length <= 0">批量删除</el-button>
       </el-form-item>
     </el-form>
     <el-table
@@ -23,45 +31,58 @@
         width="50">
       </el-table-column>
       <el-table-column
-        prop="userName"
+        prop="code"
         header-align="center"
         align="center"
-        label="用户名">
+        label="订单号">
       </el-table-column>
       <el-table-column
-        prop="nickName"
+        prop="source"
         header-align="center"
         align="center"
-        label="昵称">
+        label="订单来源"
+        :formatter="parseSource">
       </el-table-column>
       <el-table-column
-        prop="mobile"
+        prop="memberName"
         header-align="center"
         align="center"
-        label="手机号">
+        label="买家名称">
       </el-table-column>
       <el-table-column
-        prop="name"
+        prop="merchantName"
         header-align="center"
         align="center"
-        label="姓名">
+        label="商家名称">
+      </el-table-column>
+      <el-table-column
+        prop="status"
+        header-align="center"
+        align="center"
+        label="订单状态"
+        :formatter="parseStatus">
+      </el-table-column>
+      <el-table-column
+        prop="finalPrice"
+        header-align="center"
+        align="center"
+        label="订单金额">
       </el-table-column>
       <el-table-column
         prop="createTime"
         header-align="center"
         align="center"
-        width="180"
+        width="150"
         label="创建时间">
         <template slot-scope="scope">{{scope.row.createTime | formatDateTime}}</template>
       </el-table-column>
       <el-table-column
         header-align="center"
         align="center"
-        width="150"
+        width="80"
         label="操作">
         <template slot-scope="scope">
-          <el-button v-if="isAuth('system-admin-update')" type="text" size="small" @click="addOrUpdateHandle(scope.row.id)">修改</el-button>
-          <el-button v-if="isAuth('system-admin-delete')" type="text" size="small" @click="deleteHandle(scope.row.id)">删除</el-button>
+          <el-button type="text" size="small" @click="orderDetailHandle(scope.row.code)">查看</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -75,19 +96,20 @@
       layout="total, sizes, prev, pager, next, jumper">
     </el-pagination>
     <!-- 弹窗, 新增 / 修改 -->
-    <add-or-update v-if="addOrUpdateVisible" ref="addOrUpdate" @refreshDataList="getDataList"></add-or-update>
+    <order-detail v-if="orderDetailVisible" ref="orderDetail" @refreshDataList="getDataList"></order-detail>
   </div>
 </template>
 
 <script>
-import AddOrUpdate from './member-add-or-update'
-import { getMemberList, deleteMember } from "../../api/mall-member/member";
+import OrderDetail from './order-detail'
+import { getOrderList } from "../../api/mall-order/order";
 
 export default {
   data () {
     return {
       dataForm: {
-        userName: ''
+        code: '',
+        status: ''
       },
       dataList: [],
       pageNum: 1,
@@ -96,11 +118,11 @@ export default {
       userType: 0,
       dataListLoading: false,
       dataListSelections: [],
-      addOrUpdateVisible: false
+      orderDetailVisible: false
     }
   },
   components: {
-    AddOrUpdate
+    OrderDetail
   },
   activated () {
     this.getDataList()
@@ -112,9 +134,10 @@ export default {
       var params = this.axios.paramsHandler({
         pageNum: this.pageNum,
         pageSize: this.pageSize,
-        userName: this.dataForm.userName
+        code: this.dataForm.code,
+        status: this.dataForm.status
       })
-      getMemberList(params).then(({data})=> {
+      getOrderList(params).then(({data})=> {
         if (data && data.code === "200") {
           this.dataList = data.data.list
           this.totalPage = data.data.totalCount
@@ -143,38 +166,44 @@ export default {
     },
 
     // 新增 / 修改
-    addOrUpdateHandle (id) {
-      this.addOrUpdateVisible = true
+    orderDetailHandle (code) {
+      this.orderDetailVisible = true
       this.$nextTick(() => {
-        this.$refs.addOrUpdate.init(id)
+        this.$refs.orderDetail.init(code)
       })
     },
-    // 删除
-    deleteHandle (id) {
-      var userIds = id ? [id] : this.dataListSelections.map(item => {
-        return item.id
-      })
-      this.$confirm(`确定对[id=${userIds.join(',')}]进行[${id ? '删除' : '批量删除'}]操作?`, '提示', {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
-        type: 'warning'
-      }).then(() => {
-        var postData = this.axios.dataHandler(userIds, false);
-        deleteMember(postData).then(({data})=>{
-          if (data && data.code === "200") {
-            this.$message({
-              message: '操作成功',
-              type: 'success',
-              duration: 1500,
-              onClose: () => {
-                this.getDataList()
-              }
-            })
-          } else {
-            this.$message.error(data.msg)
-          }
-        });
-      }).catch(() => {})
+
+    //数据来源转换
+    parseSource(row) {
+      if (!row) {
+        return null;
+      }
+      if ( row.source == '0') {
+        return "PC端";
+      }else if (row.source == '1') {
+        return "APP";
+      } else if (row.source == '2') {
+        return "小程序";
+      }
+    },
+    //订单状态转换
+    parseStatus(row) {
+      if (!row) {
+        return null;
+      }
+      if (row.status == 'UNPAID') {
+        return "待付款";
+      } else if (row.status == 'PAID') {
+        return "已付款";
+      } else if (row.status == 'UNDELIVERED') {
+        return "待发货";
+      } else if (row.status == 'DELIVERED') {
+        return "已发货";
+      } else if (row.status == 'FINISHED') {
+        return "已完成";
+      }else if (row.status == 'CANCELLED') {
+        return "已取消";
+      }
     }
   }
 }

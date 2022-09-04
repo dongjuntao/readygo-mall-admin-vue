@@ -9,6 +9,7 @@
     <el-table
       :data="dataList"
       row-key="id"
+      v-loading="dataListLoading"
       border
       style="width: 100%; ">
       <el-table-column
