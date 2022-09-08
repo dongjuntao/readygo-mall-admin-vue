@@ -230,7 +230,8 @@ export default {
             }else {
               this.$message.warning(response.data.message);
             }
-          }).catch(() => {
+          }).catch((e) => {
+            console.log("e==",e)
             this.loading = false
             this.$message.warning("登录失败");
           })

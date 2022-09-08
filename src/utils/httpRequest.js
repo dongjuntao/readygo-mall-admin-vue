@@ -30,7 +30,6 @@ http.interceptors.request.use(config => {
  */
 http.interceptors.response.use(response => {
   if(response.data && response.data.code === "401") {
-    this.$message.error(response.data.message);
     clearLoginInfo()
     router.push({ name: 'admin-login'})
   }
