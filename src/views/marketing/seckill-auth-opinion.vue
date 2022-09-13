@@ -16,11 +16,8 @@
 </template>
 
 <script>
-import { getUserInfo } from '@/utils/auth'
-import { getAdminListAll } from '@/api/mall-admin/mall-admin'
-import { getSubFirst } from '@/api/mall-goods/goods-category'
-import { getAllGoodsList } from '@/api/mall-goods/goods'
-import { getCouponById, auth } from '@/api/mall-coupon/coupon'
+import { getSeckillConfigById } from "@/api/mall-seckill/seckill-config";
+
 export default {
   data () {
     return {
@@ -39,7 +36,7 @@ export default {
       this.visible = true;
       this.$nextTick(() => {
         if (this.dataForm.id) {
-          getCouponById(this.axios.paramsHandler({couponId: this.dataForm.id})).then(({data}) => {
+          getSeckillConfigById(this.axios.paramsHandler({seckillConfigId: this.dataForm.id})).then(({data}) => {
             if (data && data.code === "200") {
               this.dataForm.authOpinion = data.data.authOpinion
             }

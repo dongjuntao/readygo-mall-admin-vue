@@ -51,7 +51,7 @@
           <el-option value="16:00:00 - 18:00:00"></el-option>
           <el-option value="18:00:00 - 20:00:00"></el-option>
           <el-option value="20:00:00 - 22:00:00"></el-option>
-          <el-option value="22:00:00 - 24:00:00"></el-option>
+          <el-option value="22:00:00 - 23:59:59"></el-option>
         </el-select>
       </el-form-item>
 
