@@ -3,10 +3,11 @@
 > 商城管理端前端工程
 
 ## 后端接口
-git@github.com:dongjuntao/readygo-mall-cloud.git
+github: https://github.com/dongjuntao/readygo-mall-cloud
+gitee: https://gitee.com/dongjuntao/readygo-mall-cloud
 
 ## 项目端口
-grand-mall-admin-web:9000 
+grand-mall-admin-web:9000
 本地启动前请确保安装node.js
 
 ## Build Setup

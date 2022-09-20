@@ -43,6 +43,8 @@
       <el-form-item label="秒杀时间段" prop="startAndEndTime">
         <el-select v-model="dataForm.startAndEndTime" clearable placeholder="请选择">
           <el-option value="00:00:00 - 02:00:00"></el-option>
+          <el-option value="02:00:00 - 04:00:00"></el-option>
+          <el-option value="04:00:00 - 06:00:00"></el-option>
           <el-option value="06:00:00 - 08:00:00"></el-option>
           <el-option value="08:00:00 - 10:00:00"></el-option>
           <el-option value="10:00:00 - 12:00:00"></el-option>
