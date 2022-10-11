@@ -63,7 +63,7 @@
               :value="item.id">
             </el-option>
           </el-select>
-          <el-select style="margin-left: 12px;" v-model="city" filterable placeholder="请选择城市" @change="getArea()">
+          <el-select style="margin-left: 9px;" v-model="city" filterable placeholder="请选择城市" @change="getArea()">
             <el-option
               v-for="item in cityList"
               :key="item.id"
@@ -71,7 +71,7 @@
               :value="item.id">
             </el-option>
           </el-select>
-          <el-select style="margin-left: 12px;" v-model="area" filterable placeholder="请选择区县">
+          <el-select style="margin-left: 9px;" v-model="area" filterable placeholder="请选择区县">
             <el-option
               v-for="item in areaList"
               :key="item.id"
@@ -116,7 +116,7 @@
     data () {
       //密码校验
       var surePasswordValidator = (rule, value, callback) => {
-        if (!this.dataForm.id && !/\S/.test(value)) {
+        if (!value) {
           callback(new Error('确认密码不能为空'))
         } else if (this.dataForm.password !== value) {
           callback(new Error('确认密码与密码输入不一致'))
@@ -220,7 +220,7 @@
       }
     },
 
-    mounted () {
+    created () {
       this.getProvinceData();
     },
 
@@ -235,14 +235,27 @@
             this.$refs['dataForm'].resetFields()
           })
         }).then(() => {
+          this.qualificationMaterialsList = []
           if (this.dataForm.id) {
-            getUserById(this.axios.paramsHandler({id: this.dataForm.id})).then(({data}) => {
+            getUserById(this.axios.paramsHandler({id: this.dataForm.id})).then(async ({data}) => {
               if (data && data.code === "200") {
-                this.dataForm.userName = data.data.userName
-                this.dataForm.email = data.data.email
-                this.dataForm.mobile = data.data.mobile
-                this.dataForm.roleIdList = data.data.roleIdList
-                this.dataForm.status = data.data.status
+                this.dataForm = data.data
+                this.dataForm.password = null;
+                this.province = parseInt(this.dataForm.regions.split(",")[0]);
+                await this.getCity()
+                this.city = parseInt(this.dataForm.regions.split(",")[1]);
+                await this.getArea()
+                this.area = parseInt(this.dataForm.regions.split(",")[2]);
+                var qualificationMaterials = this.dataForm.qualificationMaterials;
+                if (qualificationMaterials) {
+                  var qualificationMaterialsArray = qualificationMaterials.split(",");
+                  for (var i=0; i<qualificationMaterialsArray.length; i++) {
+                    this.qualificationMaterialsList.push({
+                      name: qualificationMaterialsArray[i].substring(qualificationMaterialsArray[i].lastIndexOf("/")+20),
+                      url: qualificationMaterialsArray[i]
+                    });
+                  }
+                }
               }
             });
           }
@@ -300,10 +313,10 @@
       },
 
       //获取（初始化）省份信息
-      getProvinceData() {
+      async getProvinceData() {
         this.dataListLoading = true
         var params =  this.axios.paramsHandler({parent_id: 0},false)
-        getRegionList(params).then(({data}) => {
+        await getRegionList(params).then(({data}) => {
           if (data && data.code === "200") {
             this.provinceList = data.data;
           }
@@ -311,10 +324,10 @@
         })
       },
       //获取城市信息
-      getCity(){
+      async getCity(){
         this.dataListLoading = true
         var params =  this.axios.paramsHandler({parent_id: this.province},false)
-        getRegionList(params).then(({data}) => {
+        await getRegionList(params).then(({data}) => {
           if (data && data.code === "200") {
             this.city = null;
             this.area = null;
@@ -325,10 +338,10 @@
         })
       },
       //获取区县信息
-      getArea(){
+      async getArea(){
         this.dataListLoading = true
         var params =  this.axios.paramsHandler({parent_id: this.city},false)
-        getRegionList(params).then(({data}) => {
+        await getRegionList(params).then(({data}) => {
           if (data && data.code === "200") {
             this.area = null;
             this.areaList = data.data

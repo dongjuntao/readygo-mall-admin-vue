@@ -133,7 +133,7 @@
             align="center"
             label="秒杀价">
             <template slot-scope="scope">
-              <el-input v-model="scope.row.seckillGoodsSkuVO.seckillPrice" controls-position="right" maxLength="10"></el-input>
+              <el-input-number type="number" v-model="scope.row.seckillGoodsSkuVO.seckillPrice" controls-position="right"></el-input-number>
             </template>
           </el-table-column>
           <el-table-column
@@ -141,7 +141,7 @@
             align="center"
             label="秒杀库存">
             <template slot-scope="scope">
-              <el-input v-model="scope.row.seckillGoodsSkuVO.seckillStock" controls-position="right" maxLength="10"></el-input>
+              <el-input-number v-model="scope.row.seckillGoodsSkuVO.seckillStock" controls-position="right" :max="scope.row.stock"></el-input-number>
             </template>
           </el-table-column>
         </el-table>
