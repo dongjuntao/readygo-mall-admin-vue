@@ -101,7 +101,7 @@
                 :http-request="uploadFile"
                 :data="{index: scope.$index}"
                 :before-upload="beforeUpload">
-                <img style="width: 35px; height: 35px;" v-if="scope.row.image" :src="scope.row.image" class="avatar">
+                <img style="width: 35px; height: 35px;" v-if="scope.row.image ? scope.row.image : $store.state.goods.firstGoodsImage" :src="scope.row.image ? scope.row.image : $store.state.goods.firstGoodsImage" class="avatar">
                 <i v-else >
                   <el-button type="primary" size="mini" plain>上传</el-button>
                 </i>
@@ -274,7 +274,7 @@ export default {
           originalPrice: 0,
           sellingPrice: 0,
           stock: 0,
-          image: null,
+          image: this.$store.state.goods.firstGoodsImage,
           enable: true
         }], //单规格，只有一个
         goodsSkuList: [],//多规格sku列表
@@ -447,6 +447,8 @@ export default {
             extendValue.push({id: every.id, value: every.value});
             goodsSkuEntity.extendValue = JSON.stringify(extendValue);//扩展属性值
           }
+          //sku默认使用商品相册的第一张图片
+          goodsSkuEntity.image = this.$store.state.goods.firstGoodsImage
           goodsSkuEntity.extendAttr = JSON.stringify(extendAttr);
           this.dataForm.goodsSkuList.push(goodsSkuEntity)
         }

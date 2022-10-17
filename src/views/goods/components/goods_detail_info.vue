@@ -82,6 +82,8 @@ export default {
       var params = this.axios.paramsHandler({folderName: goodsConstant.goods_folder_name })
       fileUpload(formData, params).then(({data}) => {
         this.dataForm.images.push(data.data);
+        //将第一张相册图片保存到vuex,用于后面sku默认图片
+        this.$store.commit('goods/updateFirstGoodsImage',  this.dataForm.images[0])
       })
     },
 
@@ -92,8 +94,8 @@ export default {
     },
 
     handleRemove(file) {
-      var find = this.dataForm.images.find(image=>{ return image === file.url});
-      if (find && file.status === 'success') {
+      var find = this.dataForm.images.find(image=>{ return image.indexOf(file.name)>-1});
+      if (find) {
         this.dataForm.images.remove(find);
       }
     }

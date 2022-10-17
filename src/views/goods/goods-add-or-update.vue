@@ -108,13 +108,15 @@ export default {
                 this.$refs['goodsDetailInfo'].fileList.push({url:image})
                 goodsDetailInfo.images.push(image);
               });
+              //将相册第一张图片保存在vuex
+              this.$store.commit('goods/updateFirstGoodsImage', goodsDetailInfo.images[0])
             }
             goodsDetailInfo.infoDetail = data.data.infoDetail;
             //-----------------------------商品规格参数----------------------------
             goodsSpecificationsInfo.specificationType = data.data.specificationType//规格类型
             if(goodsSpecificationsInfo.specificationType == 0) {
               goodsSpecificationsInfo.goodsSingleSkuList = data.data.goodsSkuList //单品详细信息
-              goodsSpecificationsInfo.goodsSkuLis = [];
+              goodsSpecificationsInfo.goodsSkuList = [];
             }else {
               goodsSpecificationsInfo.goodsSkuList = data.data.goodsSkuList //sku详细信息
               goodsSpecificationsInfo.goodsSingleSkuList = [{
