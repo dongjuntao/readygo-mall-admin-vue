@@ -129,7 +129,7 @@
         align="center"
         label="操作" :key="11">
         <template slot-scope="scope">
-          <el-button v-if="isAuth('marketing-coupon-receiveDetail')" type="text" size="small" @click="addOrUpdateHandle(scope.row.id)">领取情况</el-button>
+          <el-button v-if="isAuth('marketing-coupon-receiveDetail')" type="text" size="small" @click="receivedDetailHandle(scope.row.id)">领取情况</el-button>
           <el-button v-if="scope.row.authStatus==2 && isAuth('marketing-coupon-opinion')" type="text" size="mini" @click="authOpinionHandle(scope.row.id)" >拒绝原因</el-button>
           <el-button v-if="isAuth('marketing-coupon-update')" type="text" size="mini" @click="addOrUpdateHandle(scope.row.id)" :disabled="userType!=0&&scope.row.authStatus==1">修改</el-button>
           <el-button v-if="isAuth('marketing-coupon-delete')" type="text" size="mini" @click="deleteHandle(scope.row.id)" :disabled="userType!=0&&scope.row.authStatus==1">删除</el-button>
@@ -146,6 +146,8 @@
       :total="totalPage"
       layout="total, sizes, prev, pager, next, jumper">
     </el-pagination>
+    <!--领取情况-->
+    <received-detail v-if="receivedDetailVisible" ref="receivedDetail" @refreshDataList="getDataList"></received-detail>
     <!-- 弹窗, 新增 / 修改 -->
     <add-or-update v-if="addOrUpdateVisible" ref="addOrUpdate" @refreshDataList="getDataList"></add-or-update>
     <!-- 弹窗, 审核 -->
@@ -160,6 +162,7 @@ import { getUserInfo } from '@/utils/auth'
 import AddOrUpdate from './coupon-add-or-update'
 import Auth from './coupon-auth'
 import AuthOpinion from './coupon-auth-opinion'
+import ReceivedDetail from './coupon-received-detail'
 import { getCouponList, deleteCoupon, updateStatus } from '@/api/mall-coupon/coupon'
 export default {
   data () {
@@ -176,6 +179,7 @@ export default {
       dataListLoading: false,
       dataListSelections: [],
       addOrUpdateVisible: false,
+      receivedDetailVisible: false,
       authVisible: false,
       couponSelect: 0,
       authOpinionVisible: false
@@ -184,7 +188,8 @@ export default {
   components: {
     AddOrUpdate,
     Auth,
-    AuthOpinion
+    AuthOpinion,
+    ReceivedDetail
   },
   activated () {
     this.getUserInfo();
@@ -239,6 +244,15 @@ export default {
       this.dataListSelections = val
     },
 
+    /**
+     * 领取情况
+     */
+    receivedDetailHandle(id) {
+      this.receivedDetailVisible = true
+      this.$nextTick(() => {
+        this.$refs.receivedDetail.init(id)
+      })
+    },
     // 新增 / 修改
     addOrUpdateHandle (id) {
       this.addOrUpdateVisible = true

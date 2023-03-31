@@ -140,6 +140,7 @@ export default {
       getGoodsList(params).then(({data}) => {
         if (data && data.code === "200") {
           this.dataList = data.data.list
+          console.log("this.dataList=",this.dataList)
           this.totalPage = data.data.totalCount
         } else {
           this.dataList = []

@@ -6,6 +6,10 @@
           <el-radio :label="0">单规格</el-radio>
           <el-radio :label="1">多规格</el-radio>
         </el-radio-group>
+        <el-tooltip placement="top" effect="dark">
+          <div slot="content">请谨慎选择规格组合，保存后，若更改规格，会导致原有商品SKU信息丢失，需重新建立SKU信息</div>
+          <i class="el-icon-warning"></i>
+        </el-tooltip>
       </el-form-item>
 
       <el-form-item v-if="dataForm.specificationType==1">
@@ -122,7 +126,7 @@
       </el-form-item>
 
       <!--多规格-->
-      <el-form-item v-if="dataForm.specificationType==1">
+      <el-form-item v-if="dataForm.specificationType==1" prop="goodsSkuList">
         <el-table
           size="mini"
           border
@@ -283,12 +287,7 @@ export default {
       },
       dataListLoading: false,
       dataRule: {
-        name: [
-          { required: true, message: '分类名称不能为空', trigger: 'blur' }
-        ],
-        parentName: [
-          { required: true, message: '上级分类不能为空', trigger: 'change' }
-        ]
+        goodsSkuList: [ { required: true, message: '商品sku不能为空', trigger: 'blur' } ]
       },
       goodsSkuEntity : {
         code: '',

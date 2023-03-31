@@ -75,3 +75,16 @@ export function auth(params) {
     params: params
   })
 }
+
+/**
+ * 领取情况
+ */
+export function getCouponReceivedList(params) {
+  return request({
+    url: prefix+'/coupon/getCouponReceivedList',
+    method: 'get',
+    params: params
+  })
+}
+
+
