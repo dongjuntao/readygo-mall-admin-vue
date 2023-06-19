@@ -12,9 +12,9 @@
           <el-checkbox label="热卖商品"></el-checkbox>
         </el-checkbox-group>
       </el-form-item>
-      <el-form-item label="是否上架" prop="onSale">
-        <el-switch active-color="#13ce66" v-model="dataForm.onSale"></el-switch>
-      </el-form-item>
+<!--      <el-form-item label="是否上架" prop="onSale">-->
+<!--        <el-switch active-color="#13ce66" v-model="dataForm.onSale"></el-switch>-->
+<!--      </el-form-item>-->
       <el-form-item label="运费设置" prop="freightSetting">
         <el-select v-model="dataForm.freightSetting" clearable placeholder="请选择" @change="changeFreightSetting">
           <el-option
@@ -49,7 +49,7 @@ export default {
       visible: false,
       dataForm: {
         id: 0,
-        onSale: false, //是否上架
+        // onSale: false, //是否上架
         freightSetting: null, //运费设置
         recommend: [],//商品推荐
         keyword: '', //关键词

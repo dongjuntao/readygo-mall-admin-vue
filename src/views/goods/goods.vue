@@ -1,5 +1,13 @@
 <template>
   <div class="mod-goods">
+
+    <el-radio-group v-model="goodsStatusSelect" style="margin-bottom: 30px;" @change="getDataList">
+      <el-radio-button :label="0">全部</el-radio-button>
+      <el-radio-button :label="1">待审核</el-radio-button>
+      <el-radio-button :label="2">已上架</el-radio-button>
+      <el-radio-button :label="3">已下架</el-radio-button>
+    </el-radio-group>
+
     <el-form :inline="true" :model="dataForm" @keyup.enter.native="getDataList()">
       <el-form-item>
         <el-input v-model="dataForm.name" placeholder="商品名称" clearable></el-input>
@@ -63,25 +71,46 @@
         width="150"
         label="商品编号">
       </el-table-column>
-
       <el-table-column
-        prop="onSale"
+        prop="goodsStatus"
         header-align="center"
         align="center"
         width="80"
-        label="是否上架">
+        label="商品状态">
         <template slot-scope="scope">
-          <el-switch v-model="scope.row.onSale" @change="setOnSale(scope.row)"></el-switch>
+          <el-button type="text" v-if="scope.row.goodsStatus=='NEW_CREATED'">新创建</el-button>
+          <el-button type="text" v-if="scope.row.goodsStatus=='AUDIT'">待审核</el-button>
+          <el-button type="text" v-if="scope.row.goodsStatus=='AUDIT_FAILED'">审核失败</el-button>
+          <el-button type="text" v-if="scope.row.goodsStatus=='ON_SALE'">已上架</el-button>
+          <el-button type="text" v-if="scope.row.goodsStatus=='NOT_ON_SALE'">已下架</el-button>
         </template>
       </el-table-column>
-
       <el-table-column
         header-align="center"
         align="center"
         label="操作">
         <template slot-scope="scope">
-          <el-button type="text" size="small" @click="addOrUpdateHandle(scope.row.id)" v-if="isAuth('goods-goods-update')">修改</el-button>
-          <el-button type="text" size="small" @click="deleteHandle(scope.row.id)" v-if="isAuth('goods-goods-delete')">删除</el-button>
+          <el-button type="text" size="small"
+                     @click="applyOnSale(scope.row.id)"
+                     v-if="isAuth('goods-goods-apply-on-sale')
+                     && (scope.row.goodsStatus == 'NEW_CREATED'
+                     ||scope.row.goodsStatus == 'AUDIT_FAILED'
+                     || scope.row.goodsStatus == 'NOT_ON_SALE')">申请上架</el-button>
+          <el-button type="text" size="small"
+                     @click="audit(scope.row.id, true)"
+                     v-if="isAuth('goods-goods-pass') && scope.row.goodsStatus == 'AUDIT'">通过</el-button>
+          <el-button type="text" size="small"
+                     @click="audit(scope.row.id, false)"
+                     v-if="isAuth('goods-goods-reject') && scope.row.goodsStatus == 'AUDIT'">拒绝</el-button>
+          <el-button type="text" size="small"
+                     @click="addOrUpdateHandle(scope.row.id)"
+                     v-if="isAuth('goods-goods-update') && scope.row.goodsStatus !== 'ON_SALE'">修改</el-button>
+          <el-button type="text" size="small"
+                     @click="deleteHandle(scope.row.id)"
+                     v-if="isAuth('goods-goods-delete') && scope.row.goodsStatus !== 'ON_SALE'">删除</el-button>
+          <el-button type="text" size="small"
+                     @click="offShelf(scope.row.id)"
+                     v-if="isAuth('goods-goods-offShelf') && scope.row.goodsStatus === 'ON_SALE'">下架</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -101,7 +130,7 @@
 
 <script>
 import AddOrUpdate from './goods-add-or-update'
-import { getGoodsList, deleteGoods, updateOnSale } from '@/api/mall-goods/goods'
+import { getGoodsList, deleteGoods, applyOnSale, audit, offShelf } from '@/api/mall-goods/goods'
 import { getUserInfo } from '@/utils/auth'
 export default {
   data () {
@@ -117,7 +146,8 @@ export default {
       dataListSelections: [],
       addOrUpdateVisible: false,
       adminUserId: null,
-      userType: null
+      userType: null,
+      goodsStatusSelect: 0
     }
   },
   components: {
@@ -130,11 +160,22 @@ export default {
   methods: {
     // 获取数据列表
     getDataList () {
-      this.dataListLoading = true
+      this.dataListLoading = true;
+      var goodsStatus;
+      if (this.goodsStatusSelect == 0) {
+        goodsStatus = null; //全部
+      } else if(this.goodsStatusSelect == 1) {
+        goodsStatus = 'AUDIT'; //待审核
+      } else if(this.goodsStatusSelect == 2) {
+        goodsStatus = 'ON_SALE'; //已上架
+      } else if(this.goodsStatusSelect == 3) {
+        goodsStatus = 'NOT_ON_SALE'; //已下架
+      }
       var params =  this.axios.paramsHandler({
         pageNum: this.pageNum,
         pageSize: this.pageSize,
         name: this.dataForm.name,
+        goodsStatus: goodsStatus,
         adminUserId: this.userType == 0 ? null : this.adminUserId
       })
       getGoodsList(params).then(({data}) => {
@@ -200,24 +241,74 @@ export default {
     },
 
     //是否上架
-    setOnSale(row){
-      var goodsId = row.id;
-      var onSale = row.onSale;
-      var msg = onSale ? '上架' : '下架';
-      if (onSale) row.onSale = false; else row.onSale = true;
-      this.$confirm('是否确定' + msg, '提示', {
+    applyOnSale(goodsId){
+      this.$confirm('是否申请上架', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        var params = this.axios.paramsHandler({
+          goodsId: goodsId
+        });
+        applyOnSale(params).then(async ({data}) => {
+          if (data && data.code === "200") {
+            this.$message({
+              message: data.message + '成功',
+              type: 'success',
+              duration: 1500,
+              onClose: () => {
+                this.getDataList()
+              }
+            })
+          } else {
+            this.$message.error(data.message)
+          }
+        })
+      }).catch(() => {})
+    },
+
+    //上架审核
+    audit(goodsId, auditFlag){
+      this.$confirm(auditFlag ? '审核通过' : '拒绝通过', '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning'
       }).then(() => {
         var params = this.axios.paramsHandler({
           goodsId: goodsId,
-          onSale: onSale
+          isAudit: auditFlag ? true : false
         });
-        updateOnSale(params).then(async ({data}) => {
+        audit(params).then(async ({data}) => {
           if (data && data.code === "200") {
             this.$message({
-              message: msg + '成功',
+              message: data.message + '成功',
+              type: 'success',
+              duration: 1500,
+              onClose: () => {
+                this.getDataList()
+              }
+            })
+          } else {
+            this.$message.error(data.message)
+          }
+        })
+      }).catch(() => {})
+    },
+
+    //上架审核
+    offShelf(goodsId){
+      this.$confirm('商品下架后，重新上架时需再次审核，是否确定下架?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        var params = this.axios.paramsHandler({
+          goodsId: goodsId
+        });
+        offShelf(params).then(async ({data}) => {
+          if (data && data.code === "200") {
+            this.$message({
+              message: data.message + '成功',
               type: 'success',
               duration: 1500,
               onClose: () => {

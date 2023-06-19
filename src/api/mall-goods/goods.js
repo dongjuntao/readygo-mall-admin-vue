@@ -59,11 +59,33 @@ export function getGoodsList(params) {
 }
 
 /**
- * 上架 / 下架
+ * 申请上架
  */
-export function updateOnSale(params) {
+export function applyOnSale(params) {
   return request({
-    url: prefix+'/goods/updateOnSale',
+    url: prefix+'/goods/applyOnSale',
+    method: 'put',
+    params: params
+  })
+}
+
+/**
+ * 上架审核
+ */
+export function audit(params) {
+  return request({
+    url: prefix+'/goods/audit',
+    method: 'put',
+    params: params
+  })
+}
+
+/**
+ * 下架
+ */
+export function offShelf(params) {
+  return request({
+    url: prefix+'/goods/offShelf',
     method: 'put',
     params: params
   })
