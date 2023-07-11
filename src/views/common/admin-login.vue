@@ -1,7 +1,7 @@
 <template>
   <div class="main-bg" id="mian">
     <!-- title -->
-    <h1>商城后台管理系统</h1>
+    <h1>莱蒂购商城后台管理系统</h1>
     <!-- //title -->
     <div class="sub-main-w3">
       <div class="image-style">

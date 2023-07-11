@@ -25,7 +25,7 @@
         <el-menu-item class="site-navbar__avatar" index="3">
           <el-dropdown :show-timeout="0" placement="bottom">
             <span class="el-dropdown-link" v-if="avatar">
-              <img :src="avatar" :alt="userName">{{ userName }}
+              <img style="width: 36px; height: 36px;" :src="avatar" :alt="userName">{{ userName }}
             </span>
             <span class="el-dropdown-link"v-else>
               <img src="~@/assets/img/avatar.jpg" :alt="userName">{{ userName }}

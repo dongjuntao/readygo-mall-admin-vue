@@ -19,6 +19,7 @@
     "babel-plugin-component": "0.10.1",
     "babel-polyfill": "6.26.0",
     "crypto-js": "^4.0.0",
+    "echarts": "^4.9.0",
     "element-ui": "^2.15.6",
     "js-cookie": "^2.2.1",
     "lodash": "^4.17.15",
@@ -33,6 +34,7 @@
     "tinymce": "^5.8.2",
     "vue": "2.5.16",
     "vue-cookie": "1.1.4",
+    "vue-count-to": "^1.0.13",
     "vue-router": "3.0.1",
     "vuex": "3.0.1",
     "wangeditor": "^4.7.5"

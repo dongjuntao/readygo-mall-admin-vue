@@ -34,6 +34,10 @@ Vue.config.productionTip = false
 Vue.prototype.axios = httpRequest // ajax请求方法
 Vue.prototype.isAuth = isAuth //认证方法
 
+//全局echarts
+import echarts from "echarts";
+Vue.prototype.echarts = echarts;
+
 // 定义全局时间戳过滤器
 Vue.filter('formatDate', function(value) {
   if (value != null) {
