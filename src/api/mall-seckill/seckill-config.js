@@ -55,22 +55,33 @@ export function getSeckillConfigById(params) {
 }
 
 /**
- * 修改秒杀配置状态
+ * 秒杀配置审核
  */
-export function updateStatus(params) {
+export function auth(params) {
   return request({
-    url: prefix+'/seckillConfig/updateStatus',
+    url: prefix+'/seckillConfig/auth',
     method: 'put',
     params: params
   })
 }
 
 /**
- * 秒杀配置审核
+ * 秒杀申请
  */
-export function auth(params) {
+export function apply(params) {
   return request({
-    url: prefix+'/seckillConfig/auth',
+    url: prefix+'/seckillConfig/apply',
+    method: 'put',
+    params: params
+  })
+}
+
+/**
+ * 取消秒杀
+ */
+export function cancel(params) {
+  return request({
+    url: prefix+'/seckillConfig/cancel',
     method: 'put',
     params: params
   })

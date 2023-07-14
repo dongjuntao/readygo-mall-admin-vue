@@ -34,10 +34,10 @@
         width="50" :key="1">
       </el-table-column>
       <el-table-column
-        prop="goodsName"
+        prop="name"
         header-align="center"
         align="center"
-        label="秒杀商品名称"
+        label="秒杀名称"
         width="400" :key="2">
       </el-table-column>
 
@@ -65,10 +65,8 @@
         header-align="center"
         align="center"
         label="状态"
-        width="65" :key="5">
-        <template slot-scope="scope">
-          <el-switch v-model="scope.row.status" @change="changeStatus(scope.row.id, scope.row.status)"></el-switch>
-        </template>
+        width="90"
+        :formatter="formatAuthStatus">
       </el-table-column>
 
       <el-table-column
@@ -84,10 +82,23 @@
         align="center"
         label="操作" :key="7">
         <template slot-scope="scope">
-          <el-button v-if="scope.row.authStatus==2 && isAuth('marketing-seckill-opinion')" type="text" size="mini" @click="authOpinionHandle(scope.row.id)" >拒绝原因</el-button>
-          <el-button v-if="isAuth('marketing-seckill-update')" type="text" size="mini" @click="addOrUpdateHandle(scope.row.id)" :disabled="scope.row.authStatus==1">修改</el-button>
-          <el-button v-if="isAuth('marketing-seckill-delete')" type="text" size="mini" @click="deleteHandle(scope.row.id)" :disabled="scope.row.authStatus==1">删除</el-button>
-          <el-button v-if="isAuth('marketing-seckill-auth') && userType==0 && scope.row.authStatus==0" type="text" size="mini" @click="authHandle(scope.row.id)">审核</el-button>
+          <el-button type="text" size="small"
+                     @click="apply(scope.row.id)"
+                     v-if="scope.row.authStatus == 'NEW_CREATED'
+                     ||scope.row.authStatus == 'AUDIT_FAILED'
+                     || scope.row.authStatus == 'CANCELED'">秒杀申请</el-button>
+          <el-button v-if="isAuth('marketing-seckill-auth') && userType==0 && scope.row.authStatus=='AUDIT'"
+                     type="text" size="mini" @click="authHandle(scope.row.id)">审核</el-button>
+          <el-button v-if="isAuth('marketing-seckill-update') && scope.row.authStatus !== 'AUDIT_SUCCESS'"
+                     type="text" size="mini"
+                     @click="addOrUpdateHandle(scope.row.id)">修改</el-button>
+          <el-button v-if="isAuth('marketing-seckill-delete') && scope.row.authStatus !== 'AUDIT_SUCCESS'"
+                     type="text" size="mini"
+                     @click="deleteHandle(scope.row.id)">删除</el-button>
+          <el-button v-if="scope.row.authStatus=='AUDIT_FAILED' && isAuth('marketing-seckill-opinion')"
+                     type="text" size="mini" @click="authOpinionHandle(scope.row.id)" >拒绝原因</el-button>
+          <el-button v-if="scope.row.authStatus=='AUDIT_SUCCESS'"
+                     type="text" size="mini" @click="cancelHandle(scope.row.id)" >取消</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -114,7 +125,8 @@ import { getUserInfo } from '@/utils/auth'
 import AddOrUpdate from './seckill-add-or-update'
 import Auth from './seckill-auth'
 import AuthOpinion from './seckill-auth-opinion'
-import { getSeckillConfigList, deleteSeckillConfig, updateStatus } from '@/api/mall-seckill/seckill-config'
+import { getSeckillConfigList, deleteSeckillConfig, apply,cancel } from '@/api/mall-seckill/seckill-config'
+
 export default {
   data () {
     return {
@@ -144,6 +156,7 @@ export default {
     this.getUserInfo();
     this.getDataList();
   },
+
   methods: {
     // 获取数据列表
     getDataList () {
@@ -152,11 +165,11 @@ export default {
       if (this.seckillConfigSelect == 0) {
         authStatus = null; //全部
       } else if(this.seckillConfigSelect == 1) {
-        authStatus = 0; //待审核
+        authStatus = "AUDIT"; //待审核
       } else if(this.seckillConfigSelect == 2) {
-        authStatus = 1; //已通过
+        authStatus = "AUDIT_SUCCESS"; //已通过
       } else if(this.seckillConfigSelect == 3) {
-        authStatus = 2; //已拒绝
+        authStatus = "AUDIT_FAILED"; //已拒绝
       }
       var params = this.axios.paramsHandler({
         pageNum: this.pageNum,
@@ -201,6 +214,26 @@ export default {
       })
     },
 
+    //秒杀申请
+    apply(id) {
+        var data = this.axios.paramsHandler({
+          seckillConfigId: id
+        });
+        apply(data).then(({data}) => {
+          if (data && data.code === "200") {
+            this.$message({
+              message: '申请成功',
+              type: 'success',
+              duration: 1000,
+              onClose: () => {
+                this.getDataList()
+              }
+            })
+          } else {
+            this.$message.error(data.message)
+          }
+        });
+    },
     // 审核
     authHandle (id, type) {
       this.authVisible = true
@@ -245,28 +278,32 @@ export default {
       }).catch(() => {})
     },
 
-    /**
-     * 修改启停状态
-     */
-    changeStatus(id, status) {
-      var data = this.axios.paramsHandler({
-        seckillConfigId: id,
-        status: status
-      });
-      updateStatus(data).then(({data}) => {
-        if (data && data.code === "200") {
-          this.$message({
-            message: '操作成功',
-            type: 'success',
-            duration: 1500,
-            onClose: () => {
-              this.getDataList()
-            }
-          })
-        } else {
-          this.$message.error(data.msg)
-        }
-      });
+
+    // 取消（即下架该活动）
+    cancelHandle (id) {
+      this.$confirm(`确定取消秒杀？取消后，再次申请，需要重新审核！`, '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        var data = this.axios.paramsHandler({
+          seckillConfigId: id
+        });
+        cancel(data).then(({data})=>{
+          if (data && data.code === "200") {
+            this.$message({
+              message: '取消成功',
+              type: 'success',
+              duration: 1500,
+              onClose: () => {
+                this.getDataList()
+              }
+            })
+          } else {
+            this.$message.error(data.message)
+          }
+        });
+      }).catch(() => {})
     },
 
     /**
@@ -277,6 +314,27 @@ export default {
       this.userType = userInfo.userType;
       this.adminUserId = userInfo.userId;
     },
+
+    /**
+     * 数据转换
+     * @param row
+     * @returns {string}
+     */
+    formatAuthStatus(row) {
+      if (!row || !row.authStatus) {
+        return '';
+      } else if (row.authStatus === 'NEW_CREATED'){
+        return '新创建'
+      } else if (row.authStatus === 'AUDIT'){
+        return '待审核'
+      } else if (row.authStatus === 'AUDIT_FAILED'){
+        return '审核不通过'
+      } else if (row.authStatus === 'AUDIT_SUCCESS'){
+        return '审核通过'
+      } else if (row.authStatus === 'CANCELED'){
+        return '已取消'
+      }
+    }
   }
 }
 </script>

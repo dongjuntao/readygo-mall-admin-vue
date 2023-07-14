@@ -138,8 +138,8 @@
     </el-form>
     <span slot="footer" class="dialog-footer">
       <el-button @click="visible = false">取消</el-button>
-      <el-button type="primary" @click="authCoupon(1)">通过</el-button>
-      <el-button type="danger" @click="authCoupon(2)">拒绝</el-button>
+      <el-button type="primary" @click="authCoupon('AUDIT_SUCCESS')">通过</el-button>
+      <el-button type="danger" @click="authCoupon('AUDIT_FAILED')">拒绝</el-button>
     </span>
   </el-dialog>
 </template>
@@ -212,10 +212,10 @@ export default {
     // 审核提交
     authCoupon (authStatus) {
       //如果拒绝，要填写审核意见，通过的话，可写可不写
-      if (authStatus == 2 && !this.authOpinion) {
+      if (authStatus == 'AUDIT_FAILED' && !this.authOpinion) {
         this.$message({
           message: '请填写审核意见',
-          type: 'success'
+          type: 'warning'
         })
         return;
       }

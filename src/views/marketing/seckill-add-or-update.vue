@@ -6,6 +6,10 @@
     width="85%">
     <el-form :model="dataForm" :rules="dataRule" ref="dataForm"  label-width="110px">
 
+      <el-form-item label="秒杀名称" prop="name">
+        <el-input v-model="dataForm.name"></el-input>
+      </el-form-item>
+
     <el-form-item label="所属店铺" prop="adminUserId" v-if="userType == 0">
       <el-select v-model="dataForm.adminUserId" clearable placeholder="请选择所属商户" @change="changeAdminUserId">
         <el-option
@@ -185,6 +189,9 @@
         specificationType: 0,
         goodsList: [], //商品列表
         dataRule: {
+          name: [
+            { required: true, message: '秒杀名称不能为空', trigger: 'blur' }
+          ],
           adminUserId: [
             { required: true, message: '所属商户不能为空', trigger: 'blur' }
           ],
@@ -240,7 +247,7 @@
             //处理秒杀开始日期
             var data = this.axios.dataHandler({
               id: this.dataForm.id || undefined,
-              name: this.dataForm.name, //优惠券名称
+              name: this.dataForm.name, //秒杀配置名称
               adminUserId: this.dataForm.adminUserId, //所属商户
               goodsId: this.dataForm.goodsId,
               seckillStartDate: this.dataForm.startAndEndDate[0],
