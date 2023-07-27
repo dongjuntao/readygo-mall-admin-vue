@@ -55,3 +55,14 @@ export function getOrderAndDetailByParams(params) {
     params: params
   })
 }
+
+/**
+ * 商品发货
+ */
+export function shipment(data) {
+  return request({
+    url: prefix+'/back/order/shipment',
+    method: 'PUT',
+    data: data
+  })
+}

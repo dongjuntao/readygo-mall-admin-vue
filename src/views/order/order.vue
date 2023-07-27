@@ -7,8 +7,8 @@
       <el-form-item>
         <el-select v-model="dataForm.status"  placeholder="订单状态" clearable>
           <el-option key="UNPAID" value="UNPAID" label="待付款"></el-option>
-          <el-option key="PAID" value="PAID" label="已付款"></el-option>
           <el-option key="UNDELIVERED" value="UNDELIVERED" label="待发货"></el-option>
+          <el-option key="PARTIAL_SHIPMENT" value="PARTIAL_DELIVERED" label="部分发货"></el-option>
           <el-option key="DELIVERED" value="DELIVERED" label="已发货"></el-option>
           <el-option key="FINISHED" value="FINISHED" label="已完成"></el-option>
           <el-option key="CANCELLED" value="CANCELLED" label="已取消"></el-option>
@@ -34,6 +34,7 @@
         prop="code"
         header-align="center"
         align="center"
+        width="200"
         label="订单号">
       </el-table-column>
       <el-table-column
@@ -41,24 +42,28 @@
         header-align="center"
         align="center"
         label="订单来源"
+        width="100"
         :formatter="parseSource">
       </el-table-column>
       <el-table-column
         prop="memberName"
         header-align="center"
         align="center"
+        width="150"
         label="买家名称">
       </el-table-column>
       <el-table-column
         prop="merchantName"
         header-align="center"
         align="center"
+        width="180"
         label="商家名称">
       </el-table-column>
       <el-table-column
         prop="status"
         header-align="center"
         align="center"
+        width="100"
         label="订单状态"
         :formatter="parseStatus">
       </el-table-column>
@@ -66,6 +71,7 @@
         prop="finalPrice"
         header-align="center"
         align="center"
+        width="120"
         label="订单金额">
       </el-table-column>
       <el-table-column
@@ -79,10 +85,15 @@
       <el-table-column
         header-align="center"
         align="center"
-        width="80"
         label="操作">
         <template slot-scope="scope">
-          <el-button type="text" size="small" @click="orderDetailHandle(scope.row.code)">查看</el-button>
+          <el-button type="text"
+                     size="small"
+                     v-if="scope.row.status === 'UNDELIVERED' || scope.row.status === 'PARTIAL_DELIVERED'"
+                     @click="deliverGoodsHandle(scope.row.code, scope.row.merchantId)">发货</el-button>
+          <el-button type="text"
+                     size="small"
+                     @click="orderDetailHandle(scope.row.code)">查看</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -95,13 +106,16 @@
       :total="totalPage"
       layout="total, sizes, prev, pager, next, jumper">
     </el-pagination>
-    <!-- 弹窗, 新增 / 修改 -->
+    <!-- 弹窗, 订单详情 -->
     <order-detail v-if="orderDetailVisible" ref="orderDetail" @refreshDataList="getDataList"></order-detail>
+    <!-- 弹窗, 发货 -->
+    <deliver-goods v-if="deliverGoodsVisible" ref="deliverGoods" @refreshDataList="getDataList"></deliver-goods>
   </div>
 </template>
 
 <script>
 import OrderDetail from './order-detail'
+import DeliverGoods from './deliver-goods'
 import { getOrderList } from "../../api/mall-order/order";
 
 export default {
@@ -118,11 +132,13 @@ export default {
       userType: 0,
       dataListLoading: false,
       dataListSelections: [],
-      orderDetailVisible: false
+      orderDetailVisible: false, //订单详情页面弹窗
+      deliverGoodsVisible: false //发货页面弹窗
     }
   },
   components: {
-    OrderDetail
+    OrderDetail,
+    DeliverGoods
   },
   activated () {
     this.getDataList()
@@ -165,11 +181,19 @@ export default {
       this.dataListSelections = val
     },
 
-    // 新增 / 修改
+    // 订单详情
     orderDetailHandle (code) {
       this.orderDetailVisible = true
       this.$nextTick(() => {
         this.$refs.orderDetail.init(code)
+      })
+    },
+
+    // 发货
+    deliverGoodsHandle (code, merchantId) {
+      this.deliverGoodsVisible = true
+      this.$nextTick(() => {
+        this.$refs.deliverGoods.init(code, merchantId)
       })
     },
 
@@ -193,10 +217,10 @@ export default {
       }
       if (row.status == 'UNPAID') {
         return "待付款";
-      } else if (row.status == 'PAID') {
-        return "已付款";
       } else if (row.status == 'UNDELIVERED') {
         return "待发货";
+      } else if (row.status == 'PARTIAL_DELIVERED') {
+        return "部分发货";
       } else if (row.status == 'DELIVERED') {
         return "已发货";
       } else if (row.status == 'FINISHED') {

@@ -2,7 +2,7 @@ import request from '@/utils/httpRequest'
 const prefix = "/mall-admin";
 
 /**
- * 物流公司列表
+ * 物流公司列表（分页）
  */
 export function getLogisticsCompanyList(params) {
   return request({
@@ -13,11 +13,22 @@ export function getLogisticsCompanyList(params) {
 }
 
 /**
- * 物流公司列表（带enable）
+ * 物流公司列表（分页）（带enable）
  */
 export function getListWithExpressSetting(params) {
   return request({
     url: prefix+'/logistics/company/listWithExpressSetting',
+    method: 'get',
+    params: params
+  })
+}
+
+/**
+ * 物流公司列表（不分页）（带enable）
+ */
+export function listAll(params) {
+  return request({
+    url: prefix+'/logistics/company/listAll',
     method: 'get',
     params: params
   })
